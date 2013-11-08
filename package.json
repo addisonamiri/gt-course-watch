@@ -1,0 +1,14 @@
+{
+	"name": "GTCourseWatch",
+	"description": "gt course watcher",
+	"version": "0.0.1",
+	"dependencies": {
+		"express": "latest",
+		"hbs":"latest",
+		"nodemailer": "latest",
+		"mongoose" : "latest",
+		"socket.io" : "latest",
+		"cheerio" : "latest",
+		"request" : "latest"
+	}
+}
