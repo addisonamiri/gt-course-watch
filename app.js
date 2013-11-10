@@ -15,9 +15,9 @@ var Poller = require('./Poller.js');
 var basePath = "/pls/bprod/bwckschd.p_disp_detail_sched?term_in=201402&crn_in=";
 var mailerEmail = "tofubeast1111@gmail.com";
 var mailerPass = "Vikram888";
-var mongoConnectionUrl = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/gtcw';
+var mongoConnectionUrl = 'mongodb://localhost/gtcw';
 
-server.listen(process.env.PORT || 4000);
+server.listen(process.env.PORT || 8080);
 
 //*INITIALIZE CUSTOM MODULES
 
