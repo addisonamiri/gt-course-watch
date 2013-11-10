@@ -8,11 +8,14 @@ var MongoController = require('./MongoController.js');
 var Mailer = require('./Mailer.js');
 var Poller = require('./Poller.js');
 
+//AWS Pub DNS
+//http://ec2-54-234-151-220.compute-1.amazonaws.com
+
 //*CONFIG
 var basePath = "/pls/bprod/bwckschd.p_disp_detail_sched?term_in=201402&crn_in=";
 var mailerEmail = "tofubeast1111@gmail.com";
 var mailerPass = "Vikram888";
-var mongoConnectionUrl = 'mongodb://localhost/gtcw';
+var mongoConnectionUrl = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/gtcw';
 
 server.listen(process.env.PORT || 4000);
 
@@ -50,6 +53,8 @@ app.get('/about', function(req, res) {
 //*WEBSOCKET HANDLING
 
 // socketio.disable('heartbeats');
+//socketio.set('transports', ['xhr-polling']);
+
 socketio.sockets.on('connection', socketHandler);
 
 function socketHandler(socket){

@@ -4,6 +4,14 @@ gt course watcher written in node.js with mongodb back end.
 
 allows users to make course watch requests and be notified at the email they provide upon open slot.
 
+to run a local instance, do:
+
+node app.js
+
+to run the start forever script do:
+chmod +x ./start
+./start
+
 running list of things this project has helped me learn:
 
 using websockets
