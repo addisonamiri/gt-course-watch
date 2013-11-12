@@ -18,13 +18,26 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 
 		for (requestIdx in requestPool) {
 			var currRequest = requestPool[requestIdx];
-			self.scrapeSeats(currRequest);
+			self.scrapeSeats(currRequest, false);
 		}
 
 	});
+
+	this.mongoController.smsRequest.find(function(err, requestPool){
+		if(err){
+			console.log(err)
+		}
+
+		for (requestIdx in requestPool) {
+			var currSMSRequest = requestPool[requestIdx];
+			self.scrapeSeats(currSMSRequest, true);
+		}
+
+	});
+
 }
 
-Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest){
+Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest){
 
 	var self = this;
 
@@ -56,7 +69,7 @@ Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest){
 		    $('.dddefault').each(function(i){
 		    	if(i==3){
 		    		var remainingSeats = parseInt($(this).text().trim());
-		    		self.checkSeats(remainingSeats, existingRequest);
+		    		self.checkSeats(remainingSeats, existingRequest, smsRequest);
 		    	}
 		    });
 
@@ -72,10 +85,10 @@ Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest){
 
 }
 
-Poller.prototype.checkSeats = function checkSeats(numSeats, existingRequest){
+Poller.prototype.checkSeats = function checkSeats(numSeats, existingRequest, smsRequest){
 	if(numSeats > 0){
 		// console.log('there is a seat open! ' + numSeats);
-		this.mailer.sendMail(existingRequest);
+		this.mailer.sendMail(existingRequest, smsRequest);
 		existingRequest.remove();
 	}else{
 		// console.log('there are no seats open currently' + numSeats);

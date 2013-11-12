@@ -62,8 +62,17 @@ function socketHandler(socket){
 
 	socket.on('makeRequest', function(data){
 		myMongoController.createRequest(data.crn, data.email);
+		myMailer.sendConfirmationMail(data.email, data.crn,false)
 		console.log(data.email);
 		console.log(data.crn);
+	});
+
+	socket.on('makeSMSRequest', function(data){
+		myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber);
+		myMailer.sendConfirmationMail(data.email, data.crn, true)
+		console.log(data.email);
+		console.log(data.crn);
+		console.log(data.gatewayedNumber);
 	});
 }
 

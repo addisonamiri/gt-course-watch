@@ -9,73 +9,25 @@ Published: {{published}}
 {{/each}}
  -->
 
-<script>
-	
-
-var socket = io.connect(window.location.hostname);
-socket.on('connect_success', function (data) {
-	console.log(data);
-});
-
-$(document).ready(function(){
-	//validation
-
-	$(".alert").hide();
-
-	$("#send_request").click(function(){
-		var errorCount = 0;
-
-		var crnInput = $('#inputCRN').val();
-		var emailInput = $('#inputEmail').val();
-
-		if(!isEmail(emailInput)){
-			$('#email_alert').show();
-			errorCount++;
-		}else{
-			$('#email_alert').hide();
-		}
-
-		if(!isCRN(crnInput)){
-			$('#crn_alert').show();
-			errorCount++;
-		}else{
-			$('#crn_alert').hide();
-		}
-
-		if(!errorCount){
-			$(".alert").hide();
-			$("#success_alert").show();
-			socket.emit('makeRequest', { email: emailInput, crn: crnInput});
-		}
-
-	});
-
-});
-
-
-function isEmail(email) {
-	var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-	return regex.test(email);
-}
-
-function isCRN(crn){
-	var regex = /\b\d{5}\b/g;
-	return regex.test(crn)
-}
-
-</script>
-
-
 <div id = "email_alert" class="alert alert-danger">
   <button type="button" class="close" data-dismiss="alert">&times;</button>
-  Invalid email x.x
+  Invalid email
 </div>
 
 <div id = "crn_alert" class="alert alert-danger">
   <button type="button" class="close" data-dismiss="alert">&times;</button>
-  Invalid crn x.x
+  Invalid crn
 </div>
 
+<div id = "phone_alert" class="alert alert-danger">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  Invalid phone number
+</div>	
+
+<div id = "duplicate_alert" class="alert alert-danger">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  Duplicate request, please do not flood the database
+</div>	
 
 <div id = "success_alert" class="alert alert-success">
   <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -83,11 +35,42 @@ function isCRN(crn){
 </div>
 
 <form>
-<label for="inputEmail">Email </label>
-<input type="text" class="form-control" id="inputEmail" placeholder="Whats your email?">
+	<label for="inputEmail">Email </label>
+	<input type="text" class="form-control" id="inputEmail" placeholder="Whats your email?">
 
-<label for="inputCRN">CRN </label>
-<input type="text" class="form-control" id="inputCRN" placeholder="Whats the CRN?">
+	<label for="inputCRN">CRN </label>
+	<input type="text" class="form-control" id="inputCRN" placeholder="Whats the CRN?">
+
+	<form class="form-control" id="phoneSupportForm">
+		<p> Do you want to be texted? </p>
+		<div>
+		<label for="phoneSupportYes" class="radio inline control-label">
+		<input type="radio" id="phoneSupportYes" name="phoneSupport" value="yes"/>
+		Yes</label>
+
+		<label for="phoneSupportNo" class="radio inline control-label">
+		<input type="radio" id="phoneSupportNo" name="phoneSupport" value="no"/>
+		No</label>
+		</div>
+	</form>
+
+	<div id="sms_stuff" style="display: none;">
+		<label for="serviceProvider">Service Provider</label>
+		<select id="serviceProvider" class="form-control">
+		  <option value="att">AT&T</option>
+		  <option value="verizon">Verizon</option>
+		  <option value="sprint">Sprint</option>
+		  <option value="tmobile">T-Mobile</option>
+		  <option value="virginmobile">Virgin Mobile</option>		  
+		  <option value="metropcs">Metro PCS</option>
+		  <option value="alltel">Alltel</option>
+		  <option value="boost">Boost Mobile</option>
+		</select>
+
+		<label for="inputPhoneNum">Phone Number</label>
+		<input type="text" class="form-control" id="inputPhoneNum" placeholder="Whats your number?">		
+	</div>
+
 
 </form>
 
