@@ -138,8 +138,8 @@ function checkDuplicateRequest(req1, req2){
 
 function formatPhoneNumber(number){
 	var toReturn = number.replace("-", "");
-	toReturn = number.replace(".", "");
-	toReturn = number.replace(" ", "");
+	toReturn = toReturn.replace(".", "");
+	toReturn = toReturn.replace(" ", "");
 	return toReturn;
 }
 
