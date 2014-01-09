@@ -37,50 +37,56 @@
 		{{/each}}
 		 -->
 
-	<form>
-	<!-- 			<label for="inputEmail">Email </label>
-	-->			
+	<div class="formCenter">
+		<form>
+		<!-- 			<label for="inputEmail">Email </label>
+		-->			
 
 			<input type="text" class="form-control" id="inputEmail" placeholder="Whats your email?">
 
-	<!-- 			<label for="inputCRN">CRN </label>
-	-->			
-		<input type="text" class="form-control" id="inputCRN" placeholder="Whats the CRN?">
+		<!-- 			<label for="inputCRN">CRN </label>
+		-->			
+			<input type="text" class="form-control" id="inputCRN" placeholder="Whats the CRN?">
 
-		<form class="form-control" id="phoneSupportForm">
-			<p> Do you want to be texted? </p>
-			<div>
-			<label for="phoneSupportYes" class="radio inline control-label">
-			<input type="radio" id="phoneSupportYes" name="phoneSupport" value="yes"/>
-			Yes</label>
+			<form class="form-control" id="phoneSupportForm">
+				<p> Do you want to be texted? </p>
+				<div>
+				<label for="phoneSupportYes" class="radio inline control-label">
+				<input type="radio" id="phoneSupportYes" name="phoneSupport" value="yes"/>
+				Yes</label>
 
-			<label for="phoneSupportNo" class="radio inline control-label">
-			<input type="radio" id="phoneSupportNo" name="phoneSupport" value="no"/>
-			No</label>
+				<label for="phoneSupportNo" class="radio inline control-label">
+				<input type="radio" id="phoneSupportNo" name="phoneSupport" value="no"/>
+				No</label>
+				</div>
+			</form>
+
+			<div id="sms_stuff" style="display: none;">
+				<label for="serviceProvider">Choose Your Service Provider:</label>
+				<select id="serviceProvider" class="form-control">
+				  <option value="att">AT&T</option>
+				  <option value="verizon">Verizon</option>
+				  <option value="sprint">Sprint</option>
+				  <option value="tmobile">T-Mobile</option>
+				  <option value="virginmobile">Virgin Mobile</option>		  
+				  <option value="metropcs">Metro PCS</option>
+				  <option value="alltel">Alltel</option>
+				  <option value="boost">Boost Mobile</option>
+				</select>
+
+	<!-- 			<label for="inputPhoneNum">Phone Number</label>
+	 -->			
+				<input type="text" class="form-control" id="inputPhoneNum" placeholder="Whats your number?">		
 			</div>
+
 		</form>
 
-		<div id="sms_stuff" style="display: none;">
-			<label for="serviceProvider">Service Provider</label>
-			<select id="serviceProvider" class="form-control">
-			  <option value="att">AT&T</option>
-			  <option value="verizon">Verizon</option>
-			  <option value="sprint">Sprint</option>
-			  <option value="tmobile">T-Mobile</option>
-			  <option value="virginmobile">Virgin Mobile</option>		  
-			  <option value="metropcs">Metro PCS</option>
-			  <option value="alltel">Alltel</option>
-			  <option value="boost">Boost Mobile</option>
-			</select>
-
-			<label for="inputPhoneNum">Phone Number</label>
-			<input type="text" class="form-control" id="inputPhoneNum" placeholder="Whats your number?">		
+		<div class="btnCenter">
+			<button id= "send_request" class="btn btn-primary">Request</button>
+			<button id="makeAnother" class="btn btn-info">Make Another</button>
 		</div>
-
-	</form>
-
-	<button id= "send_request" class="btn btn-primary">Request</button>
-	<button id="makeAnother" class="btn btn-info">Make Another</button>
+	
+	</div>
 
 </div>
 
