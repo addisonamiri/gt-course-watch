@@ -19,3 +19,10 @@ div.center
   margin-left: auto;
   margin-right: auto;	
 }
+
+.smsCenter{
+  width: 85%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto; 
+}

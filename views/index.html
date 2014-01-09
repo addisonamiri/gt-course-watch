@@ -41,25 +41,28 @@
 		<form>
 		<!-- 			<label for="inputEmail">Email </label>
 		-->			
-
 			<input type="text" class="form-control" id="inputEmail" placeholder="Whats your email?">
 
 		<!-- 			<label for="inputCRN">CRN </label>
 		-->			
 			<input type="text" class="form-control" id="inputCRN" placeholder="Whats the CRN?">
 
-			<form class="form-control" id="phoneSupportForm">
-				<p> Do you want to be texted? </p>
-				<div>
-				<label for="phoneSupportYes" class="radio inline control-label">
-				<input type="radio" id="phoneSupportYes" name="phoneSupport" value="yes"/>
-				Yes</label>
+			<div class="smsCenter">
 
-				<label for="phoneSupportNo" class="radio inline control-label">
-				<input type="radio" id="phoneSupportNo" name="phoneSupport" value="no"/>
-				No</label>
-				</div>
-			</form>
+				<form class="form-control" id="phoneSupportForm">
+					<p> Do you want to be texted? </p>
+					<div>
+					<label for="phoneSupportYes" class="radio inline control-label">
+					<input type="radio" id="phoneSupportYes" name="phoneSupport" value="yes"/>
+					Yes</label>
+
+					<label for="phoneSupportNo" class="radio inline control-label">
+					<input type="radio" id="phoneSupportNo" name="phoneSupport" value="no"/>
+					No</label>
+					</div>
+				</form>
+
+			</div>
 
 			<div id="sms_stuff" style="display: none;">
 				<label for="serviceProvider">Choose Your Service Provider:</label>
@@ -79,12 +82,13 @@
 				<input type="text" class="form-control" id="inputPhoneNum" placeholder="Whats your number?">		
 			</div>
 
-		</form>
+			</form>
+
 
 		<div class="btnCenter">
 			<button id= "send_request" class="btn btn-primary">Request</button>
 			<button id="makeAnother" class="btn btn-info">Make Another</button>
-		</div>
+		</div> <!--form center -->
 	
 	</div>
 
