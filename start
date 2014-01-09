@@ -1,4 +1,5 @@
 sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to 8080
+sudo npm install
 
 sudo mkdir -p /data
 sudo chown $(whoami) /data
