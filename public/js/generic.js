@@ -1,4 +1,5 @@
 var socket = io.connect(window.location.hostname);
+
 socket.on('connect_success', function (data) {
 	console.log(data);
 });
@@ -15,6 +16,11 @@ $(document).ready(function(){
 	//validation
 
 	$(".alert").hide();
+	$("#makeAnother").hide();
+
+	$("#makeAnother").click(function(){
+		window.location.replace("/");		
+	});
 
 	$("#send_request").click(function(){
 		var errorCount = 0;
@@ -49,7 +55,6 @@ $(document).ready(function(){
 
 		if(!errorCount && !smsEnabled){
 			$(".alert").hide();
-			$("#success_alert").show();
 
 			var currentRequest = {
 				"crn" : crnInput,
@@ -61,6 +66,9 @@ $(document).ready(function(){
 				$("#duplicate_alert").show();
 			}else{
 				$("#duplicate_alert").hide();
+				$("#success_alert").show();
+				$("#send_request").hide();
+				$("#makeAnother").show();
 				submittedRequest = currentRequest;
 				socket.emit('makeRequest', { email: emailInput, crn: crnInput});
 			}
@@ -68,7 +76,6 @@ $(document).ready(function(){
 
 		}else if(!errorCount && smsEnabled){
 			$(".alert").hide();
-			$("#success_alert").show();
 
 			var gatewayedInput = "";			
 			var serviceProvider = $("#serviceProvider").val();
@@ -104,6 +111,9 @@ $(document).ready(function(){
 				$("#duplicate_alert").show();
 			}else{
 				$("#duplicate_alert").hide();
+				$("#success_alert").show();
+				$("#send_request").hide();
+				$("#makeAnother").show();
 				submittedRequest = currentRequest;
 				socket.emit('makeSMSRequest', { email: emailInput, crn: crnInput, gatewayedNumber: gatewayedInput});
 			}
@@ -138,8 +148,8 @@ function checkDuplicateRequest(req1, req2){
 
 function formatPhoneNumber(number){
 	var toReturn = number.replace("-", "");
-	toReturn = number.replace(".", "");
-	toReturn = number.replace(" ", "");
+	toReturn = toReturn.replace(".", "");
+	toReturn = toReturn.replace(" ", "");
 	return toReturn;
 }
 

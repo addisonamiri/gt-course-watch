@@ -1,0 +1,28 @@
+div.center
+{
+  width: 400px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.formCenter{
+  width: 90%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btnCenter{
+  width: 75%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;	
+}
+
+.smsCenter{
+  width: 85%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto; 
+}

@@ -24,7 +24,7 @@ Mailer.prototype.sendMail = function sendMail(existingRequest, smsRequest){
 	    from: "GT Course Watch Mailer ✔ <"+ this.emailID +">", // sender address
 	    to: existingRequest.email, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
 	    subject: "Seat Open for Class: " + existingRequest.crn, // Subject line
-	    text: "Rapido! " + "https://buzzport.gatech.edu/cp/home/displaylogin", // plaintext body
+	    text: "Registration Link: " + "https://buzzport.gatech.edu/cp/home/displaylogin", // plaintext body
 	    // html: "<b>Hello world ✔</b>" // html body
 	}
 
@@ -49,7 +49,7 @@ Mailer.prototype.sendMail = function sendMail(existingRequest, smsRequest){
 		    from: "GT Course Watch Mailer ✔ <"+ this.emailID +">", // sender address
 		    to: existingRequest.gatewayedNumber, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
 		    subject: "Seat Open for Class: " + existingRequest.crn, // Subject line
-		    text: "Rapido! "+ "https://buzzport.gatech.edu/cp/home/displaylogin", // plaintext body
+		    text: "Registration Link: "+ "https://buzzport.gatech.edu/cp/home/displaylogin", // plaintext body
 		    // html: "<b>Hello world ✔</b>" // html body
 		}
 
@@ -68,12 +68,7 @@ Mailer.prototype.sendMail = function sendMail(existingRequest, smsRequest){
 
 Mailer.prototype.sendConfirmationMail = function sendConfirmationMail(requestEmail, requestCRN, smsRequest){
 
-	var bodyText = "Hey, this is just a confirmation message letting you know that " +
-	    "your request has indeed been received, and you will be emailed at this email address " +
-	    "when a slot is open for your class.\n\n" +
-	    "You will also be texted at the number you provided if you signed up for " +
-	    "text notifications.\n\n" +
-	    "Your Requested Class: " + requestCRN + 
+	    var bodyText="Your Requested Class: " + requestCRN + 
 	    "\nSigned up for SMS notification: " + 
 	    (smsRequest ? "yes" : "no") + 
 	    "\n\nThank you for using my service!";
