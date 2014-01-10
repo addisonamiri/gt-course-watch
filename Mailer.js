@@ -71,7 +71,7 @@ Mailer.prototype.sendConfirmationMail = function sendConfirmationMail(requestEma
 	var bodyText = "Hey, this is just a confirmation message letting you know that " +
 	    "your request has indeed been received, and you will be emailed at this email address " +
 	    "when a slot is open for your class.\n\n" +
-	    "You will also be texted at the number you provided if you signed up for" +
+	    "You will also be texted at the number you provided if you signed up for " +
 	    "text notifications.\n\n" +
 	    "Your Requested Class: " + requestCRN + 
 	    "\nSigned up for SMS notification: " + 
