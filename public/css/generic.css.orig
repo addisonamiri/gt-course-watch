@@ -1,20 +1,32 @@
-div.center
+/*div.center
 {
   width: 400px;
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
+<<<<<<< HEAD
+*/
+/*.formCenter{
+  width: 90%;
+=======
 
 .formCenter{
   width: 80%;
+>>>>>>> 11209d8b26bbb7a790c59713a5f02fdbaf8a684b
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
+<<<<<<< HEAD
+*/
+/*.btnCenter{
+  width: 75%;
+=======
 
 .btnCenter{
   width: 70%;
+>>>>>>> 11209d8b26bbb7a790c59713a5f02fdbaf8a684b
   display: block;
   margin-left: auto;
   margin-right: auto;	
@@ -26,4 +38,4 @@ div.center
   margin-left: auto;
   margin-right: auto; 
 }
-
+*/
