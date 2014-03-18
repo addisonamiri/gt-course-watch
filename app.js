@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-var socketio = require('socket.io').listen(server);
+var io = require('socket.io').listen(server);
 var hbs = require('hbs');
 
 var MongoController = require('./MongoController.js');
@@ -52,10 +52,10 @@ app.get('/about', function(req, res) {
 
 //*WEBSOCKET HANDLING
 
-// socketio.disable('heartbeats');
-//socketio.set('transports', ['xhr-polling']);
+// io.disable('heartbeats');
+//io.set('transports', ['xhr-polling']);
 
-socketio.sockets.on('connection', socketHandler);
+io.sockets.on('connection', socketHandler);
 
 function socketHandler(socket){
 	socket.emit('connect_success', {hello:'world'});
