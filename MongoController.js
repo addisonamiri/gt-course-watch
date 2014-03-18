@@ -16,13 +16,15 @@ function MongoController(url){
 
 	this.requestSchema = mongoose.Schema({
 		crn: String,
-		email: String
+		email: String,
+		term: String
 	});
 
 	this.smsRequestSchema = mongoose.Schema({
 		crn: String,
 		email: String,
-		gatewayedNumber: String
+		gatewayedNumber: String,
+		term: String
 	});
 
 	this.Request = mongoose.model('Request', this.requestSchema);
@@ -34,8 +36,8 @@ function MongoController(url){
 }
 
 //STANDARD REQUEST
-MongoController.prototype.createRequest = function createRequest(crnInput, emailInput){
-	var newRequest = new this.Request({crn:crnInput,email:emailInput});
+MongoController.prototype.createRequest = function createRequest(crnInput, emailInput, termInput){
+	var newRequest = new this.Request({crn:crnInput,email:emailInput,term:termInput});
 	newRequest.save(function(err, newRequest){
 		if(err){
 			console.log('save error:' + err);
@@ -44,9 +46,9 @@ MongoController.prototype.createRequest = function createRequest(crnInput, email
 }
 
 //SMS REQUEST (same as standard with added sms capability)
-MongoController.prototype.createSMSRequest = function createSMSRequest(crnInput, emailInput, gatewayedInput){
+MongoController.prototype.createSMSRequest = function createSMSRequest(crnInput, emailInput, gatewayedInput, termInput){
 	var newSMSRequest = new this.smsRequest({crn:crnInput,email:emailInput,
-		gatewayedNumber:gatewayedInput});
+		gatewayedNumber:gatewayedInput, term:termInput});
 	
 	newSMSRequest.save(function(err, newSMSRequest){
 		if(err){

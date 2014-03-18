@@ -1,17 +1,18 @@
 var https = require('https');
 var cheerio = require('cheerio');
 
-function Poller(mongoController, mailer, basePath){
+function Poller(mongoController, mailer, basePath, term){
 	this.mongoController = mongoController;
 	this.mailer = mailer;
 	this.basePath = basePath;
+	this.term = term;
 }
 
 Poller.prototype.pollAllSeats = function pollAllSeats(){
 	console.log("polling...");
 	var self = this;
 
-	this.mongoController.Request.find(function(err, requestPool){
+	this.mongoController.Request.find({term:self.term}, function(err, requestPool){
 		if(err){
 			console.log(err);
 		}
@@ -23,7 +24,7 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 
 	});
 
-	this.mongoController.smsRequest.find(function(err, requestPool){
+	this.mongoController.smsRequest.find({term:self.term}, function(err, requestPool){
 		if(err){
 			console.log(err)
 		}

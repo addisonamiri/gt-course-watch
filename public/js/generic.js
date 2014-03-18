@@ -28,6 +28,8 @@ $(document).ready(function(){
 		var crnInput = $('#inputCRN').val();
 		var emailInput = $('#inputEmail').val();
 		var phoneInput = $('#inputPhoneNum').val();
+		var term = $("#selectTerm").val();
+
 
 		if(!isEmail(emailInput)){
 			$('#email_alert').show();
@@ -70,7 +72,7 @@ $(document).ready(function(){
 				$("#send_request").hide();
 				$("#makeAnother").show();
 				submittedRequest = currentRequest;
-				socket.emit('makeRequest', { email: emailInput, crn: crnInput});
+				socket.emit('makeRequest', { email: emailInput, crn: crnInput, term: term});
 			}
 
 
@@ -115,7 +117,7 @@ $(document).ready(function(){
 				$("#send_request").hide();
 				$("#makeAnother").show();
 				submittedRequest = currentRequest;
-				socket.emit('makeSMSRequest', { email: emailInput, crn: crnInput, gatewayedNumber: gatewayedInput});
+				socket.emit('makeSMSRequest', { email: emailInput, crn: crnInput, gatewayedNumber: gatewayedInput, term:term});
 			}
 
 		}
