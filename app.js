@@ -40,9 +40,6 @@ var springBasePath = null;
 var springTerm = null;
 var springPoller = new Poller(myMongoController, myMailer, springBasePath, springTerm);
 
-
-//input term, scheduling jobs.
-
 var pollerTerms = {spring:springTerm, fall:fallTerm, summer:summerTerm};
 var pollers = {spring:springPoller, summer:summerPoller, fall:fallPoller};
 
