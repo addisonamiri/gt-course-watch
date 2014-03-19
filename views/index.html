@@ -27,9 +27,11 @@
 
 
 <div class="center">
-	<h1>Updated (3/19/2014)</h1>
+	<h1>Make a Request</h1>
 	<div>
-		<h5><a href="http://www.gtcoursewatch.us"> gtcoursewatch.us </a> -- make a request</h5>
+		<h5><a href="http://www.gtcoursewatch.us"> gtcoursewatch.us </a></h5>
+		<h6>This site will automatically update and be ready when a new term comes around.</h6>
+		<h6>After you make a request, the server will poll for its status every 2 mins.</h6>
 
 	</div>
 
@@ -47,13 +49,13 @@
 			<label for="selectTerm">Term:</label>
 			<select id="selectTerm" class="form-control">
 				{{#if fall}}
-					<option value="{{fall}}">Fall 2014</option>
+					<option value="{{fall}}">{{fallLabel}}</option>
 				{{/if}}
 				{{#if spring}}
-					<option value="{{spring}}">Spring 2014</option>
+					<option value="{{spring}}">{{springLabel}}</option>
 				{{/if}}
 				{{#if summer}}
-					<option value="{{summer}}">Summer 2014</option>
+					<option value="{{summer}}">{{summerLabel}}</option>
 				{{/if}}
 			</select>
 

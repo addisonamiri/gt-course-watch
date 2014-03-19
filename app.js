@@ -12,7 +12,6 @@ var Poller = require('./Poller.js');
 //http://ec2-54-234-151-220.compute-1.amazonaws.com
 
 //*CONFIG
-var basePath = null;
 var mailerEmail = "tofubeast1111@gmail.com";
 var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
@@ -21,27 +20,26 @@ server.listen(process.env.PORT || 8080);
 
 //*CONSTANTS
 var millisInSecond = 1000;
+var millisInMinute = millisInSecond*60;
+var millisInHour = millisInMinute*60;
+var millisInDay = millisInHour*24;
 
 //*INITIALIZE CUSTOM MODULES
 var myMailer = new Mailer(mailerEmail, mailerPass);
 var myMongoController = new MongoController(mongoConnectionUrl);
-var myPoller = new Poller(myMongoController, myMailer, basePath); 
 
+var springPoller, fallPoller, summerPoller; //pollers
+var pollers; //collection of json objects
 
-var summerBasePath = '/pls/bprod/bwckschd.p_disp_detail_sched?term_in=201405&crn_in='; 
-var summerTerm = "summer2014";
-var summerPoller = new Poller(myMongoController, myMailer, summerBasePath, summerTerm);
+var springTerm, fallTerm, summerTerm; //string ids of current terms, also used to tell which terms to poll
 
-var fallBasePath = '/pls/bprod/bwckschd.p_disp_detail_sched?term_in=201408&crn_in=';
-var fallTerm = "fall2014";
-var fallPoller = new Poller(myMongoController, myMailer, fallBasePath, fallTerm);
+var rejectRequests = false;
 
-var springBasePath = null;
-var springTerm = null;
-var springPoller = new Poller(myMongoController, myMailer, springBasePath, springTerm);
+initPollers();
 
-var pollerTerms = {spring:springTerm, fall:fallTerm, summer:summerTerm};
-var pollers = {spring:springPoller, summer:summerPoller, fall:fallPoller};
+console.log('Spring Null? ' + (pollers['spring']==null).toString());
+console.log('Fall Null? ' + (pollers['fall']==null).toString());
+console.log('Summer Null? ' + (pollers['summer']==null).toString());
 
 //*ROUTING
 
@@ -52,10 +50,19 @@ app.use(express.bodyParser());
 app.use(express.static('public'));
 
 app.get('/', function(req, res) {
+	var springLabel, summerLabel, fallLabel;
+
+	if(springTerm) springLabel = createLabel(springTerm);
+	if(summerTerm) summerLabel = createLabel(summerTerm);
+	if(fallTerm) fallLabel = createLabel(fallTerm);
+
 	res.render('index',{title:"Home", 
 						spring:springTerm, 
 						summer:summerTerm, 
-						fall:fallTerm});
+						fall:fallTerm,
+						springLabel: springLabel,
+						summerLabel: summerLabel,
+						fallLabel: fallLabel});
 });
 
 app.get('/about', function(req, res) {
@@ -67,7 +74,10 @@ app.get('/about', function(req, res) {
 // io.disable('heartbeats');
 //io.set('transports', ['xhr-polling']);
 
-io.sockets.on('connection', socketHandler);
+
+if(!rejectRequests){
+	io.sockets.on('connection', socketHandler);
+}
 
 function socketHandler(socket){
 	socket.emit('connect_success', {hello:'world'});
@@ -75,27 +85,84 @@ function socketHandler(socket){
 	socket.on('makeRequest', function(data){
 		myMongoController.createRequest(data.crn, data.email, data.term);
 		myMailer.sendConfirmationMail(data.email, data.crn, false)
-		console.log(data.term);
 	});
 
 	socket.on('makeSMSRequest', function(data){
 		myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber, data.term);
 		myMailer.sendConfirmationMail(data.email, data.crn, true)
-		console.log(data.term);
 	});
 }
 
+function initPollers(){
+	var d = new Date();
+	var pathComponents= ['/pls/bprod/bwckschd.p_disp_detail_sched?term_in=','4digityear','2digitmonth','&crn_in='];
+	var month = d.getMonth();
+	var year; //can't initalize due to spring edge cases
 
+	console.log('init pollers, for date:' + d );
+
+	if(month>=9 || month<=0){
+		//spring registration
+		fallTerm = summerTerm = null;
+
+		if(month == 0) year = pathComponents[1] = d.getFullYear();
+		else year = pathComponents[1] = d.getFullYear()+1;
+
+		springTerm = 'spring'+ year.toString();
+		pathComponents[2] = '02';
+		var springBasePath = pathComponents.join('');
+		springPoller = new Poller(myMongoController, myMailer, springBasePath, springTerm);
+
+		summerPoller = fallPoller = summerTerm = fallTerm = null;
+		rejectRequests = false;
+	}else if(month>=2 && month<=7){
+		//summer and fall
+		year = pathComponents[1] = d.getFullYear();
+
+		fallTerm = 'fall' + year.toString();
+		pathComponents[2] = '08';
+		var fallBasePath = pathComponents.join('');
+		fallPoller = new Poller(myMongoController, myMailer, fallBasePath, fallTerm);
+
+		summerTerm = 'summer' + year.toString();
+		pathComponents[2] = '05';
+		var summerBasePath = pathComponents.join('');
+		summerPoller = new Poller(myMongoController, myMailer, summerBasePath, summerTerm);
+
+		springPoller = springTerm = null;
+		rejectRequests = false;
+	}else{
+		rejectRequests = true;
+	}
+
+	pollers = {spring:springPoller, summer:summerPoller, fall:fallPoller};
+}
+
+function createLabel(term){
+	var length = term.length;
+	var year = term.slice(length-4,length);
+	var season = term.slice(0,length-4);
+	season = capitalizeFirstLetter(season);
+	return season + " " + year;
+}
+
+function capitalizeFirstLetter(string){
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 //*SCHEDULED JOBS
 
+//re-init pollers every day in the event of new term
 setInterval(function(){
+	initPollers();
+}, millisInDay)
 
+//polling job
+setInterval(function(){
 	for (var key in pollers) {
 		if (pollers.hasOwnProperty(key)) {
 			//alert(key + " -> " + p[key]);
-			if(pollerTerms[key] != null) pollers[key].pollAllSeats();
+			if(pollers[key]) pollers[key].pollAllSeats();
 		}
 	}
-
-},millisInSecond*60);
+}, 2*millisInMinute);
