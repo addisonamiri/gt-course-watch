@@ -28,7 +28,7 @@ var myMongoController = new MongoController(mongoConnectionUrl);
 var myPoller = new Poller(myMongoController, myMailer, basePath); 
 
 
-var summerBasePath = 'pls/bprod/bwckschd.p_disp_detail_sched?term_in=201405&crn_in='; 
+var summerBasePath = '/pls/bprod/bwckschd.p_disp_detail_sched?term_in=201405&crn_in='; 
 var summerTerm = "summer2014";
 var summerPoller = new Poller(myMongoController, myMailer, summerBasePath, summerTerm);
 
@@ -43,7 +43,7 @@ var springPoller = new Poller(myMongoController, myMailer, springBasePath, sprin
 
 //input term, scheduling jobs.
 
-var pollerStatuses = {spring:springTerm, fall:fallTerm, summer:summerTerm};
+var pollerTerms = {spring:springTerm, fall:fallTerm, summer:summerTerm};
 var pollers = {spring:springPoller, summer:summerPoller, fall:fallPoller};
 
 //*ROUTING
@@ -94,7 +94,7 @@ setInterval(function(){
 	for (var key in pollers) {
 		if (pollers.hasOwnProperty(key)) {
 			//alert(key + " -> " + p[key]);
-			if(pollerStatuses[key] != null) pollers[key].pollAllSeats();
+			if(pollerTerms[key] != null) pollers[key].pollAllSeats();
 		}
 	}
 

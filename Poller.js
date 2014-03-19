@@ -9,7 +9,6 @@ function Poller(mongoController, mailer, basePath, term){
 }
 
 Poller.prototype.pollAllSeats = function pollAllSeats(){
-	console.log("polling...");
 	var self = this;
 
 	this.mongoController.Request.find({term:self.term}, function(err, requestPool){
@@ -17,9 +16,9 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 			console.log(err);
 		}
 
+
 		for (requestIdx in requestPool) {
-			var currRequest = requestPool[requestIdx];
-			self.scrapeSeats(currRequest, false);
+			self.scrapeSeats(requestPool[requestIdx], false);
 		}
 
 	});
@@ -30,12 +29,11 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 		}
 
 		for (requestIdx in requestPool) {
-			var currSMSRequest = requestPool[requestIdx];
-			self.scrapeSeats(currSMSRequest, true);
+			self.scrapeSeats(requestPool[requestIdx], true);
 		}
 
 	});
-
+	
 }
 
 Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest){
@@ -53,6 +51,7 @@ Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest)
 	var req = https.request(options, function(res) {
 	  // console.log("statusCode: ", res.statusCode);
 	  // console.log("headers: ", res.headers);
+
 		var body = [];
 	    res.setEncoding('utf8');
 
