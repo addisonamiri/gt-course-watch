@@ -55,11 +55,14 @@ app.use(express.bodyParser());
 app.use(express.static('public'));
 
 app.get('/', function(req, res) {
-	res.render('index',{title:"Home"});
+	res.render('index',{title:"Home", 
+						spring:springTerm, 
+						summer:summerTerm, 
+						fall:fallTerm});
 });
 
 app.get('/about', function(req, res) {
-	res.render('about', {title:"About"});
+	res.render('about', {title:"About Me"});
 });
 
 //*WEBSOCKET HANDLING
