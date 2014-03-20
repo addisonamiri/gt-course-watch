@@ -133,6 +133,8 @@ function initPollers(){
 		rejectRequests = false;
 	}else{
 		rejectRequests = true;
+		springPoller = fallPoller = summerPoller = springTerm =
+		summerTerm = fallTerm = null;
 	}
 
 	pollers = {spring:springPoller, summer:summerPoller, fall:fallPoller};
