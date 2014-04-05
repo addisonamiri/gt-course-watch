@@ -84,12 +84,13 @@ function socketHandler(socket){
 
 	socket.on('makeRequest', function(data){
 		myMongoController.createRequest(data.crn, data.email, data.term);
-		myMailer.sendConfirmationMail(data.email, data.crn, false)
+		myMailer.sendConfirmationMail(data.email, data.crn, false);
 	});
 
 	socket.on('makeSMSRequest', function(data){
+		data.gatewayedNumber = data.gatewayedNumber.replace('-',''); //remove dashes
 		myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber, data.term);
-		myMailer.sendConfirmationMail(data.email, data.crn, true)
+		myMailer.sendConfirmationMail(data.email, data.crn, true);
 	});
 }
 
@@ -132,6 +133,7 @@ function initPollers(){
 		springPoller = springTerm = null;
 		rejectRequests = false;
 	}else{
+		//hibernation months, accept or process no requests, no labels for term selection either
 		rejectRequests = true;
 		springPoller = fallPoller = summerPoller = springTerm =
 		summerTerm = fallTerm = null;
