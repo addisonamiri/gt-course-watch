@@ -76,7 +76,6 @@ app.get('/about', function(req, res) {
 
 app.get('/getTimeoutStatus', function(req, res){
 	var TIMEOUT = 15*millisInSecond; // 15 sec
-	console.log(req.session.throttleTime);
 
 	if(req.session.throttleTime == null){
 		//initial hit

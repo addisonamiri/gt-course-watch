@@ -18,8 +18,8 @@ $(document).ready(function(){
 	$(".alert").hide();
 	$("#makeAnother").hide();
 
-	$("#makeAnother").click(makeAnotherRequest);
-	$("#send_request").click(processInputAndSend);
+	$("#makeAnother").click(makeRequest);
+	$("#send_request").click(makeRequest);
 
 	//SMS gateway
 
@@ -37,14 +37,10 @@ $(document).ready(function(){
 
 });
 
-function makeAnotherRequest(){
+function makeRequest(){
 	// window.location.replace("/");
 
-	$.ajax({
-		url:"/getTimeoutStatus",
-		dataType: "json",
-		type: "GET",
-		success: function(data){
+	getTimeoutStatus(function(data){
 			if(data.status == "bad"){
 				updateWaitMessage(data.timeLeft);
 				$('#wait_alert').show();
@@ -52,8 +48,7 @@ function makeAnotherRequest(){
 				$('#wait_alert').hide("fold");
 				processInputAndSend();
 			}
-		}
-	})
+	});
 }
 
 function processInputAndSend(){
@@ -63,7 +58,6 @@ function processInputAndSend(){
 	var emailInput = $('#inputEmail').val();
 	var phoneInput = $('#inputPhoneNum').val();
 	var term = $("#selectTerm").val();
-
 
 	if(!isEmail(emailInput)){
 		$('#email_alert').show();
@@ -157,6 +151,14 @@ function processInputAndSend(){
 	}
 }
 
+function getTimeoutStatus(callback){
+	$.ajax({
+		url:"/getTimeoutStatus",
+		dataType: "json",
+		type: "GET",
+		success: callback
+	})
+}
 
 function updateWaitMessage(time){
 	$('#wait_alert').html("Please wait the following number of seconds to make your next request: " + time);
