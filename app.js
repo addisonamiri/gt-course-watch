@@ -16,6 +16,11 @@ var mailerEmail = "tofubeast1111@gmail.com";
 var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
 
+
+app.use(express.cookieParser());
+var store = new express.session.MemoryStore;
+app.use(express.session({secret:"blahblabhla", store:store}));
+
 server.listen(process.env.PORT || 8080);
 
 //*CONSTANTS
@@ -66,14 +71,36 @@ app.get('/', function(req, res) {
 });
 
 app.get('/about', function(req, res) {
-	res.render('about', {title:"About Me"});
+	res.render('about', {title:"About"});
+});
+
+app.get('/getTimeoutStatus', function(req, res){
+	var TIMEOUT = 15*millisInSecond; // 15 sec
+	console.log(req.session.throttleTime);
+
+	if(req.session.throttleTime == null){
+		//initial hit
+		req.session.throttleTime = Date.now();
+		res.json({status:"good"});
+	}else{
+		//check if timeoout is up
+		var timeDelta = Date.now() - req.session.throttleTime;
+		if( timeDelta < TIMEOUT){
+			//send bad resonse
+			res.json({status:"bad", timeLeft: (TIMEOUT-timeDelta)/1000});
+		}else{
+			//send good response
+			req.session.throttleTime = Date.now();
+			res.json({status:"good"})
+		}
+	}
+
 });
 
 //*WEBSOCKET HANDLING
 
 // io.disable('heartbeats');
 //io.set('transports', ['xhr-polling']);
-
 
 if(!rejectRequests){
 	io.sockets.on('connection', socketHandler);
@@ -88,10 +115,21 @@ function socketHandler(socket){
 	});
 
 	socket.on('makeSMSRequest', function(data){
-		data.gatewayedNumber = data.gatewayedNumber.replace('-',''); //remove dashes
+		data.gatewayedNumber = data.gatewayedNumber.replace('-','').replace('.',''); //remove dashes
 		myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber, data.term);
 		myMailer.sendConfirmationMail(data.email, data.crn, true);
 	});
+}
+
+function processRegularRequest(){
+	myMongoController.createRequest(data.crn, data.email, data.term);
+	myMailer.sendConfirmationMail(data.email, data.crn, false);
+}
+
+function processSMSRequest(){
+	data.gatewayedNumber = data.gatewayedNumber.replace('-','').replace('.',''); //remove dashes
+	myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber, data.term);
+	myMailer.sendConfirmationMail(data.email, data.crn, true);	
 }
 
 function initPollers(){
