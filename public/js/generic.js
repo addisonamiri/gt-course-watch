@@ -169,11 +169,8 @@ function checkDuplicateRequest(req1, req2){
 		(req1.gatewayedInput == req2.gatewayedInput);
 }
 
-function formatPhoneNumber(number){
-	var toReturn = number.replace("-", "");
-	toReturn = toReturn.replace(".", "");
-	toReturn = toReturn.replace(" ", "");
-	return toReturn;
+function formatPhoneNumber(number){	
+	return number.replace(/-/g, "").replace(/./g, "").replace(/ /g, "");
 }
 
 function isPhoneNumber(number){

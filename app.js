@@ -101,9 +101,7 @@ app.get('/getTimeoutStatus', function(req, res){
 // io.disable('heartbeats');
 //io.set('transports', ['xhr-polling']);
 
-if(!rejectRequests){
-	io.sockets.on('connection', socketHandler);
-}
+io.sockets.on('connection', socketHandler);
 
 function socketHandler(socket){
 	socket.emit('connect_success', {hello:'world'});
