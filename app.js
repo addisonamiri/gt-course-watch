@@ -96,6 +96,14 @@ app.get('/getTimeoutStatus', function(req, res){
 
 });
 
+app.get('/getNumWatchers/:crn', function(req, res){
+	myMongoController.Request.find({crn:req.params.crn}, function(err, requests){
+		myMongoController.smsRequest.find({crn:req.params.crn}, function(err, smsRequests){
+			res.json({numWatchers:smsRequests.length + requests.length - 1});
+		});
+	});
+});
+
 //*WEBSOCKET HANDLING
 
 // io.disable('heartbeats');

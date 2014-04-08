@@ -102,6 +102,7 @@ function processInputAndSend(){
 			submittedRequest = currentRequest;
 			socket.emit('makeRequest', { email: emailInput, crn: crnInput, term: term});
 			updateLastRequested(crnInput);
+			updateOtherWatchers(crnInput);
 		}
 
 
@@ -148,6 +149,7 @@ function processInputAndSend(){
 			submittedRequest = currentRequest;
 			socket.emit('makeSMSRequest', { email: emailInput, crn: crnInput, gatewayedNumber: gatewayedInput, term:term});
 			updateLastRequested(crnInput);
+			updateOtherWatchers(crnInput);
 		}
 
 	}
@@ -160,6 +162,19 @@ function getTimeoutStatus(callback){
 		type: "GET",
 		success: callback
 	})
+}
+
+function updateOtherWatchers(crn){
+	var numWatchers;
+
+	$.ajax({
+		url:"/getNumWatchers/"+crn,
+		dataType: "json",
+		type: "GET",
+		success: function(data){
+			$('#otherWatchers').html(data.numWatchers + " other people are watching this class.");
+		}
+	});
 }
 
 function updateLastRequested(lastCrn){
