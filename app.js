@@ -112,7 +112,6 @@ function socketHandler(socket){
 	});
 
 	socket.on('makeSMSRequest', function(data){
-		data.gatewayedNumber = data.gatewayedNumber.replace('-','').replace('.',''); //remove dashes
 		myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber, data.term);
 		myMailer.sendConfirmationMail(data.email, data.crn, true);
 	});

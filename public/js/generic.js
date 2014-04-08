@@ -101,6 +101,7 @@ function processInputAndSend(){
 			$("#makeAnother").show();
 			submittedRequest = currentRequest;
 			socket.emit('makeRequest', { email: emailInput, crn: crnInput, term: term});
+			updateLastRequested(crnInput);
 		}
 
 
@@ -146,6 +147,7 @@ function processInputAndSend(){
 			$("#makeAnother").show();
 			submittedRequest = currentRequest;
 			socket.emit('makeSMSRequest', { email: emailInput, crn: crnInput, gatewayedNumber: gatewayedInput, term:term});
+			updateLastRequested(crnInput);
 		}
 
 	}
@@ -160,6 +162,10 @@ function getTimeoutStatus(callback){
 	})
 }
 
+function updateLastRequested(lastCrn){
+	$('#lastRequested').html("Last Requested CRN: " + lastCrn)
+}
+
 function updateWaitMessage(time){
 	$('#wait_alert').html("Please wait the following number of seconds to make your next request: " + time);
 }
@@ -170,7 +176,7 @@ function checkDuplicateRequest(req1, req2){
 }
 
 function formatPhoneNumber(number){	
-	return number.replace(/-/g, "").replace(/./g, "").replace(/ /g, "");
+	return number.replace(/-/g, "");
 }
 
 function isPhoneNumber(number){
