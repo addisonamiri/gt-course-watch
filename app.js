@@ -104,6 +104,31 @@ app.get('/getNumWatchers/:crn', function(req, res){
 	});
 });
 
+app.get('/getStats/:crn/:term', function(req, res){
+	myMongoController.Request.find({crn:req.params.crn}, function(err, requests){
+		myMongoController.smsRequest.find({crn:req.params.crn}, function(err, smsRequests){
+			var pollers = getActivePollers();
+			var termPoller;
+
+			for(var i in pollers){
+				if(pollers[i].term = req.params.term){
+					termPoller = pollers[i];
+				}
+			}
+
+			if(termPoller){
+				termPoller.getSeatStats(req.params.crn, req.params.term, function(result){
+					result['numWatchers'] = requests.length + smsRequests.length;
+					res.send(result);
+				});
+			}else{
+				res.send("bad req");
+			}			
+
+		});
+	});
+});
+
 //*WEBSOCKET HANDLING
 
 // io.disable('heartbeats');
@@ -123,6 +148,7 @@ function socketHandler(socket){
 		myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber, data.term);
 		myMailer.sendConfirmationMail(data.email, data.crn, true);
 	});
+
 }
 
 function processRegularRequest(){
@@ -154,6 +180,7 @@ function initPollers(){
 		springTerm = 'spring'+ year.toString();
 		pathComponents[2] = '02';
 		var springBasePath = pathComponents.join('');
+		console.log(springBasePath);
 		springPoller = new Poller(myMongoController, myMailer, springBasePath, springTerm);
 
 		summerPoller = fallPoller = summerTerm = fallTerm = null;
@@ -171,6 +198,9 @@ function initPollers(){
 		pathComponents[2] = '05';
 		var summerBasePath = pathComponents.join('');
 		summerPoller = new Poller(myMongoController, myMailer, summerBasePath, summerTerm);
+
+		console.log(fallBasePath);
+		console.log(summerBasePath);
 
 		springPoller = springTerm = null;
 		rejectRequests = false;
@@ -194,6 +224,21 @@ function createLabel(term){
 
 function capitalizeFirstLetter(string){
     return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function getActivePollers(){
+	var result = [];
+
+	for (var key in pollers) {
+		if (pollers.hasOwnProperty(key)) {
+			//alert(key + " -> " + p[key]);
+			if(pollers[key]){
+				result.push(pollers[key]);
+			}
+		}
+	}
+
+	return result;
 }
 
 //*SCHEDULED JOBS

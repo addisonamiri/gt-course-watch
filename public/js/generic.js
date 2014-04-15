@@ -13,6 +13,12 @@ var submittedRequest = {
 };
 
 $(document).ready(function(){
+
+	$('#myTab a').click(function(e){
+	  e.preventDefault();
+	  $(this).tab('show');
+	});
+
 	//validation
 
 	$(".alert").hide();
@@ -34,6 +40,8 @@ $(document).ready(function(){
 	    	smsEnabled = false;
 	    }
 	});
+
+	$("#get_stats_btn").click(getStats);
 
 });
 
@@ -175,6 +183,59 @@ function updateOtherWatchers(crn){
 			$('#otherWatchers').html(data.numWatchers + " other people are watching this class.");
 		}
 	});
+}
+
+function getStats(cb){
+	var crn = $('#stats_crn').val();
+	var term = $('#stats_term').val();
+
+	$.ajax({
+		url:"/getStats/"+crn+"/"+term,
+		dataType: "json",
+		type: "GET",
+		success: function(data){
+			//dom manipulation to display returned data
+			$('#class_stats_div').html("<h3> Loaded CRN: " + crn + "</h3>");
+			$('#class_stats_div').append("<h3>" + data.numWatchers + " people are watching this class. </h3>");
+
+			var tableHTML = '<br/> <table class="table table-striped" style="width:300px"> <tr> <th>*</th> <th>Seat Stats</th>' + 
+				'<th>Waitlist Stats</th> </tr> <tr> <td>Remaining</td>' +
+				'<td>' + data.remaining + '</td>' +	 '<td>' + data.waitlist_remaining + '</td></tr><tr><td>Actual</td>' +
+				'<td>' + data.actual + '</td>' + '<td>' + data.waitlist_actual + '</td></tr><tr><td>Capacity</td>' +
+				'<td>' + data.capacity + '</td>' + '<td>' + data.waitlist_capacity + '</td></tr></table>';
+
+			$('#class_stats_div').append(tableHTML);
+
+			// <table style="width:300px">
+			// 	<tr>
+			// 		<th>*</th>
+			// 		<th>Seat Stats</th>
+			// 		<th>Waitlist Stats</th>
+			// 	</tr>
+
+			// 	<tr>
+			// 		<td>Remaining</td>
+			// 		<td>data.remaining</td>
+			// 		<td>data.waitlist_remaining</td> 
+			// 	</tr>
+
+			// 	<tr>
+			// 		<td>Actual</td>				
+			// 		<td>data.actual</td>
+			// 		<td>data.waitlist_actual</td> 
+			// 	</tr>
+
+			// 	<tr>
+			// 		<td>Capacity</td>
+			// 		<td>data.capacity</td>
+			// 		<td>data.waitlist_capacity</td> 
+			// 	</tr>
+			// </table>
+
+
+		}
+	});
+
 }
 
 function updateLastRequested(lastCrn){
