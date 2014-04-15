@@ -195,7 +195,7 @@ function getStats(cb){
 		type: "GET",
 		success: function(data){
 			//dom manipulation to display returned data
-			$('#class_stats_div').html("<h3> Loaded CRN: " + crn + "</h3>");
+			$('#class_stats_div').html("<h3> Stats for CRN: " + crn + "</h3>");
 			$('#class_stats_div').append("<h3>" + data.numWatchers + " people are watching this class. </h3>");
 
 			var tableHTML = '<br/> <table class="table table-striped" style="width:300px"> <tr> <th>*</th> <th>Seat Stats</th>' + 
