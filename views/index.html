@@ -132,6 +132,7 @@
 
 			<input type="text" id="stats_crn" placeholder="CRN?">
 			<br/>
+
 			<select id="stats_term">
 				{{#if fall}}
 					<option value="{{fall}}">{{fallLabel}}</option>
@@ -149,7 +150,28 @@
 			<br/>
 			<br/>
 			
-			<div id="class_stats_div"></div>
+			<div id="class_stats_div">
+				
+			<table class="table" style="width:300px">
+				<tr>
+					<th></th>
+					<th>Seat Stats</th>
+					<th>Waitlist Stats</th>
+				</tr>
+
+				<tr>
+					<td>Remaining</td>
+					<td>-</td>
+					<td>-</td> 
+				</tr>
+
+				<tr>
+					<td>Actual</td>				
+					<td>-</td>
+					<td>-</td> 
+				</tr>
+			</table>
+			</div>
 
 		</div>
 
