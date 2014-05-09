@@ -137,7 +137,11 @@ app.get('/getStats/:crn/:term', function(req, res){
 io.sockets.on('connection', socketHandler);
 
 function socketHandler(socket){
-	socket.emit('connect_success', {hello:'world'});
+	socket.emit('message', {message:'Welcome to the chat!'});
+
+	socket.on('sendMessage', function(data){
+		io.sockets.emit('message', data);
+	});
 
 	socket.on('makeRequest', function(data){
 		myMongoController.createRequest(data.crn, data.email, data.term);
@@ -148,7 +152,6 @@ function socketHandler(socket){
 		myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber, data.term);
 		myMailer.sendConfirmationMail(data.email, data.crn, true);
 	});
-
 }
 
 function processRegularRequest(){
