@@ -15,13 +15,26 @@
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
+
+      path.slice{
+        stroke-width:2px;
+      }
+
+      polyline{
+        opacity: .3;
+        stroke: black;
+        stroke-width: 2px;
+        fill: none;
+      }
     </style>
+    
     <link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/bootstrap/js/bootstrap.min.js"></script>
- 
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+
     <script src="/js/generic.js"></script>
 
   </head>
