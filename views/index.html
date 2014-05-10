@@ -37,6 +37,7 @@
 <!-- Nav tabs -->
 	<ul class="nav nav-tabs" id="myTab">
 	  <li class="active"><a href="#home" data-toggle="tab">Request Form</a></li>
+	  <li><a href="#auto_reg" data-toggle="tab">Auto-Registration</a></li>
 	  <li><a href="#class_stats" data-toggle="tab">Course Stats</a></li>
 	  <li><a href="#live_chat" data-toggle="tab">Live Chat Room</a></li>
 	</ul>
@@ -54,6 +55,7 @@
 				After you make a request, the server will poll for its status every 2 mins. <br>
 				You will be e-mailed and/or texted as soon as the server realizes a seat is open.<br>
 				*Note - sms functionality has been spotty sometimes <br>
+
 				</h6>
 			</div>
 
@@ -130,7 +132,7 @@
 			<div>
 				<h6>
 					Load seat stats for a CRN of your choice. Enjoy the animated chart.<br>
-					Try CRN 90559 for example.<br>
+					Using d3.js data visualization library.<br>
 				</h6>
 			</div>			
 
@@ -182,10 +184,46 @@
 
 		</div>
 
+
+		<div class="tab-pane fade" id="auto_reg">
+			<h4>Under construction </h4>
+
+			<h6>When a seat is free, the service will log in and register for you.
+			<br>Using PhantomJS headless WebKit (being run as a Node.js child process)</h6>
+
+			<input type="text" id="buzzport_id" placeholder="Buzzport Username"> </input>
+			</br>
+			<input type="password" id="buzzport_pass" placeholder="Buzzport Password"> </input>
+			<br>
+			<input type="button" id="buzz_verify_sub" class="btn" value="Verify Buzzport Credentials"></input>
+
+			<br>
+			<br>
+
+			<input type="text" placeholder="CRN"> </input>
+			<br>
+			<select id="buzzport_term" class="form-control">
+				{{#if fall}}
+					<option value="{{fall}}">{{fallLabel}}</option>
+				{{/if}}
+				{{#if spring}}
+					<option value="{{spring}}">{{springLabel}}</option>
+				{{/if}}
+				{{#if summer}}
+					<option value="{{summer}}">{{summerLabel}}</option>
+				{{/if}}
+			</select>
+
+			<br>
+
+			<input type="button" id="buzz_register" class="btn" value="Auto-Register"></input>
+		</div>
+
+
 		<div class="tab-pane fade" id="live_chat">
 
-			<h6> Have fun with it. Anyone on this page right now can see what you're saying. No history saved. </h6>
-
+			<h6> Have fun with it. Anyone on this page right now can see what you're saying. No history saved. <br>
+			Using the socket.io WebSocket library.</h6>
 
 			<div id="content" style='width: 500px; height: 300px; margin: 0 0 20px 0; border: solid 1px #999; overflow-y: scroll;'> </div>
 
@@ -210,6 +248,3 @@
 		<img src="http://www.freedomain.co.nr/images/bars/anima.gif" width="88" height="31" border="0" alt="Link to Us : Help with CO.NR development">
 	</a>
 </div> -->
-
- <script src="/js/pie_chart.js"></script>
-

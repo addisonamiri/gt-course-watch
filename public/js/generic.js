@@ -58,6 +58,29 @@ $(document).ready(function(){
 	  $(this).tab('show');
 	});
 
+	$('#buzz_verify_sub').click(function(){
+		console.log
+
+		$.ajax({
+			url:"/verifyBuzzport",
+			dataType: "json",
+			timeout: 30000,
+			data: {username: $('#buzzport_id').val(), password: $('#buzzport_pass').val()},
+			type: "POST",
+			success: function(res){
+				console.log(res.status);
+				if(res.status=="success"){
+					alert("your good");
+				}else{
+					alert("couldn't verify");
+				}
+			},
+			error: function(){
+				console.log("timeout");
+			}
+		});
+	});
+
 	//validation
 
 	$(".alert").hide();
@@ -238,8 +261,8 @@ function getStats(cb){
 		type: "GET",
 		success: function(data){
 			//dom manipulation to display returned data
-			$('#class_stats_div').html("<h3> Stats for CRN: " + crn + "</h3>");
-			$('#class_stats_div').append("<h3>" + data.numWatchers + " people are watching this class. </h3>");
+			$('#class_stats_div').html("<h6> Stats for CRN: " + crn + "</h6>");
+			$('#class_stats_div').append("<h6>" + data.numWatchers + " people are watching this class. </h6>");
 
 			var tableHTML = '<br/> <table class="table table-striped" style="width:300px"> <tr> <th></th> <th>Seat Stats</th>' + 
 				'<th>Waitlist Stats</th> </tr> <tr> <td>Remaining</td>' +

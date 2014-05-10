@@ -3,6 +3,8 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 var hbs = require('hbs');
+var exec = require('child_process').exec,
+    child;
 
 var MongoController = require('./MongoController.js');
 var Mailer = require('./Mailer.js');
@@ -53,6 +55,24 @@ app.engine('html', hbs.__express);
 
 app.use(express.bodyParser());
 app.use(express.static('public'));
+
+app.post('/verifyBuzzport', function(req, res){
+	var post = req.body;
+	console.log(post);
+
+	child = exec('phantomjs PhantomVerify.js ' + post.username + " " + post.password,
+	    function (error, stdout, stderr) {
+	    }
+	);
+
+	child.stdout.on("data", function(data){
+		if(data.indexOf("VERIFICATION_SUCCESS")>-1){
+			res.send({status: "success"});
+		}else{
+			res.send({status: "failure"});
+		}
+	});
+});
 
 app.get('/', function(req, res) {
 	var springLabel, summerLabel, fallLabel;
