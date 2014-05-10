@@ -158,8 +158,6 @@ var steps = [
     cb(status);
   },
   function enterStudentServices(cb){
-    // console.log("enter stud svc method");
-
     page.open("https://oscar.gatech.edu/pls/bprod/bwskfreg.P_AltPin", function(){
       // console.log("Student Svcs status: " + status);
 
@@ -174,14 +172,12 @@ var steps = [
       //     phantom.exit( 0 );
       // }
 
-      page.render("buzzporter.jpeg", {format: 'jpeg', quality:'100'});
-
       var status = page.evaluate(function(term){
 
         if(document.title == "Select Term"){
           console.log("on select term page");
 
-          var submitBtn = document.querySelector('input[type=submit]');
+          var submitBtn = document.querySelector('input[value=Submit][type=submit]');
           var selector = document.querySelector('select');
           var selectorOpts = selector.options;
 
@@ -202,13 +198,29 @@ var steps = [
         // console.log(document.querySelectorAll('html')[0].outerHTML);
 
       }, args[3]);
+  
+      cb(status);
+    });
 
+  },
+  function enterRegistration(cb){
+    console.log("reg func ent");
+
+    page.render("buzzporter.jpeg", {format: 'jpeg', quality:'100'});
+
+    var status = page.evaluate(function() {
+      if(document.title=="Add/Drop Classes:"){
+        //confirm login, forward to OSCAR
+        console.log("Inside Registration Page");
+        
+
+        return "success";
+        // console.log(document.querySelectorAll('html')[0].outerHTML);
+      }
+      return "failure";
     });
 
     cb(status);
-  },
-  function enterRegistration(cb){
-
   }
 ];
 
