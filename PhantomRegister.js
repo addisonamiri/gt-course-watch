@@ -140,8 +140,6 @@ var steps = [
         for(var i in links){
           // console.log(links[i].textContent);
           if(links[i].textContent == "Registration - OSCAR "){
-            console.log("found something");
-
             var link = links[i];
             var event = document.createEvent('MouseEvents');
             event.initMouseEvent( 'click', true, true, window, 1, 0, 0 );
@@ -204,23 +202,42 @@ var steps = [
 
   },
   function enterRegistration(cb){
-    console.log("reg func ent");
-
-    page.render("buzzporter.jpeg", {format: 'jpeg', quality:'100'});
-
-    var status = page.evaluate(function() {
+    var status = page.evaluate(function(crnInput) {
       if(document.title=="Add/Drop Classes:"){
         //confirm login, forward to OSCAR
         console.log("Inside Registration Page");
-        
+        // console.log("Crn Input:" + crnInput);
+        var crnField = document.getElementById('crn_id1');
+        var submitBtn = document.querySelector('input[value="Submit Changes"]');
 
+        crnField.value = ""+crnInput;
+        submitBtn.click();
         return "success";
         // console.log(document.querySelectorAll('html')[0].outerHTML);
       }
       return "failure";
-    });
+    }, args[4]);
 
     cb(status);
+  },
+  function confirmRegistration(cb){
+    page.render("buzzporter.jpeg", {format: 'jpeg', quality:'100'});
+    console.log("Verifying Registration...");
+
+    var status = page.evaluate(function(crnInput) {
+
+      var crnsOnPage = document.getElementsByName('CRN_IN')
+
+      for(var i in crnsOnPage){
+        if(crnsOnPage[i].value == crnInput){
+          console.log("Registration Verified and Complete");
+          return "success";
+        } 
+      }
+      return "failure";
+    }, args[4]);
+
+    cb(status);    
   }
 ];
 

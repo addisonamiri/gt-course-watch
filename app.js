@@ -57,8 +57,8 @@ app.use(express.bodyParser());
 app.use(express.static('public'));
 
 app.post('/verifyBuzzport', function(req, res){
-	var post = req.body;
-	console.log(post);
+	// var post = req.body;
+	// console.log(post);
 
 	child = exec('phantomjs PhantomVerify.js ' + post.username + " " + post.password,
 	    function (error, stdout, stderr) {
@@ -72,6 +72,28 @@ app.post('/verifyBuzzport', function(req, res){
 			res.send({status: "failure"});
 		}
 	});
+});
+
+app.post('/autoRegReq', function(req, res){
+	var post = req.body;
+	console.log(post);
+	
+	post.term = post.term.replace(' ', '-');
+
+	child = exec('phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 PhantomRegister.js ' 
+		+ post.username + " " + post.password + " " + post.term + " " + post.crn,
+	    function (error, stdout, stderr) {
+	    }
+	);
+
+	child.stdout.on("data", function(data){
+		if(data.indexOf("SUCCESS")>-1){
+			res.send({status: "success"});
+		}else{
+			res.send({status: "failure"});
+		}
+	});	
+
 });
 
 app.get('/', function(req, res) {
