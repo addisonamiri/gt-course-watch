@@ -15,9 +15,9 @@ var page = new WebPage(),
 //   });
 // }
 
-// page.onConsoleMessage = function(msg) {
-//   console.log(msg);
-// };
+page.onConsoleMessage = function(msg) {
+  console.log(msg);
+};
 
 page.onLoadStarted = function() {
   loadInProgress = true;
@@ -119,7 +119,7 @@ var steps = [
         return "failure";
       }
 
-    }, args[1], args[2]); //"vsomu3", "KansasCity7");
+    }, args[1], args[2]);
     cb(status);
 
   },
@@ -224,7 +224,13 @@ var steps = [
 
     var status = page.evaluate(function(crnInput) {
 
-      var crnsOnPage = document.getElementsByName('CRN_IN')
+      if(document.querySelector('.errortext') != null){
+          console.log("Detected : Buzzport registration error.");
+          //could maybe return something else to signal we detected an error
+          return "success";
+      }
+
+      var crnsOnPage = document.getElementsByName('CRN_IN');
 
       for(var i in crnsOnPage){
         if(crnsOnPage[i].value == crnInput){
