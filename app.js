@@ -57,10 +57,10 @@ app.use(express.bodyParser());
 app.use(express.static('public'));
 
 app.post('/verifyBuzzport', function(req, res){
-	// var post = req.body;
+	var post = req.body;
 	// console.log(post);
 
-	child = exec('phantomjs PhantomVerify.js ' + post.username + " " + post.password,
+	child = exec('phantomjs PhantomVerifyTask.js ' + post.username + " " + post.password,
 	    function (error, stdout, stderr) {
 	    }
 	);
@@ -79,12 +79,14 @@ app.post('/autoRegReq', function(req, res){
 	console.log(post);
 	
 	post.term = post.term.replace(' ', '-');
+	var execStatement = 'phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 PhantomRegisterTask.js ' 
+		+ post.username + " " + post.password + " " + post.term + " " + post.crn;
 
-	child = exec('phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 PhantomRegister.js ' 
-		+ post.username + " " + post.password + " " + post.term + " " + post.crn,
-	    function (error, stdout, stderr) {
-	    }
-	);
+	console.log(execStatement);
+
+	child = exec(execStatement,function (error, stdout, stderr) {
+		console.log(stdout);
+	});
 
 	child.stdout.on("data", function(data){
 		if(data.indexOf("SUCCESS")>-1){
@@ -153,14 +155,15 @@ app.get('/getStats/:crn/:term', function(req, res){
 			var termPoller;
 
 			for(var i in pollers){
-				if(pollers[i].term = req.params.term){
+				if(pollers[i].term == req.params.term){
 					termPoller = pollers[i];
 				}
 			}
 
 			if(termPoller){
-				termPoller.getSeatStats(req.params.crn, req.params.term, function(result){
+				termPoller.getSeatStats(req.params.crn, function(result){
 					result['numWatchers'] = requests.length + smsRequests.length;
+					console.log(result["remaining"]);
 					res.send(result);
 				});
 			}else{

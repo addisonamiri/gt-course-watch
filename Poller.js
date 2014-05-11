@@ -36,7 +36,7 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 	
 }
 
-Poller.prototype.getSeatStats = function getSeatStats(crn, term, cb){
+Poller.prototype.getSeatStats = function getSeatStats(crn, cb){
 	var self = this;
 
 	var options = {
@@ -64,6 +64,8 @@ Poller.prototype.getSeatStats = function getSeatStats(crn, term, cb){
 			var joinedBody = body.join('');
 			var $ = cheerio.load(joinedBody);
 			var result = {};
+
+			// console.log(joinedBody);
 
 		    //traversing method
 		    $('.dddefault').each(function(i){

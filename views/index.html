@@ -188,8 +188,9 @@
 		<div class="tab-pane fade" id="auto_reg">
 			<h4>Under construction </h4>
 
-			<h6>When a seat is free, the service will log in and register for you.
-			<br>Using PhantomJS headless WebKit (being run as a Node.js child process)</h6>
+			<h6>When a seat is free, the automated system will login to BuzzPort and register for you. <br>
+			You'll be e-mailed upon successful registration.
+			<br>Using PhantomJS headless WebKit</h6>
 
 			<input type="text" id="buzzport_id" placeholder="Buzzport Username"> </input>
 			</br>
@@ -200,7 +201,7 @@
 			<br>
 			<br>
 
-			<input type="text" placeholder="CRN"> </input>
+			<input id="buzzport_crn" type="text" placeholder="CRN"> </input>
 			<br>
 			<select id="buzzport_term" class="form-control">
 				{{#if fall}}

@@ -59,7 +59,7 @@ $(document).ready(function(){
 	});
 
 	$('#buzz_verify_sub').click(function(){
-		console.log
+		//verify buzzport
 
 		$.ajax({
 			url:"/verifyBuzzport",
@@ -79,6 +79,32 @@ $(document).ready(function(){
 				console.log("timeout");
 			}
 		});
+	});
+
+	$('#buzz_register').click(function(){
+		//make auto reg request
+		$.ajax({
+			url:"/autoRegReq",
+			dataType: "json",
+			timeout: 30000,
+			data: {	username: $('#buzzport_id').val(), 
+					password: $('#buzzport_pass').val(),
+					term: $('#buzzport_term option:selected').text(),
+					crn: $('#buzzport_crn').val()},
+			type: "POST",
+			success: function(res){
+				console.log(res.status);
+				if(res.status=="success"){
+					alert("registration complete");
+				}else{
+					alert("couldn't complete registration");
+				}	
+			},
+			error: function(){
+				console.log("timeout");				
+			}
+		})
+
 	});
 
 	//validation
