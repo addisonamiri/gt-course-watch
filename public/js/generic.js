@@ -1,4 +1,5 @@
 var socket = io.connect(window.location.hostname);
+var buzzPortVerified = false;
 
 window.onload = function() {
     var messages = [];
@@ -53,13 +54,30 @@ var submittedRequest = {
 
 $(document).ready(function(){
 
-	$('#myTab a').click(function(e){
-	  e.preventDefault();
-	  $(this).tab('show');
+	$('#contact-sub').click(function(){
+			var iName = $('#contact-name').val();
+			var iMessage = $('#contact-msg').val();
+			var iEmail = $('#contact-email').val();
+
+			if(!iName || !iMessage || !iEmail){
+				$('#contact_alert').show();
+				return;
+			}
+
+            socket.emit('contactReq', { message: iMessage, 
+            							email: iEmail,
+            							name:  iName});		
 	});
 
 	$('#buzz_verify_sub').click(function(){
 		//verify buzzport
+		var $modal = $('.loading-bar-modal');
+
+	    $modal.modal({
+		  backdrop: 'static',
+		  keyboard: false,
+		  show: true
+		})
 
 		$.ajax({
 			url:"/verifyBuzzport",
@@ -70,19 +88,28 @@ $(document).ready(function(){
 			success: function(res){
 				console.log(res.status);
 				if(res.status=="success"){
-					alert("your good");
+					$modal.modal('hide');
+					$('#auto-reg-classinfo').show();
+					buzzPortVerified = true;
+					alert("Information successfully verified! Input additional info.");
 				}else{
-					alert("couldn't verify");
+					$modal.modal('hide');			
+					alert("Your information couldn't be verified.");
 				}
 			},
 			error: function(){
-				console.log("timeout");
+				$modal.modal('hide');
+				alert("Request Timeout (>30sec)");
 			}
 		});
 	});
 
 	$('#buzz_register').click(function(){
 		//make auto reg request
+		if(buzzPortVerified==false){
+			return;
+		}
+
 		$.ajax({
 			url:"/autoRegReq",
 			dataType: "json",
@@ -103,9 +130,15 @@ $(document).ready(function(){
 			error: function(){
 				console.log("timeout");				
 			}
-		})
+		});
 
 	});
+
+	$('#myTab a').click(function(e){
+	  e.preventDefault();
+	  $(this).tab('show');
+	});
+
 
 	//validation
 

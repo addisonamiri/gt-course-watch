@@ -188,6 +188,10 @@ function socketHandler(socket){
 		io.sockets.emit('message', data);
 	});
 
+	socket.on('contactReq', function(data){
+		myMailer.contactMailJob(data.email, data.name, data.message);
+	})
+
 	socket.on('makeRequest', function(data){
 		myMongoController.createRequest(data.crn, data.email, data.term);
 		myMailer.sendConfirmationMail(data.email, data.crn, false);

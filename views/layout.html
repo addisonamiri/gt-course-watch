@@ -9,7 +9,6 @@
     <meta name="author" content="null">
 
     <link href="/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="/css/styles.css" rel="stylesheet">
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -22,29 +21,94 @@
 
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
         <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <a  href='#'class="navbar-brand">gt coursewatch</a>
+
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navCollapse">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand">gt course watch</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
+          <div class="navbar-collapse collapse navCollapse">
+            <ul class="nav navbar-nav navbar-right">
               <li><a href="/">Home</a></li>
               <li><a href="/about">About</a></li>
+              <li><a href="#contact_modal" data-toggle="modal">Contact</a></li>
+
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Quick Links <b class="caret"></b> </a>
+
+                <ul class="dropdown-menu">
+                  <li><a href = "https://buzzport.gatech.edu/cp/home/displaylogin">BuzzPort</a></li>
+                  <li><a href = "https://gatech.courseoff.com">GT Courseoff</a></li>
+                </ul>
+              </li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
-      </div>
     </div>
 
     <div class="container">
+      <div id = "contact_alert" class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        You didn't fully fill out the contact form.
+      </div>
 
     	{{{body}}}
 
     </div> <!-- /container -->
+
+    <div class = "navbar navbar-default navbar-fixed-bottom">
+   
+            <div class = "container">
+                    <p class = "navbar-text pull-left"> <i>GT Course Watch - Registration Assistance System - (2014)</i> </p>
+<!--                     <a href = "#" class = "navbar-btn btn-danger btn pull-right"> - </a>
+ -->            </div>
+   
+    </div>
+
+
+  <div class="modal fade" id="contact_modal" role="dialog"> 
+    <div class="modal-dialog"> 
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4>Contact Me</h4>
+        </div>
+        <div class="modal-body">
+          <div class = "form-group">
+   
+              <label for = "contact-name" class = "col-lg-2 control-label">Name:</label>
+              <div class = "col-lg-10">
+                  <input type = "text" class = "form-control" id = "contact-name" placeholder = "Full Name">
+              </div>
+             
+          </div>
+         
+          <div class = "form-group">
+             
+              <label for = "contact-email" class = "col-lg-2 control-label">Email:</label>
+              <div class = "col-lg-10">
+                  <input type = "email" class = "form-control" id = "contact-email" placeholder = "you@example.com">
+              </div>
+             
+          </div>
+         
+          <div class = "form-group">
+             
+              <label for = "contact-msg" class = "col-lg-2 control-label">Message:</label>
+              <div class = "col-lg-10">
+                  <textarea class = "form-control" rows = "8" id='contact-msg'></textarea>
+              </div>
+             
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a class="btn btn-danger" data-dismiss="modal">Close</a>
+          <button id="contact-sub" class = "btn btn-primary" type = "submit" data-dismiss="modal">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   </body>
 </html>
