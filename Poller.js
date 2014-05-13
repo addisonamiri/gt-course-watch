@@ -33,6 +33,17 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 		}
 
 	});
+
+	this.mongoController.autoRegReq.find({term:self.term}, function(err, requestPool){
+		if(err){
+			console.log(err)
+		}
+
+		for (requestIdx in requestPool) {
+			self.scrapeSeats(requestPool[requestIdx], true);
+		}
+
+	});
 	
 }
 
@@ -96,63 +107,6 @@ Poller.prototype.getSeatStats = function getSeatStats(crn, cb){
 	});	
 }
 
-Poller.prototype.getSeatsStats = function getStats(crn, term, cb){
-	var self = this;
-
-	var options = {
-	  hostname: 'oscar.gatech.edu',
-	  port: 443,
-	  path: self.buildPath(crn),
-	  method: 'GET',
-	  rejectUnauthorized: 'false'
-	};
-
-	var req = https.request(options, function(res) {
-	  // console.log("statusCode: ", res.statusCode);
-	  // console.log("headers: ", res.headers);
-
-		var body = [];
-	    res.setEncoding('utf8');
-
-		res.on('data', function(chunk) {
-			body.push(chunk);
-		});
-
-
-		res.on('end', function(){
-
-			var joinedBody = body.join('');
-			var $ = cheerio.load(joinedBody);
-			var result = [];
-
-		    //traversing method
-		    $('.dddefault').each(function(i){
-		    	if(i==3){
-		    		result["remaining"] = parseInt($(this).text().trim());
-		    	}else if(i==2){
-		    		result["actual"] = parseInt($(this).text().trim());
-		    	}else if(i==1){
-		    		result["capacity"] = parseInt($(this).text().trim());		    		
-		    	}else if(i==4){
-		    		result["waitlist_capacity"] = parseInt($(this).text().trim());		    		
-		    	}else if(i==5){
-		    		result["waitlist_actual"] = parseInt($(this).text().trim());		    				    		
-		    	}else if(i==6){
-		    		result["waitlist_remaining"] = parseInt($(this).text().trim());		    				    		
-		    	}
-		    });
-
-		    cb(result);
-		});
-
-	});
-
-	req.end();
-
-	req.on('error', function(e) {
-	  console.error(e);
-	});	
-}
 
 Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest){
 
@@ -206,8 +160,17 @@ Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest)
 Poller.prototype.checkSeats = function checkSeats(numSeats, existingRequest, smsRequest){
 	if(numSeats > 0){
 		// console.log('there is a seat open! ' + numSeats);
-		this.mailer.sendMail(existingRequest, smsRequest);
-		existingRequest.remove();
+		if(existingRequest.hasOwnProperty('buzzport_id')){
+			//encounter case where there is a free slot for an auto registration request.
+			//dispatch phantom job
+
+			//check if phantom was able to successfuly register. if so, send status update email and remove request from db.
+			this.mailer.sendAutoRegSuccessMail(existingRequest);
+			existingRequest.remove();
+		}else{
+			this.mailer.sendMail(existingRequest, smsRequest);
+			existingRequest.remove();
+		}
 	}else{
 		// console.log('there are no seats open currently' + numSeats);
 	}
@@ -215,7 +178,7 @@ Poller.prototype.checkSeats = function checkSeats(numSeats, existingRequest, sms
 
 Poller.prototype.buildPath = function buildPath(crn){
 	//format : /pls/bprod/bwckschd.p_disp_detail_sched?term_in=201402&crn_in=
-	return this.basePath + crn
+	return this.basePath + crn;
 }
 
 

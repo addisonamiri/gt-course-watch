@@ -14,19 +14,19 @@ var page = new WebPage(),
 //   });
 // }
 
-// page.onConsoleMessage = function(msg) {
-//   console.log(msg);
-// };
+page.onConsoleMessage = function(msg) {
+  console.log(msg);
+};
 
-// page.onLoadStarted = function() {
-//   loadInProgress = true;
-//   console.log("load started");
-// };
+page.onLoadStarted = function() {
+  loadInProgress = true;
+  console.log("load started");
+};
 
-// page.onLoadFinished = function() {
-//   loadInProgress = false;
-//   console.log("load finished");
-// };
+page.onLoadFinished = function() {
+  loadInProgress = false;
+  console.log("load finished");
+};
 
 // page.onAlert = function(msg){
 //   console.log("Alert! - " + msg);

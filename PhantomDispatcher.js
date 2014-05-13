@@ -1,4 +1,5 @@
-var jobQueue = [],
+var verifyJobQueue = [],
+	registerJobQueue = [],
 	jobInProgress = false;
 
 
@@ -6,7 +7,7 @@ function PhantomDispatcher(){
 
 }
 
-PhantomDispatcher.prototype.dispatchVerifyTask = function(){
+PhantomDispatcher.prototype.addVerifyTaskToQueue = function(){
 
 }
 

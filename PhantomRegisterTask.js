@@ -205,6 +205,12 @@ var steps = [
         //confirm login, forward to OSCAR
         console.log("Inside Registration Page");
         // console.log("Crn Input:" + crnInput);
+
+        if(document.querySelector('span.infotext').innerHTML.indexOf("You have no Registration Time") > -1){
+          console.log("Don't have a time ticket for your term.");
+          return "INVALID_TERM_ERROR";
+        }
+
         var crnField = document.getElementById('crn_id1');
         var submitBtn = document.querySelector('input[value="Submit Changes"]');
 
@@ -227,7 +233,7 @@ var steps = [
       if(document.querySelector('.errortext') != null){
           console.log("Detected : Buzzport registration error.");
           //could maybe return something else to signal we detected an error
-          return "success";
+          return "REGISTRATION_ERROR";
       }
 
       var crnsOnPage = document.getElementsByName('CRN_IN');
@@ -254,13 +260,17 @@ setInterval(function() {
       if(status=="success"){
         stepIndex++;
         retrys = 0;
-      }else{
+      }else if(status == "REGISTRATION_ERROR" || status=="INVALID_TERM_ERROR"){
+        console.log(status);
+        phantom.exit();
+      }
+      else{
         retrys = retrys + 1;
         if(retrys > maxRetrys){
           //task failure condition
           console.log("FAILURE");
           phantom.exit();
-        }
+        }      
       }      
     });
 

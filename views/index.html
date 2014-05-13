@@ -51,6 +51,8 @@
 
 			<div>
 				<h6>
+				*Note: Sometimes, even after getting a notification, you might find that your seat has been taken before you could register. This is likely due to others watching the same class as you. To greatly improve your odds of getting the class you want, use the AUTO-REGISTER service.<br>
+
 				This site will automatically update and be ready when a new term comes around.<br>
 				After you make a request, the server will poll for its status every 2 mins. <br>
 				You will be e-mailed and/or texted as soon as the server realizes a seat is open.<br>
@@ -62,12 +64,12 @@
 			<form style="padding-left:1px">
 			<!-- 			<label for="inputEmail">Email </label>
 			-->			
-				<input type="text" class="form-control" id="inputEmail" placeholder="Whats your email?">
+				<input type="text" class="form-control" id="inputEmail" placeholder="you@example.com">
 
 			<!-- 			<label for="inputCRN">CRN </label>
 			-->			
 				</br>
-				<input type="text" class="form-control" id="inputCRN" placeholder="Whats the CRN?">
+				<input type="text" class="form-control" id="inputCRN" placeholder="CRN">
 
 				<label for="selectTerm">Term:</label>
 				<select id="selectTerm" class="form-control">
@@ -116,7 +118,7 @@
 		 -->			
 					
 					</br>
-					<input type="text" class="form-control" id="inputPhoneNum" placeholder="Whats your number?"/>		
+					<input type="text" class="form-control" id="inputPhoneNum" placeholder="Phone #"/>		
 				</div>
 			</form>
 
@@ -206,6 +208,7 @@
 			<div id="auto-reg-classinfo" style="display:none">
 				<input id="buzzport_crn" type="text" placeholder="CRN"> </input>
 				<br>
+
 				<select id="buzzport_term" class="form-control">
 					{{#if fall}}
 						<option value="{{fall}}">{{fallLabel}}</option>
@@ -217,7 +220,9 @@
 						<option value="{{summer}}">{{summerLabel}}</option>
 					{{/if}}
 				</select>
+				<br>
 
+				<input id="auto-reg-email" type="text" placeholder="you@example.com"></input>
 				<br>
 
 				<input type="button" id="buzz_register" class="btn" value="Auto-Register"></input>

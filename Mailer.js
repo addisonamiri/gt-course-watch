@@ -67,11 +67,31 @@ Mailer.prototype.sendMail = function sendMail(existingRequest, smsRequest){
 
 }
 
-Mailer.prototype.sendConfirmationMail = function sendConfirmationMail(requestEmail, requestCRN, smsRequest){
+Mailer.prototype.sendAutoRegSuccessMail = function(existingRequest){
+	// setup e-mail data with unicode symbols
+	var mailOptions = {
+//	    from: "GT Course Watch Mailer ✔ <tofubeast1111@gmail.com>", // sender address
+	    from: "GT Course Watch Mailer ✔ <"+ this.emailID +">", // sender address
+	    to: existingRequest.email, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
+	    subject: "Registration Success CRN: " + existingRequest.crn, // Subject line
+	    text: "The automatated system was able to successfully register you for your class!", // plaintext body
+	    // html: "<b>Hello world ✔</b>" // html body
+	}
+
+	// send mail with defined transport object
+	this.smtpTransport.sendMail(mailOptions, function(error, response){
+	    if(error){
+	        console.log(error);
+	    }
+	});	
+}
+
+Mailer.prototype.sendConfirmationMail = function sendConfirmationMail(requestEmail, requestCRN, smsRequest, autoRegReq){
 
 	    var bodyText="Your Requested Class: " + requestCRN + 
-	    "\nSigned up for SMS notification: " + 
-	    (smsRequest ? "yes" : "no") + 
+
+	    (autoRegReq ? "\nYou signed up for automatic registration." : 
+	    	("\nSigned up for SMS notification: " + (smsRequest ? "yes" : "no") ) ) + 
 	    "\n\nThank you for using my service!";
 
 	// setup e-mail data with unicode symbols

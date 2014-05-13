@@ -27,8 +27,17 @@ function MongoController(url){
 		term: String
 	});
 
+	this.autoRegReqSchema = mongoose.Schema({
+		crn: String,
+		email: String,
+		term: String,
+		buzzport_id: String,
+		buzzport_pass: String
+	});
+
 	this.Request = mongoose.model('Request', this.requestSchema);
 	this.smsRequest = mongoose.model('smsRequest', this.smsRequestSchema);
+	this.autoRegReq = mongoose.model('autoRegReq', this.autoRegReqSchema);
 
 	this.myDB.once('open', function(){
 		console.log('db successfully opened');
@@ -38,7 +47,7 @@ function MongoController(url){
 //STANDARD REQUEST
 MongoController.prototype.createRequest = function createRequest(crnInput, emailInput, termInput){
 	var newRequest = new this.Request({crn:crnInput,email:emailInput,term:termInput});
-	newRequest.save(function(err, newRequest){
+	newRequest.save(function(err, doc){
 		if(err){
 			console.log('save error:' + err);
 		}
@@ -50,11 +59,29 @@ MongoController.prototype.createSMSRequest = function createSMSRequest(crnInput,
 	var newSMSRequest = new this.smsRequest({crn:crnInput,email:emailInput,
 		gatewayedNumber:gatewayedInput, term:termInput});
 	
-	newSMSRequest.save(function(err, newSMSRequest){
+	newSMSRequest.save(function(err, doc){
 		if(err){
 			console.log('save error:' + err);
 		}
 	});
+}
+
+MongoController.prototype.createAutoRegReq = function(iCrn, iEmail, iTerm, iBuzzId, iBuzzPass){
+	var newAutoRegReq = new this.autoRegReq({
+			crn: iCrn,
+			email: iEmail,
+			term: iTerm,
+			buzzport_id: iBuzzId,
+			buzzport_pass: iBuzzPass
+		});
+
+	newAutoRegReq.save(function(err, doc){
+		if(err){
+			console.log(err);
+		}
+	});	
+
+
 }
 
 module.exports = MongoController;

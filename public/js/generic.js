@@ -1,5 +1,11 @@
 var socket = io.connect(window.location.hostname);
 var buzzPortVerified = false;
+var smsEnabled = false; 
+var submittedRequest = {
+	"crn" : null,
+	"email" : null,
+	"gatewayedInput" : null
+};
 
 window.onload = function() {
     var messages = [];
@@ -38,19 +44,13 @@ window.onload = function() {
             sendMessage();
         }
     });
+
+    socket.on('connect_success', function (data) {
+		console.log(data);
+	});
 }
 
-socket.on('connect_success', function (data) {
-	console.log(data);
-});
 
-var smsEnabled = false; 
-
-var submittedRequest = {
-	"crn" : null,
-	"email" : null,
-	"gatewayedInput" : null
-};
 
 $(document).ready(function(){
 
@@ -71,6 +71,7 @@ $(document).ready(function(){
 
 	$('#buzz_verify_sub').click(function(){
 		//verify buzzport
+		console.log()
 		var $modal = $('.loading-bar-modal');
 
 	    $modal.modal({
@@ -93,8 +94,8 @@ $(document).ready(function(){
 					buzzPortVerified = true;
 					alert("Information successfully verified! Input additional info.");
 				}else{
-					$modal.modal('hide');			
 					alert("Your information couldn't be verified.");
+					$modal.modal('hide');			
 				}
 			},
 			error: function(){
@@ -117,7 +118,8 @@ $(document).ready(function(){
 			data: {	username: $('#buzzport_id').val(), 
 					password: $('#buzzport_pass').val(),
 					term: $('#buzzport_term option:selected').text(),
-					crn: $('#buzzport_crn').val()},
+					crn: $('#buzzport_crn').val(),
+					email: $('#auto-reg-email').val()},
 			type: "POST",
 			success: function(res){
 				console.log(res.status);
