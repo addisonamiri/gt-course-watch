@@ -32,9 +32,8 @@ var millisInDay = millisInHour*24;
 //*INITIALIZE CUSTOM MODULES
 var myMailer = new Mailer(mailerEmail, mailerPass);
 var myMongoController = new MongoController(mongoConnectionUrl);
-var myDispatcher = new PhantomJobDispatcher( myMailer,false);
+var myDispatcher = new PhantomJobDispatcher( myMailer);
 myDispatcher.startDispatcher(2000);
-
 
 var springPoller, fallPoller, summerPoller; //pollers
 var pollers; //collection of json objects
@@ -292,4 +291,4 @@ setInterval(function(){
 			if(pollers[key]) pollers[key].pollAllSeats();
 		}
 	}
-}, .1*millisInMinute);
+}, 2*millisInMinute);

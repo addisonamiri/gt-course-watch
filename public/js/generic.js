@@ -83,7 +83,7 @@ $(document).ready(function(){
 		$.ajax({
 			url:"/verifyBuzzport",
 			dataType: "json",
-			timeout: 1000*60*5,
+			timeout: 5*1000*60,
 			data: {username: $('#buzzport_id').val(), password: $('#buzzport_pass').val()},
 			type: "POST",
 			success: function(res){
@@ -105,7 +105,7 @@ $(document).ready(function(){
 				}
 			},
 			error: function(res){
-				alert("Request Timeout (>30sec)");
+				alert("Haven't heard back from the server in 5 minutes, please try again later.");
 				$modal.modal('hide');
 			}
 		});

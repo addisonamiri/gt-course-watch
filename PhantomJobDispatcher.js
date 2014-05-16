@@ -39,7 +39,6 @@ PhantomJobDispatcher.prototype.dispatcherEventLoop = function(){
 		var job = registrationJobsQueue.shift(); //job is just a request obj from mongoDB
 		
 		execRegistrationTask(job, function(res){
-			console.log("Registration job return status: " + res.status);
 			if(res.status == "SUCCESS"){
 				//check if phantom was able to successfuly register. 
 				//if so, send status update email and remove request from db.
@@ -65,7 +64,6 @@ PhantomJobDispatcher.prototype.dispatcherEventLoop = function(){
 		var job = verifyJobsQueue.shift();		
 		
 		execVerifyTask(job.req, function(res){
-			console.log("Verify job return status: " + res.status);
 			job.func(res.status);
 		});
 	}
@@ -83,7 +81,6 @@ function execRegistrationTask(job, cb){
 		+ job.buzzport_id + " " + job.buzzport_pass + " " + job.term + " " + job.crn;
 
 	child = exec(execStatement,function (error, stdout, stderr) {
-		console.log(stdout);
 	});
 
 	child.stdout.on("data", function(data){
