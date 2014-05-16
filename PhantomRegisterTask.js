@@ -16,7 +16,7 @@ var page = new WebPage(),
 // }
 
 page.onConsoleMessage = function(msg) {
-  console.log(msg);
+  // console.log(msg);
 };
 
 page.onLoadStarted = function() {

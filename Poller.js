@@ -1,11 +1,12 @@
 var https = require('https');
 var cheerio = require('cheerio');
 
-function Poller(mongoController, mailer, basePath, term){
+function Poller(mongoController, mailer, basePath, term, dispatcher){
 	this.mongoController = mongoController;
 	this.mailer = mailer;
 	this.basePath = basePath;
 	this.term = term;
+	this.dispatcher = dispatcher;
 }
 
 Poller.prototype.pollAllSeats = function pollAllSeats(){
@@ -16,11 +17,9 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 			console.log(err);
 		}
 
-
 		for (requestIdx in requestPool) {
 			self.scrapeSeats(requestPool[requestIdx], false);
 		}
-
 	});
 
 	this.mongoController.smsRequest.find({term:self.term}, function(err, requestPool){
@@ -31,10 +30,14 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 		for (requestIdx in requestPool) {
 			self.scrapeSeats(requestPool[requestIdx], true);
 		}
-
 	});
 
-	this.mongoController.autoRegReq.find({term:self.term}, function(err, requestPool){
+	//need to adjust term for auto reg reqs
+	var indexOf2 = self.term.indexOf('2');
+	var adjustedTerm = self.term.slice(0, indexOf2) + "-" + self.term.slice(indexOf2);
+	adjustedTerm = adjustedTerm.charAt(0).toUpperCase() + adjustedTerm.slice(1);
+
+	this.mongoController.autoRegReq.find({term:adjustedTerm}, function(err, requestPool){
 		if(err){
 			console.log(err)
 		}
@@ -42,9 +45,7 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 		for (requestIdx in requestPool) {
 			self.scrapeSeats(requestPool[requestIdx], true);
 		}
-
 	});
-	
 }
 
 Poller.prototype.getSeatStats = function getSeatStats(crn, cb){
@@ -109,7 +110,6 @@ Poller.prototype.getSeatStats = function getSeatStats(crn, cb){
 
 
 Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest){
-
 	var self = this;
 
 	var options = {
@@ -141,12 +141,11 @@ Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest)
 		    $('.dddefault').each(function(i){
 		    	if(i==3){
 		    		var remainingSeats = parseInt($(this).text().trim());
+		    		//perserve this reference by calling on self
 		    		self.checkSeats(remainingSeats, existingRequest, smsRequest);
 		    	}
 		    });
-
 		});
-
 	});
 
 	req.end();
@@ -154,21 +153,22 @@ Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest)
 	req.on('error', function(e) {
 	  console.error(e);
 	});
-
 }
 
 Poller.prototype.checkSeats = function checkSeats(numSeats, existingRequest, smsRequest){
 	if(numSeats > 0){
 		// console.log('there is a seat open! ' + numSeats);
-		if(existingRequest.hasOwnProperty('buzzport_id')){
+		if('buzzport_id' in existingRequest){
 			//encounter case where there is a free slot for an auto registration request.
-			//dispatch phantom job
+			//add job to phantom queue
+			if(existingRequest.beingProcessed == "false"){
+				this.dispatcher.addRegisterTaskToQueue(existingRequest);
+				existingRequest.beingProcessed = "true";
+				existingRequest.save();
+			}
 
-			//check if phantom was able to successfuly register. if so, send status update email and remove request from db.
-			this.mailer.sendAutoRegSuccessMail(existingRequest);
-			existingRequest.remove();
 		}else{
-			this.mailer.sendMail(existingRequest, smsRequest);
+			this.mailer.sendNotificationMail(existingRequest, smsRequest);
 			existingRequest.remove();
 		}
 	}else{

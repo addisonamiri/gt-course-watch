@@ -3,11 +3,11 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 var hbs = require('hbs');
-var exec = require('child_process').exec;
 
 var MongoController = require('./MongoController.js');
 var Mailer = require('./Mailer.js');
 var Poller = require('./Poller.js');
+var PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
 
 //AWS Pub DNS
 //http://ec2-54-234-151-220.compute-1.amazonaws.com
@@ -16,7 +16,6 @@ var Poller = require('./Poller.js');
 var mailerEmail = "tofubeast1111@gmail.com";
 var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
-
 
 app.use(express.cookieParser());
 var store = new express.session.MemoryStore;
@@ -33,6 +32,9 @@ var millisInDay = millisInHour*24;
 //*INITIALIZE CUSTOM MODULES
 var myMailer = new Mailer(mailerEmail, mailerPass);
 var myMongoController = new MongoController(mongoConnectionUrl);
+var myDispatcher = new PhantomJobDispatcher( myMailer,false);
+myDispatcher.startDispatcher(2000);
+
 
 var springPoller, fallPoller, summerPoller; //pollers
 var pollers; //collection of json objects
@@ -57,64 +59,27 @@ app.use(express.static('public'));
 
 app.post('/verifyBuzzport', function(req, res){
 	var post = req.body;
+	console.log(post);
 
-	/*
-	var maxWaitPeriod = 30000;
-	var child;
-
-	child = exec('phantomjs PhantomVerifyTask.js ' + post.username + " " + post.password,
-	    function (error, stdout, stderr) {
-	    }
+	myDispatcher.addVerifyTaskToQueue(
+		{	
+			username: post.username, 
+			password:post.password 
+		}, 
+		function(status){
+			res.json({status: status});
+		}
 	);
-
-	child.stdout.on("data", function(data){
-		console.log(data);
-		if(data.indexOf("VERIFICATION_SUCCESS")>-1){
-			res.send({status: "success"});
-		}
-		else if(data.indexOf("VERIFICATION_FAILURE")>-1){
-			res.send({status: "failure"});
-		}
-	});
-
-	setTimeout(function(){
-		console.log("Sending SIGKILL to phantom..");
-		child.kill('SIGKILL');
-	}, maxWaitPeriod);
-	*/
 });
 
 app.post('/autoRegReq', function(req, res){
 	var post = req.body;
 
-	/*
-	var child;	
-	var execStatement = 'phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 PhantomRegisterTask.js ' 
-		+ post.username + " " + post.password + " " + post.term + " " + post.crn;
-
-	child = exec(execStatement,function (error, stdout, stderr) {
-		console.log(stdout);
-	});
-
-	child.stdout.on("data", function(data){
-		if(data.indexOf("SUCCESS")>-1){
-			res.send({status: "success"});
-		}
-		else if(data.indexOf("FAILURE")>-1){
-			res.send({status: "FAILURE"});
-		}
-		else if(data.indexOf("INVALID_TERM_ERROR")>-1){
-			res.send({status: "INVALID_TERM_ERROR"});
-		}		
-		else if(data.indexOf("REGISTRATION_ERROR")>-1){
-			res.send({status: "REGISTRATION_ERROR"});
-		}
-	});
-	*/
-
-	post.term = post.term.replace(' ', '-');	
+	post.term = post.term.replace(' ', '-');
 	myMongoController.createAutoRegReq(post.crn, post.email, post.term, post.username, post.password);
 	myMailer.sendConfirmationMail(post.email, post.crn, false, true);
+
+	res.json({status: "SUCCESS"});
 });
 
 app.get('/', function(req, res) {
@@ -242,7 +207,7 @@ function initPollers(){
 		pathComponents[2] = '02';
 		var springBasePath = pathComponents.join('');
 		console.log(springBasePath);
-		springPoller = new Poller(myMongoController, myMailer, springBasePath, springTerm);
+		springPoller = new Poller(myMongoController, myMailer, springBasePath, springTerm, myDispatcher);
 
 		summerPoller = fallPoller = summerTerm = fallTerm = null;
 		atLeastOnePoller = true;
@@ -255,7 +220,7 @@ function initPollers(){
 			summerTerm = 'summer' + year.toString();
 			pathComponents[2] = '05';
 			var summerBasePath = pathComponents.join('');
-			summerPoller = new Poller(myMongoController, myMailer, summerBasePath, summerTerm);
+			summerPoller = new Poller(myMongoController, myMailer, summerBasePath, summerTerm, myDispatcher);
 			atLeastOnePoller = true;
 		}else{
 			summerTerm = summerPoller = null;
@@ -266,7 +231,7 @@ function initPollers(){
 			fallTerm = 'fall' + year.toString();
 			pathComponents[2] = '08';
 			var fallBasePath = pathComponents.join('');
-			fallPoller = new Poller(myMongoController, myMailer, fallBasePath, fallTerm);
+			fallPoller = new Poller(myMongoController, myMailer, fallBasePath, fallTerm, myDispatcher);
 			atLeastOnePoller = true;
 		}else{
 			fallTerm = fallPoller = null;
@@ -327,4 +292,4 @@ setInterval(function(){
 			if(pollers[key]) pollers[key].pollAllSeats();
 		}
 	}
-}, 2*millisInMinute);
+}, .1*millisInMinute);

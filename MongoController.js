@@ -32,7 +32,8 @@ function MongoController(url){
 		email: String,
 		term: String,
 		buzzport_id: String,
-		buzzport_pass: String
+		buzzport_pass: String,
+		beingProcessed: String
 	});
 
 	this.Request = mongoose.model('Request', this.requestSchema);
@@ -72,16 +73,15 @@ MongoController.prototype.createAutoRegReq = function(iCrn, iEmail, iTerm, iBuzz
 			email: iEmail,
 			term: iTerm,
 			buzzport_id: iBuzzId,
-			buzzport_pass: iBuzzPass
+			buzzport_pass: iBuzzPass,
+			beingProcessed: "false"
 		});
 
 	newAutoRegReq.save(function(err, doc){
 		if(err){
 			console.log(err);
 		}
-	});	
-
-
+	});
 }
 
 module.exports = MongoController;

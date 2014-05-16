@@ -17,7 +17,25 @@ function Mailer(email, pass){
 
 }
 
-Mailer.prototype.sendMail = function sendMail(existingRequest, smsRequest){
+Mailer.prototype.sendGenericMail = function(email, subj, msg){
+	var mailOptions = {
+//	    from: "GT Course Watch Mailer ✔ <tofubeast1111@gmail.com>", // sender address
+	    from: "GT Course Watch Mailer <"+ this.emailID +">", // sender address
+	    to: email, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
+	    subject: subj, // Subject line
+	    text: msg, // plaintext body
+	    // html: "<b>Hello world ✔</b>" // html body
+	}
+
+	// send mail with defined transport object
+	this.smtpTransport.sendMail(mailOptions, function(error, response){
+	    if(error){
+	        console.log(error);
+	    }
+	});		
+}
+
+Mailer.prototype.sendNotificationMail = function(existingRequest, smsRequest){
 
 	// setup e-mail data with unicode symbols
 	var mailOptions = {

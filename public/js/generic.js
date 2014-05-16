@@ -83,24 +83,30 @@ $(document).ready(function(){
 		$.ajax({
 			url:"/verifyBuzzport",
 			dataType: "json",
-			timeout: 30000,
+			timeout: 1000*60*5,
 			data: {username: $('#buzzport_id').val(), password: $('#buzzport_pass').val()},
 			type: "POST",
 			success: function(res){
 				console.log(res.status);
-				if(res.status=="success"){
+				if(res.status=="SUCCESS"){
 					$modal.modal('hide');
 					$('#auto-reg-classinfo').show();
 					buzzPortVerified = true;
 					alert("Information successfully verified! Input additional info.");
-				}else{
+				}else if(res.status=="FAILURE"){
 					alert("Your information couldn't be verified.");
 					$modal.modal('hide');			
+				}else if(res.status=="MAX_TIME_REACHED"){
+					alert("Server under heavy load, please try again later.");
+					$modal.modal('hide');					
+				}else{
+					alert("Something went wrong.");
+					$modal.modal('hide');					
 				}
 			},
-			error: function(){
-				$modal.modal('hide');
+			error: function(res){
 				alert("Request Timeout (>30sec)");
+				$modal.modal('hide');
 			}
 		});
 	});
@@ -123,10 +129,10 @@ $(document).ready(function(){
 			type: "POST",
 			success: function(res){
 				console.log(res.status);
-				if(res.status=="success"){
-					alert("registration complete");
+				if(res.status=="SUCCESS"){
+					alert("Successfully signed up for auto-registration.");
 				}else{
-					alert("couldn't complete registration");
+					alert("Couldn't sign you up due to an error.");
 				}	
 			},
 			error: function(){

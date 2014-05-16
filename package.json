@@ -1,6 +1,6 @@
 {
 	"name": "GTCourseWatch",
-	"description": "gt course watcher",
+	"description": "GT Registration Assistance System",
 	"version": "0.0.1",
 	"dependencies": {
 		"express": "3.2",
@@ -9,7 +9,6 @@
 		"mongoose" : "latest",
 		"socket.io" : "latest",
 		"cheerio" : "latest",
-		"request" : "latest",
 		"forever" : "latest"
 	}
 }
