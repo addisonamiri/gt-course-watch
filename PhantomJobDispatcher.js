@@ -50,6 +50,7 @@ PhantomJobDispatcher.prototype.dispatcherEventLoop = function(){
 				var subj = "Registration Error";
 				var msg = "Your automatated registration request encountered the following error: " + res.status +
 					"\nAs a result, your request has been removed from the system.";
+
 				self.mailer.sendGenericMail(job.email, subj, msg);
 				job.remove();
 			}else{
@@ -100,7 +101,7 @@ function execRegistrationTask(job, cb){
 			clearTimeout(killJob);
 			jobInProgress = false;
 			numConcurrentJobs--;							
-			cb({status: "INVALID TERM ERROR: Term not open for registration."});
+			cb({status: "INVALID TERM ERROR: You don't have a time ticket for the term you signed up for."});
 		}		
 		else if(data.indexOf("REGISTRATION_ERROR")>-1){
 			clearTimeout(killJob);
