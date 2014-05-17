@@ -139,22 +139,23 @@
 				</h6>
 			</div>			
 
-			<input type="text" class="form-control" id="stats_crn" placeholder="CRN">
+			<div class="form-group">
+				<input type="text" class="form-control" id="stats_crn" placeholder="CRN">
 
-			<select id="stats_term" class="form-control">
-				{{#if fall}}
-					<option value="{{fall}}">{{fallLabel}}</option>
-				{{/if}}
-				{{#if spring}}
-					<option value="{{spring}}">{{springLabel}}</option>
-				{{/if}}
-				{{#if summer}}
-					<option value="{{summer}}">{{summerLabel}}</option>
-				{{/if}}
-			</select>
-			<br/>
+				<select id="stats_term" class="form-control">
+					{{#if fall}}
+						<option value="{{fall}}">{{fallLabel}}</option>
+					{{/if}}
+					{{#if spring}}
+						<option value="{{spring}}">{{springLabel}}</option>
+					{{/if}}
+					{{#if summer}}
+						<option value="{{summer}}">{{summerLabel}}</option>
+					{{/if}}
+				</select>
+			</div>
 
-			<input id="get_stats_btn" class="btn" type="button btn-info" value="Get Stats" onClick="getStats();" />
+			<input id="get_stats_btn" class="btn btn-info" type="button" value="Get Stats" onClick="getStats();" />
 			<br/>
 			<br/>
 
@@ -199,8 +200,8 @@
 
 			<div class="form-group">
 
-			<input type="text" id="buzzport_id" class="form-control" placeholder="Buzzport Username"> </input>
-			<input type="password" id="buzzport_pass" class="form-control" placeholder="Buzzport Password"> </input>
+				<input type="text" id="buzzport_id" class="form-control" placeholder="Buzzport Username"> </input>
+				<input type="password" id="buzzport_pass" class="form-control" placeholder="Buzzport Password"> </input>
 
 			</div>
 

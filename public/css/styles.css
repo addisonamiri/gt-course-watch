@@ -3,6 +3,14 @@ body {
 	margin-bottom: 80px;
 }
 
+input {
+	margin-top: 5px;
+}
+
+select{
+	margin-top: 5px;	
+}
+
 path.slice{
   stroke-width:2px;
 }
