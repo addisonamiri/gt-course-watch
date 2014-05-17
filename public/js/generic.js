@@ -136,7 +136,7 @@ $(document).ready(function(){
 				}	
 			},
 			error: function(){
-				console.log("timeout");				
+				console.log("connection timeout");				
 			}
 		});
 

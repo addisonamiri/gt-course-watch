@@ -101,7 +101,7 @@ function execRegistrationTask(job, cb){
 			clearTimeout(killJob);
 			jobInProgress = false;
 			numConcurrentJobs--;							
-			cb({status: "INVALID TERM ERROR: You don't have a time ticket for the term you signed up for."});
+			cb({status: "INVALID TERM ERROR, You don't have a time ticket for the term you signed up for."});
 		}		
 		else if(data.indexOf("REGISTRATION_ERROR")>-1){
 			clearTimeout(killJob);

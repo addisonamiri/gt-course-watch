@@ -59,28 +59,31 @@
 				</h6>
 			</div>
 
-			<form style="padding-left:1px">
+			<form role="form" style="padding-left:1px">
 			<!-- 			<label for="inputEmail">Email </label>
 			-->			
-				<input type="text" class="form-control" id="inputEmail" placeholder="you@example.com">
 
-			<!-- 			<label for="inputCRN">CRN </label>
-			-->			
-				</br>
-				<input type="text" class="form-control" id="inputCRN" placeholder="CRN">
+				<div class="form-group">
 
-				<label for="selectTerm">Term:</label>
-				<select id="selectTerm" class="form-control">
-					{{#if fall}}
-						<option value="{{fall}}">{{fallLabel}}</option>
-					{{/if}}
-					{{#if spring}}
-						<option value="{{spring}}">{{springLabel}}</option>
-					{{/if}}
-					{{#if summer}}
-						<option value="{{summer}}">{{summerLabel}}</option>
-					{{/if}}
-				</select>
+					<input type="text" class="form-control" id="inputEmail" placeholder="Email">
+
+				<!-- 			<label for="inputCRN">CRN </label>
+				-->			
+					<input type="text" class="form-control" id="inputCRN" placeholder="CRN">
+
+					<select id="selectTerm" class="form-control">
+						{{#if fall}}
+							<option value="{{fall}}">{{fallLabel}}</option>
+						{{/if}}
+						{{#if spring}}
+							<option value="{{spring}}">{{springLabel}}</option>
+						{{/if}}
+						{{#if summer}}
+							<option value="{{summer}}">{{summerLabel}}</option>
+						{{/if}}
+					</select>
+					
+				</div>
 
 				<div>
 
@@ -115,14 +118,13 @@
 		<!-- 			<label for="inputPhoneNum">Phone Number</label>
 		 -->			
 					
-					</br>
 					<input type="text" class="form-control" id="inputPhoneNum" placeholder="Phone #"/>		
 				</div>
 			</form>
 
-
+			<br>
 			<div>
-				<button id= "send_request" class="btn btn-primary">Request</button>
+				<button id= "send_request" class="btn btn-primary">Request Watch</button>
 				<button id="makeAnother" class="btn btn-info">Make Another</button>
 			</div> <!--form center -->
 			
@@ -132,14 +134,14 @@
 		<div class="tab-pane fade" id="class_stats">
 			<div>
 				<h6>
-					Load seat stats for a CRN of your choice. Enjoy the animated chart.
+					Load seat stats for a CRN of your choice without having to log in to BuzzPort. 
+					<br>Enjoy the animated chart.
 				</h6>
 			</div>			
 
-			<input type="text" id="stats_crn" placeholder="CRN?">
-			<br/>
+			<input type="text" class="form-control" id="stats_crn" placeholder="CRN">
 
-			<select id="stats_term">
+			<select id="stats_term" class="form-control">
 				{{#if fall}}
 					<option value="{{fall}}">{{fallLabel}}</option>
 				{{/if}}
@@ -152,7 +154,7 @@
 			</select>
 			<br/>
 
-			<input id="get_stats_btn" class="btn" type="button" value="Get Stats" onClick="getStats();" />
+			<input id="get_stats_btn" class="btn" type="button btn-info" value="Get Stats" onClick="getStats();" />
 			<br/>
 			<br/>
 
@@ -189,25 +191,26 @@
 			<h6>
 			First verify your BuzzPort credentials, then input your course information and hit auto-register.<br>
 			When a seat is free, the automated system will login to BuzzPort and register for you. <br>
-			You'll be e-mailed upon successful registration.<br>
-			Free for a limited time.
+			You'll also be e-mailed upon successful registration.<br>
 			</h6>
 
 
 <!-- 			<a href="#buzz_verify_modal" data-toggle="modal" class="btn btn-primary">Verify BuzzPort Credentials</a> -->
 
-			<input type="text" id="buzzport_id" placeholder="Buzzport Username"> </input>
-			</br>
-			<input type="password" id="buzzport_pass" placeholder="Buzzport Password"> </input>
-			<br>
-			<input type="button" id="buzz_verify_sub" class="btn" value="Verify BuzzPort"></input>
+			<div class="form-group">
+
+			<input type="text" id="buzzport_id" class="form-control" placeholder="Buzzport Username"> </input>
+			<input type="password" id="buzzport_pass" class="form-control" placeholder="Buzzport Password"> </input>
+
+			</div>
+
+			<input type="button" id="buzz_verify_sub" class="btn btn-primary" value="Verify BuzzPort"></input>
 
 			<br>
 			<br>
 
 			<div id="auto-reg-classinfo" style="display:none">
-				<input id="buzzport_crn" type="text" placeholder="CRN"> </input>
-				<br>
+				<input id="buzzport_crn" type="text" class="form-control" placeholder="CRN"> </input>
 
 				<select id="buzzport_term" class="form-control">
 					{{#if fall}}
@@ -220,27 +223,26 @@
 						<option value="{{summer}}">{{summerLabel}}</option>
 					{{/if}}
 				</select>
-				<br>
 
-				<input id="auto-reg-email" type="text" placeholder="you@example.com"></input>
-				<br>
+				<input id="auto-reg-email" type="text" class="form-control" placeholder="Email"></input>
 
-				<input type="button" id="buzz_register" class="btn" value="Auto-Register"></input>
+				<br>
+				
+				<input type="button" id="buzz_register" class="btn btn-success" value="Request Auto-Register"></input>
 			</div>
 		</div>
 
 
 		<div class="tab-pane fade" id="live_chat">
 
-			<h6>Anyone on this page right now can see what you're saying, and no history saved.</h6>
+			<h6>Anyone on this page right now can see what you're saying. no history saved.</h6>
 
 			<div id="content" style='width: 500px; height: 300px; margin: 0 0 20px 0; border: solid 1px #999; overflow-y: scroll;'> </div>
 
 			<div class="input-append">
 			<!-- style="width:350px;" -->
-				<input id="name" type="text" placeholder="Name" style="width:350px;"> </input>
-				<br>
-				<input id="field" type="text" placeholder="Message" style="width:350px;"> </input>
+				<input id="name" class="form-control" type="text" placeholder="Name" style="width:350px;"> </input>
+				<input id="field" class="form-control" type="text" placeholder="Message" style="width:350px;"> </input>
 				<input id="send" type="button" class="btn" value="Send"></input>			
 			</div>
 
