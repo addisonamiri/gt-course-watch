@@ -331,7 +331,7 @@ function getStats(cb){
 			$('#class_stats_div').html("<h6> Stats for CRN: " + crn + "</h6>");
 			$('#class_stats_div').append("<h6>" + data.numWatchers + " people are watching this class. </h6>");
 
-			var tableHTML = '<br/> <table class="table table-striped" style="width:300px"> <tr> <th></th> <th>Seat Stats</th>' + 
+			var tableHTML = '<br/> <table class="table table-striped" style="width:500px"> <tr> <th></th> <th>Seat Stats</th>' + 
 				'<th>Waitlist Stats</th> </tr> <tr> <td>Remaining</td>' +
 				'<td>' + data.remaining + '/' + data.capacity + '</td>' +	 
 				'<td>' + data.waitlist_remaining + '/' + data.waitlist_capacity + '</td></tr><tr><td>Actual</td>' +

@@ -131,59 +131,77 @@
 
 		</div>
 
-		<div class="tab-pane fade" id="class_stats">
-			<div>
-				<h6>
-					Load seat stats for a CRN of your choice without having to log in to BuzzPort. 
-					<br>Enjoy the animated chart.
-				</h6>
-			</div>			
+		<div class="tab-pane fade" style="position:relative;" id="class_stats">
 
-			<div class="form-group">
-				<input type="text" class="form-control" id="stats_crn" placeholder="CRN">
+			<div class = "container">
+			        <div class = "row">
+			               
+			<!--                Remember, there's 12 possible grid boxes to be divided amongst your grid items.
+			-->
+			            <div class = "col-md-2">
+							<div>
+								<h6>
+									Load seat stats for a CRN of your choice without having to log in to BuzzPort. 
+									<br>Enjoy the animated chart.
+								</h6>
+							</div>			
 
-				<select id="stats_term" class="form-control">
-					{{#if fall}}
-						<option value="{{fall}}">{{fallLabel}}</option>
-					{{/if}}
-					{{#if spring}}
-						<option value="{{spring}}">{{springLabel}}</option>
-					{{/if}}
-					{{#if summer}}
-						<option value="{{summer}}">{{summerLabel}}</option>
-					{{/if}}
-				</select>
+							<div class="form-group">
+								<input type="text" style="width:auto;" class="form-control" id="stats_crn" placeholder="CRN">
+
+								<select id="stats_term" style="width:auto;" class="form-control">
+									{{#if fall}}
+										<option value="{{fall}}">{{fallLabel}}</option>
+									{{/if}}
+									{{#if spring}}
+										<option value="{{spring}}">{{springLabel}}</option>
+									{{/if}}
+									{{#if summer}}
+										<option value="{{summer}}">{{summerLabel}}</option>
+									{{/if}}
+								</select>
+							</div>
+
+							<input id="get_stats_btn" class="btn btn-info" type="button" value="Get Stats" onClick="getStats();" />
+
+			            </div>
+
+			            <div class = "col-md-7 col-md-offset-3">
+
+							<div class="upperRight" style="position:absolute;top:0px;width:500px;">
+
+								<div id="class_stats_div">
+
+									<table class="table" style="width:500px">
+										<tr>
+											<th></th>
+											<th>Seat Stats</th>
+											<th>Waitlist Stats</th>
+										</tr>
+
+										<tr>
+											<td>Remaining</td>
+											<td>-</td>
+											<td>-</td> 
+										</tr>
+
+										<tr>
+											<td>Actual</td>				
+											<td>-</td>
+											<td>-</td> 
+										</tr>
+									</table>
+
+								</div>
+
+								<div id="pieChart"></div>
+
+							</div>
+
+			            </div>
+
+			         </div>
 			</div>
-
-			<input id="get_stats_btn" class="btn btn-info" type="button" value="Get Stats" onClick="getStats();" />
-			<br/>
-			<br/>
-
-			<div id="class_stats_div">
-
-				<table class="table" style="width:300px">
-					<tr>
-						<th></th>
-						<th>Seat Stats</th>
-						<th>Waitlist Stats</th>
-					</tr>
-
-					<tr>
-						<td>Remaining</td>
-						<td>-</td>
-						<td>-</td> 
-					</tr>
-
-					<tr>
-						<td>Actual</td>				
-						<td>-</td>
-						<td>-</td> 
-					</tr>
-				</table>
-
-			</div>
-
-			<div id="pieChart"></div>
 
 		</div>
 
