@@ -36,9 +36,23 @@ function MongoController(url){
 		beingProcessed: String
 	});
 
+	this.confirmationStatSchema = mongoose.Schema({
+		reg_reqs: Number,
+		sms_reqs: Number,
+		auto_reqs: Number
+	});
+
+	this.successStatSchema = mongoose.Schema({
+		reg_reqs: Number,
+		sms_reqs: Number,
+		auto_reqs: Number
+	});
+
 	this.Request = mongoose.model('Request', this.requestSchema);
 	this.smsRequest = mongoose.model('smsRequest', this.smsRequestSchema);
 	this.autoRegReq = mongoose.model('autoRegReq', this.autoRegReqSchema);
+	this.confirmationStat = mongoose.model('confirmationStat', this.confirmationStatSchema);
+	this.successStat = mongoose.model('successStat', this.successStatSchema);
 
 	this.myDB.once('open', function(){
 		console.log('db successfully opened');
@@ -83,6 +97,34 @@ MongoController.prototype.createAutoRegReq = function(iCrn, iEmail, iTerm, iBuzz
 		}
 	});
 }
+
+MongoController.prototype.createRequest = function createRequest(crnInput, emailInput, termInput){
+	var newRequest = new this.Request({crn:crnInput,email:emailInput,term:termInput});
+	newRequest.save(function(err, doc){
+		if(err){
+			console.log('save error:' + err);
+		}
+	});
+}
+
+MongoController.prototype.createConfirmationStat = function (regular, sms, auto){
+	var newStat = new this.confirmationStat({reg_reqs:regular,sms_reqs:sms,auto_reqs:auto});
+	newStat.save(function(err, doc){
+		if(err){
+			console.log('save error:' + err);
+		}
+	});
+}
+
+MongoController.prototype.createSuccessStat = function (regular, sms, auto){
+	var newStat = new this.successStat({reg_reqs:regular,sms_reqs:sms,auto_reqs:auto});
+	newStat.save(function(err, doc){
+		if(err){
+			console.log('save error:' + err);
+		}
+	});
+}
+
 
 module.exports = MongoController;
 

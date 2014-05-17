@@ -168,6 +168,15 @@ Poller.prototype.checkSeats = function checkSeats(numSeats, existingRequest, sms
 			}
 
 		}else{
+
+
+			if(smsRequest){
+				this.mongoController.createSuccessStat(0,1,0);
+			}else{
+				this.mongoController.createSuccessStat(1,0,0);
+			}
+
+
 			this.mailer.sendNotificationMail(existingRequest, smsRequest);
 			existingRequest.remove();
 		}

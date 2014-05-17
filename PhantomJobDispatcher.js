@@ -6,9 +6,10 @@ var verifyJobsQueue = [], //each index holds an obj {request, callbackFunc}
 	numConcurrentJobs = 0,
 	eventLoopInterval;
 
-function PhantomJobDispatcher(mailer, throttle){
+function PhantomJobDispatcher(mailer, mongoController, throttle){
    	this.throttle = typeof throttle !== 'undefined' ? throttle : false;
 	this.mailer = mailer;
+	this.mongoController = mongoController;
 }
 
 //producers
@@ -44,6 +45,7 @@ PhantomJobDispatcher.prototype.dispatcherEventLoop = function(){
 				//if so, send status update email and remove request from db.
 				//this is the condition where we bill.
 				self.mailer.sendAutoRegSuccessMail(job);
+				self.mongoController.createSuccessStat(0,0,1);
 				job.remove(); //remove from DB	
 			}else if(res.status.indexOf("ERROR") > -1){
 				//encountered an error so remove from DB

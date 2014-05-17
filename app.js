@@ -32,7 +32,7 @@ var millisInDay = millisInHour*24;
 //*INITIALIZE CUSTOM MODULES
 var myMailer = new Mailer(mailerEmail, mailerPass);
 var myMongoController = new MongoController(mongoConnectionUrl);
-var myDispatcher = new PhantomJobDispatcher( myMailer);
+var myDispatcher = new PhantomJobDispatcher( myMailer, myMongoController);
 myDispatcher.startDispatcher(2000);
 
 var springPoller, fallPoller, summerPoller; //pollers
@@ -76,6 +76,7 @@ app.post('/autoRegReq', function(req, res){
 
 	post.term = post.term.replace(' ', '-');
 	myMongoController.createAutoRegReq(post.crn, post.email, post.term, post.username, post.password);
+	myMongoController.createConfirmationStat(0,0,1);
 	myMailer.sendConfirmationMail(post.email, post.crn, false, true);
 
 	res.json({status: "SUCCESS"});
@@ -178,11 +179,14 @@ function socketHandler(socket){
 	socket.on('makeRequest', function(data){
 		myMongoController.createRequest(data.crn, data.email, data.term);
 		myMailer.sendConfirmationMail(data.email, data.crn, false, false);
+		myMongoController.createConfirmationStat(1,0,0);
+
 	});
 
 	socket.on('makeSMSRequest', function(data){
 		myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber, data.term);
 		myMailer.sendConfirmationMail(data.email, data.crn, true, false);
+		myMongoController.createConfirmationStat(0,1,0);
 	});
 }
 
