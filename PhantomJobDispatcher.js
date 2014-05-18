@@ -77,7 +77,7 @@ function execRegistrationTask(job, cb){
 	jobInProgress = true;
 	numConcurrentJobs++;
 
-	var maxWaitPeriod = 60000,
+	var maxWaitPeriod = 90000,
 		child;
 
 	var execStatement = 'phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 PhantomRegisterTask.js ' 
@@ -127,7 +127,7 @@ function execVerifyTask(job, cb){
 	jobInProgress = true;
 	numConcurrentJobs++;	
 
-	var maxWaitPeriod = 30000,
+	var maxWaitPeriod = 60000,
 		child;
 
 	child = exec('phantomjs PhantomVerifyTask.js ' + job.username + " " + job.password,

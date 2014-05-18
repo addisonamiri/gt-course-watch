@@ -97,10 +97,10 @@ $(document).ready(function(){
 					alert("Your information couldn't be verified.");
 					$modal.modal('hide');			
 				}else if(res.status=="MAX_TIME_REACHED"){
-					alert("Server under heavy load, please try again later.");
+					alert("Server under heavy load, please try again in a minute.");
 					$modal.modal('hide');					
 				}else{
-					alert("Something went wrong.");
+					alert("Something went wrong, try again later.");
 					$modal.modal('hide');					
 				}
 			},
