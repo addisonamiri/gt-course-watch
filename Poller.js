@@ -9,46 +9,7 @@ function Poller(mongoController, mailer, basePath, term, dispatcher){
 	this.dispatcher = dispatcher;
 }
 
-Poller.prototype.pollAllSeats = function pollAllSeats(){
-	var self = this;
-
-	this.mongoController.Request.find({term:self.term}, function(err, requestPool){
-		if(err){
-			console.log(err);
-		}
-
-		for (requestIdx in requestPool) {
-			self.scrapeSeats(requestPool[requestIdx], false);
-		}
-	});
-
-	this.mongoController.smsRequest.find({term:self.term}, function(err, requestPool){
-		if(err){
-			console.log(err)
-		}
-
-		for (requestIdx in requestPool) {
-			self.scrapeSeats(requestPool[requestIdx], true);
-		}
-	});
-
-	//need to adjust term for auto reg reqs
-	var indexOf2 = self.term.indexOf('2');
-	var adjustedTerm = self.term.slice(0, indexOf2) + "-" + self.term.slice(indexOf2);
-	adjustedTerm = adjustedTerm.charAt(0).toUpperCase() + adjustedTerm.slice(1);
-
-	this.mongoController.autoRegReq.find({term:adjustedTerm}, function(err, requestPool){
-		if(err){
-			console.log(err)
-		}
-
-		for (requestIdx in requestPool) {
-			self.scrapeSeats(requestPool[requestIdx], true);
-		}
-	});
-}
-
-Poller.prototype.getSeatStats = function getSeatStats(crn, cb){
+Poller.prototype.getSeatStats = function (crn, cb){
 	var self = this;
 
 	var options = {
@@ -108,6 +69,44 @@ Poller.prototype.getSeatStats = function getSeatStats(crn, cb){
 	});	
 }
 
+Poller.prototype.pollAllSeats = function pollAllSeats(){
+	var self = this;
+
+	this.mongoController.Request.find({term:self.term}, function(err, requestPool){
+		if(err){
+			console.log(err);
+		}
+
+		for (requestIdx in requestPool) {
+			self.scrapeSeats(requestPool[requestIdx], false);
+		}
+	});
+
+	this.mongoController.smsRequest.find({term:self.term}, function(err, requestPool){
+		if(err){
+			console.log(err)
+		}
+
+		for (requestIdx in requestPool) {
+			self.scrapeSeats(requestPool[requestIdx], true);
+		}
+	});
+
+	//need to adjust term for auto reg reqs
+	var indexOf2 = self.term.indexOf('2');
+	var adjustedTerm = self.term.slice(0, indexOf2) + "-" + self.term.slice(indexOf2);
+	adjustedTerm = adjustedTerm.charAt(0).toUpperCase() + adjustedTerm.slice(1);
+
+	this.mongoController.autoRegReq.find({term:adjustedTerm}, function(err, requestPool){
+		if(err){
+			console.log(err)
+		}
+
+		for (requestIdx in requestPool) {
+			self.scrapeSeats(requestPool[requestIdx], true);
+		}
+	});
+}
 
 Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest){
 	var self = this;

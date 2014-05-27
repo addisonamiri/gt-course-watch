@@ -4,6 +4,7 @@ var verifyJobsQueue = [], //each index holds an obj {request, callbackFunc}
 	registrationJobsQueue = [], //each index just holds a requuest obj from db
 	jobInProgress = false,
 	numConcurrentJobs = 0,
+	maxConcurrentJobs = 8,
 	eventLoopInterval;
 
 function PhantomJobDispatcher(mailer, mongoController, throttle){
@@ -62,7 +63,7 @@ PhantomJobDispatcher.prototype.dispatcherEventLoop = function(){
 			}
 		});
 
-	}else if(verifyJobsQueue.length > 0){
+	}else if(verifyJobsQueue.length > 0 && (numConcurrentJobs <= maxConcurrentJobs)){
 		//we can look for validation tasks to complete.
 		var job = verifyJobsQueue.shift();		
 		

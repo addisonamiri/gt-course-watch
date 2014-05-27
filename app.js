@@ -58,7 +58,6 @@ app.use(express.static('public'));
 
 app.post('/verifyBuzzport', function(req, res){
 	var post = req.body;
-	console.log(post);
 
 	myDispatcher.addVerifyTaskToQueue(
 		{	
@@ -147,7 +146,6 @@ app.get('/getStats/:crn/:term', function(req, res){
 			if(termPoller){
 				termPoller.getSeatStats(req.params.crn, function(result){
 					result['numWatchers'] = requests.length + smsRequests.length;
-					console.log(result["remaining"]);
 					res.send(result);
 				});
 			}else{
@@ -156,6 +154,30 @@ app.get('/getStats/:crn/:term', function(req, res){
 
 		});
 	});
+});
+
+app.get('/verifyCRN/:crn/:term', function(req, res){
+	var pollers = getActivePollers();
+	var termPoller;
+
+	for(var i in pollers){
+		if(pollers[i].term == req.params.term){
+			termPoller = pollers[i];
+		}
+	}
+
+	if(termPoller){
+		termPoller.getSeatStats(req.params.crn, function(result){
+			if(result.hasOwnProperty('remaining')){
+				res.send({verification_status:1})
+			}else{
+				res.send({verification_status:0})
+			}
+		});
+	}else{
+		res.send({verification_status:0})
+	}
+
 });
 
 //*WEBSOCKET HANDLING

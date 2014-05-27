@@ -1,12 +1,17 @@
 var socket = io.connect(window.location.hostname);
 var buzzPortVerified = false;
-var smsEnabled = false; 
+var autoCRNVerified = false;
+var watchCRNVerified = false;
+var smsEnabled = false;
+var numVerificationReqs = 0;
+
 var submittedRequest = {
 	"crn" : null,
 	"email" : null,
 	"gatewayedInput" : null
 };
 
+//live chat code.
 window.onload = function() {
     var messages = [];
     var field = document.getElementById("field");
@@ -53,7 +58,6 @@ window.onload = function() {
 
 
 $(document).ready(function(){
-
 	$('#contact-sub').click(function(){
 			var iName = $('#contact-name').val();
 			var iMessage = $('#contact-msg').val();
@@ -69,8 +73,128 @@ $(document).ready(function(){
             							name:  iName});		
 	});
 
-	$('#buzz_verify_sub').click(function(){
+	$('#autoVerifyCRN').click(function(){
+		if(autoCRNVerified){
+			return;
+		}
+
+		var opts = {
+		  lines: 13, // The number of lines to draw
+		  length: 10, // The length of each line
+		  width: 2, // The line thickness
+		  radius: 8, // The radius of the inner circle
+		  corners: 1, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#000', // #rgb or #rrggbb or array of colors
+		  speed: 1.2, // Rounds per second
+		  trail: 42, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: false, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: '61%', // Top position relative to parent
+		  left: '20%' // Left position relative to parent
+		};
+
+		var iCRN = $('#buzzport_crn').val();
+		var iTerm = $('#buzzport_term').val();
+
+		if(!isCRN(iCRN)){
+			$('#crn_alert').show();
+			return;
+		}else{
+			$('#crn_alert').hide();
+		}
+
+		var target = document.getElementById('autoRegSpinner');
+		var spinner = new Spinner(opts).spin(target);
+
+		verifyCRN(iCRN, iTerm, function(result){
+			if(result){
+				$('#autoRegCrnCheck').show();
+				$('#buzzport_crn').attr('disabled', true);
+				$('#buzzport_term').attr('disabled', true);
+				autoCRNVerified = true;
+
+				if(autoCRNVerified && buzzPortVerified){
+					$('#buzz_register').attr('class', 'btn btn-success');
+				}
+			}else{
+				alert("Your crn couldn't be verified.")
+			}
+			spinner.stop();
+		});
+
+	});
+
+	$('#cwVerifyCRN').click(function(){
+		var opts = {
+		  lines: 13, // The number of lines to draw
+		  length: 10, // The length of each line
+		  width: 2, // The line thickness
+		  radius: 8, // The radius of the inner circle
+		  corners: 1, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#000', // #rgb or #rrggbb or array of colors
+		  speed: 1.2, // Rounds per second
+		  trail: 42, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: false, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: '55%', // Top position relative to parent
+		  left: '15%' // Left position relative to parent
+		};
+
+		var iCRN = $('#inputCRN').val();
+		var iTerm = $('#selectTerm').val();
+
+		if(!isCRN(iCRN)){
+			$('#crn_alert').show();
+			return;
+		}else{
+			$('#crn_alert').hide();
+		}
+
+		var target = document.getElementById('watchSpinner');
+		var spinner = new Spinner(opts).spin(target);
+
+		verifyCRN(iCRN, iTerm, function(result){
+			if(result){
+				$('#cwRegCrnCheck').show();
+				$('#inputCRN').attr('disabled', true);
+				$('#selectTerm').attr('disabled', true);				
+				watchCRNVerified = true;
+				$('#send_request').attr('class', 'btn btn-success');
+			}else{
+				alert("Your crn couldn't be verified.")
+			}
+			spinner.stop();
+		});
+
+	});
+
+	function verifyBuzzport(){
 		//verify buzzport
+
+		var buzzUser = $('#buzzport_id').val();
+		var buzzPass = $('#buzzport_pass').val();
+
+		if( !(buzzUser.length>2) || !(buzzPass.length>4) ){
+			$('#buzzport_alert').show();
+			return;
+		}else{
+			$('#buzzport_alert').hide();
+		}
+
+		if(numVerificationReqs>=3){
+			alert("Max verification attempts reached.");
+			return;
+		}
+		numVerificationReqs++;
+
 		console.log()
 		var $modal = $('.loading-bar-modal');
 
@@ -84,15 +208,20 @@ $(document).ready(function(){
 			url:"/verifyBuzzport",
 			dataType: "json",
 			timeout: 5*1000*60,
-			data: {username: $('#buzzport_id').val(), password: $('#buzzport_pass').val()},
+			data: {username: buzzUser, password: buzzPass},
 			type: "POST",
 			success: function(res){
 				console.log(res.status);
 				if(res.status=="SUCCESS"){
 					$modal.modal('hide');
-					$('#auto-reg-classinfo').show();
+					$('#autoRegBuzzCheck').show();
+					$('#buzzport_id').attr("disabled", true);
+					$('#buzzport_pass').attr("disabled", true);
 					buzzPortVerified = true;
-					alert("Information successfully verified! Input additional info.");
+
+					if(autoCRNVerified && buzzPortVerified){
+						$('#buzz_register').attr('class', 'btn btn-success');
+					}
 				}else if(res.status=="FAILURE"){
 					alert("Your information couldn't be verified.");
 					$modal.modal('hide');			
@@ -109,14 +238,26 @@ $(document).ready(function(){
 				$modal.modal('hide');
 			}
 		});
-	});
+	}
 
-	$('#buzz_register').click(function(){
+	function autoRegistrationSubmit(){
 		//make auto reg request
-		if(buzzPortVerified==false){
+		if(!$('#buzz_register').hasClass('btn-success')){
+			alert("You need to verify your CRN and BuzzPort before you can do that.");
 			return;
 		}
 
+		if( !isEmail( $('#auto-reg-email').val() ) ){
+			$('#email_alert').show();
+			return;
+		}else{
+			$('#email_alert').hide();
+		}
+
+		if(buzzPortVerified==false){
+			return;
+		}
+		
 		$.ajax({
 			url:"/autoRegReq",
 			dataType: "json",
@@ -130,7 +271,7 @@ $(document).ready(function(){
 			success: function(res){
 				console.log(res.status);
 				if(res.status=="SUCCESS"){
-					alert("Successfully signed up for auto-registration.");
+					$('#success_alert').show();
 				}else{
 					alert("Couldn't sign you up due to an error.");
 				}	
@@ -139,25 +280,19 @@ $(document).ready(function(){
 				console.log("connection timeout");				
 			}
 		});
-
-	});
-
-	$('#myTab a').click(function(e){
-	  e.preventDefault();
-	  $(this).tab('show');
-	});
-
+	}
 
 	//validation
 
 	$(".alert").hide();
 	$("#makeAnother").hide();
 
-	$("#makeAnother").click(makeRequest);
-	$("#send_request").click(makeRequest);
+	$("#makeAnother").click(function(){updateThrottle(processInputAndSend)});
+	$("#send_request").click(function(){updateThrottle(processInputAndSend)});
+	$('#buzz_register').click(function(){updateThrottle(autoRegistrationSubmit)});
+	$('#buzz_verify_sub').click(function(){updateThrottle(verifyBuzzport)});
 
 	//SMS gateway
-
 	$("input:radio[name=phoneSupport]").click(function() {
 	    var value = $(this).val();
 
@@ -171,24 +306,27 @@ $(document).ready(function(){
 	});
 
 	$("#get_stats_btn").click(getStats);
-
 });
 
-function makeRequest(){
+function updateThrottle(cb){
 	// window.location.replace("/");
-
 	getTimeoutStatus(function(data){
 			if(data.status == "bad"){
 				updateWaitMessage(data.timeLeft);
 				$('#wait_alert').show();
 			}else{
 				$('#wait_alert').hide("fold");
-				processInputAndSend();
+				cb();
 			}
 	});
 }
 
 function processInputAndSend(){
+	if(!$('#send_request').hasClass('btn-success')){
+		alert("You need to verify your CRN before you can do that.");
+		return;
+	}
+
 	var errorCount = 0;
 
 	var crnInput = $('#inputCRN').val();
@@ -314,10 +452,53 @@ function updateOtherWatchers(crn){
 	});
 }
 
+function verifyCRN(crn, term, cb){
+	$.ajax({
+		url:"/verifyCRN/"+crn+"/"+term,
+		dataType: "json",
+		type: "GET",
+		success: function(data){
+			if(data.verification_status==1){
+				cb(true);
+			}else{
+				cb(false);
+			}
+		}
+	});
+}
 
 function getStats(cb){
 	var crn = $('#stats_crn').val();
 	var term = $('#stats_term').val();
+
+	if(!isCRN(crn)){
+		$('#crn_alert').show();
+		return;
+	}else{
+		$('#crn_alert').hide();
+	}
+
+	var opts = {
+	  lines: 13, // The number of lines to draw
+	  length: 10, // The length of each line
+	  width: 2, // The line thickness
+	  radius: 8, // The radius of the inner circle
+	  corners: 1, // Corner roundness (0..1)
+	  rotate: 0, // The rotation offset
+	  direction: 1, // 1: clockwise, -1: counterclockwise
+	  color: '#000', // #rgb or #rrggbb or array of colors
+	  speed: 1.2, // Rounds per second
+	  trail: 42, // Afterglow percentage
+	  shadow: false, // Whether to render a shadow
+	  hwaccel: false, // Whether to use hardware acceleration
+	  className: 'spinner', // The CSS class to assign to the spinner
+	  zIndex: 2e9, // The z-index (defaults to 2000000000)
+	  top: '91%', // Top position relative to parent
+	  left: '80%' // Left position relative to parent
+	};
+
+	var target = document.getElementById('classStatsSpinner');
+	var spinner = new Spinner(opts).spin(target);
 
 	var remainingPieChart;
 	var takenPieChart;
@@ -327,6 +508,14 @@ function getStats(cb){
 		dataType: "json",
 		type: "GET",
 		success: function(data){
+			if(data.remaining == undefined){
+				alert("Your crn couldn't be found on BuzzPort.");
+				spinner.stop();
+				return;
+			}
+
+			spinner.stop();			
+
 			//dom manipulation to display returned data
 			$('#class_stats_div').html("<h6> Stats for CRN: " + crn + "</h6>");
 			$('#class_stats_div').append("<h6>" + data.numWatchers + " people are watching this class. </h6>");
@@ -384,7 +573,7 @@ function updateLastRequested(lastCrn){
 }
 
 function updateWaitMessage(time){
-	$('#wait_alert').html("Please wait the following number of seconds to make your next request: " + time);
+	$('#wait_alert').html("(Throttling) You need to wait the following number of seconds to do that: " + time);
 }
 
 function checkDuplicateRequest(req1, req2){

@@ -2,17 +2,23 @@
 
 <div id = "email_alert" class="alert alert-danger">
   <button type="button" class="close" data-dismiss="alert">&times;</button>
-  Invalid email
+  Invalid Email
+</div>
+<!-- <link href="/css/generic.css" rel="stylesheet"> -->
+
+<div id = "buzzport_alert" class="alert alert-danger">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  Invalid BuzzPort Credentials
 </div>
 
 <div id = "crn_alert" class="alert alert-danger">
   <button type="button" class="close" data-dismiss="alert">&times;</button>
-  Invalid crn
+  Invalid CRN
 </div>
 
 <div id = "phone_alert" class="alert alert-danger">
   <button type="button" class="close" data-dismiss="alert">&times;</button>
-  Invalid phone number
+  Invalid Phone Number
 </div>	
 
 <div id = "duplicate_alert" class="alert alert-danger">
@@ -26,7 +32,7 @@
 </div>
 
 <div id = "wait_alert" class="alert alert-warning">
-  Please wait the following number of seconds to make your next request: 
+  You need to wait the following number of second to do that: 
 </div>
 
 
@@ -42,7 +48,7 @@
 	</ul>
 
 	<div class="tab-content">
-	  	<div class="tab-pane fade in active" id="home">
+	  	<div class="tab-pane fade in active" id="home" style="position:relative;">
 
   			<h2 id="lastRequested"> </h2>
 
@@ -68,6 +74,12 @@
 				</h6>
 			</div>
 
+			<div id="cwRegStatus">
+				<div id="cwRegCrnCheck" style="display:none">
+					<i class="glyphicon glyphicon-ok" style="color:green;"></i> CRN Verified!
+				</div>
+			</div>
+
 			<form role="form" style="padding-left:1px">
 			<!-- 			<label for="inputEmail">Email </label>
 			-->			
@@ -91,6 +103,11 @@
 							<option value="{{summer}}">{{summerLabel}}</option>
 						{{/if}}
 					</select>
+
+					<div style="margin-top:15px">
+						<input id="cwVerifyCRN" type="button" class="btn btn-primary" value="Verify CRN"></input>
+						<div id="watchSpinner"></div>
+					</div>
 					
 				</div>
 
@@ -133,7 +150,7 @@
 
 			<br>
 			<div>
-				<button id= "send_request" class="btn btn-primary">Request Watch</button>
+				<button id= "send_request" class="btn btn-danger">Request Watch</button>
 				<button id="makeAnother" class="btn btn-danger">Make Another</button>
 			</div> <!--form center -->
 			
@@ -141,6 +158,7 @@
 		</div>
 
 		<div class="tab-pane fade" style="position:relative;" id="class_stats">
+
 
 			<div class = "container">
 			        <div class = "row">
@@ -161,8 +179,8 @@
 											Enjoy the animated chart.
 										</li>
 									</ul>
-
 								</h6>
+
 							</div>			
 
 							<div class="form-group">
@@ -181,7 +199,10 @@
 								</select>
 							</div>
 
-							<input id="get_stats_btn" class="btn btn-info" type="button" value="Get Stats" onClick="getStats();" />
+							<div>
+								<input id="get_stats_btn" class="btn btn-info" type="button" value="Get Stats" />
+								<div id="classStatsSpinner"></div>
+							</div>
 
 			            </div>
 
@@ -241,26 +262,29 @@
 					</li>
 					<li>
 						You'll also be e-mailed upon successful registration.<br>
-					</li>														
+					</li>													
 				</ul>
 			</h6>
+
+			<div id="autoRegVerificationStatus">
+				<div id="autoRegBuzzCheck" style="display:none">
+					<i class="glyphicon glyphicon-ok" style="color:green;"></i> BuzzPort Verified!
+				</div>
+				<div id="autoRegCrnCheck" style="display:none">
+					<i class="glyphicon glyphicon-ok" style="color:green;"></i> CRN Verified!
+				</div>
+			</div>
 
 
 <!-- 			<a href="#buzz_verify_modal" data-toggle="modal" class="btn btn-primary">Verify BuzzPort Credentials</a> -->
 
 			<div class="form-group">
-
 				<input type="text" id="buzzport_id" class="form-control" placeholder="Buzzport Username"> </input>
 				<input type="password" id="buzzport_pass" class="form-control" placeholder="Buzzport Password"> </input>
-
+				<input type="button" id="buzz_verify_sub" class="btn btn-warning" value="Verify BuzzPort"></input>
 			</div>
 
-			<input type="button" id="buzz_verify_sub" class="btn btn-primary" value="Verify BuzzPort"></input>
-
-			<br>
-			<br>
-
-			<div id="auto-reg-classinfo" style="display:none">
+			<div id="auto-reg-classinfo">
 				<input id="buzzport_crn" type="text" class="form-control" placeholder="CRN"> </input>
 
 				<select id="buzzport_term" class="form-control">
@@ -275,12 +299,17 @@
 					{{/if}}
 				</select>
 
-				<input id="auto-reg-email" type="text" class="form-control" placeholder="Email"></input>
-
-				<br>
-				
-				<input type="button" id="buzz_register" class="btn btn-success" value="Request Auto-Register"></input>
+				<input id="autoVerifyCRN" type="button" class="btn btn-primary" value="Verify CRN"></input>
+				<div id="autoRegSpinner"></div>
 			</div>
+
+			<br>
+
+			<div id="autoreg_finalize">
+				<input id="auto-reg-email" type="text" class="form-control" placeholder="Email"></input>				
+				<input type="button" id="buzz_register" class="btn btn-danger" value="Request Auto-Register"></input>
+			</div>
+
 		</div>
 
 
