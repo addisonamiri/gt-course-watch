@@ -93,7 +93,7 @@ $(document).ready(function(){
 		  hwaccel: false, // Whether to use hardware acceleration
 		  className: 'spinner', // The CSS class to assign to the spinner
 		  zIndex: 2e9, // The z-index (defaults to 2000000000)
-		  top: '61%', // Top position relative to parent
+		  top: '57%', // Top position relative to parent
 		  left: '20%' // Left position relative to parent
 		};
 
