@@ -242,6 +242,11 @@ $(document).ready(function(){
 
 	function autoRegistrationSubmit(){
 		//make auto reg request
+
+		if (typeof autoRegistrationSubmit.registrationComplete != 'undefined') {
+			return;
+		}
+
 		if(!$('#buzz_register').hasClass('btn-success')){
 			alert("You need to verify your CRN and BuzzPort before you can do that.");
 			return;
@@ -272,6 +277,10 @@ $(document).ready(function(){
 				console.log(res.status);
 				if(res.status=="SUCCESS"){
 					$('#success_alert').show();
+			
+					if (typeof autoRegistrationSubmit.registrationComplete == 'undefined') {
+						autoRegistrationSubmit.registrationComplete = true;
+					}
 				}else{
 					alert("Couldn't sign you up due to an error.");
 				}	
@@ -287,7 +296,10 @@ $(document).ready(function(){
 	$(".alert").hide();
 	$("#makeAnother").hide();
 
-	$("#makeAnother").click(function(){updateThrottle(processInputAndSend)});
+	$("#makeAnother").click(function(){
+		window.location = window.location.origin;
+		// updateThrottle(processInputAndSend);
+	});
 	$("#send_request").click(function(){updateThrottle(processInputAndSend)});
 	$('#buzz_register').click(function(){updateThrottle(autoRegistrationSubmit)});
 	$('#buzz_verify_sub').click(function(){updateThrottle(verifyBuzzport)});

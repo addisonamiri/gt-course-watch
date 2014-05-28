@@ -72,44 +72,88 @@ Poller.prototype.getSeatStats = function (crn, cb){
 Poller.prototype.pollAllSeats = function pollAllSeats(){
 	var self = this;
 
-	this.mongoController.Request.find({term:self.term}, function(err, requestPool){
-		if(err){
-			console.log(err);
-		}
-
-		for (requestIdx in requestPool) {
-			self.scrapeSeats(requestPool[requestIdx], false);
-		}
-	});
-
-	this.mongoController.smsRequest.find({term:self.term}, function(err, requestPool){
-		if(err){
-			console.log(err)
-		}
-
-		for (requestIdx in requestPool) {
-			self.scrapeSeats(requestPool[requestIdx], true);
-		}
-	});
-
 	//need to adjust term for auto reg reqs
 	var indexOf2 = self.term.indexOf('2');
 	var adjustedTerm = self.term.slice(0, indexOf2) + "-" + self.term.slice(indexOf2);
 	adjustedTerm = adjustedTerm.charAt(0).toUpperCase() + adjustedTerm.slice(1);
 
+	var aggregatedReqs = {};
+
+	//auto regs must be handled before unpaid reqs for aggregation to work!
 	this.mongoController.autoRegReq.find({term:adjustedTerm}, function(err, requestPool){
 		if(err){
-			console.log(err)
+			console.log(err);
 		}
 
-		for (requestIdx in requestPool) {
-			self.scrapeSeats(requestPool[requestIdx], true);
-		}
+		aggregateRequests(aggregatedReqs, requestPool);
+
+		executeUnpaidReqs(function(){
+
+			for (var crn in aggregatedReqs) {
+			
+				self.getSeatStats(crn, function(result){
+					if(result.hasOwnProperty("remaining") && result["remaining"] > 0){
+						var aggArray = aggregatedReqs[crn];
+
+						for(i in aggArray){
+							var req = aggArray[i];
+							if('gatewayedNumber' in req){
+								self.scrapeSeats(req, true);
+							}else{
+								self.scrapeSeats(req, false);
+							}
+						}
+					}
+				});
+			
+			}
+
+		});
 	});
+
+
+	function executeUnpaidReqs(cb){
+		self.mongoController.Request.find({term:self.term}, function(err, requestPool){
+			if(err){
+				console.log(err);
+			}
+
+			aggregateRequests(aggregatedReqs, requestPool);
+
+			self.mongoController.smsRequest.find({term:self.term}, function(err, requestPool){
+				if(err){
+					console.log(err);
+				}
+
+				aggregateRequests(aggregatedReqs, requestPool);
+
+				cb();
+			});
+		});		
+
+	}
+
+	function aggregateRequests(aggregatorObj, requestPool){
+		for(i in requestPool){
+			var req = requestPool[i];
+
+			if(!aggregatorObj.hasOwnProperty(req.crn)){
+				aggregatorObj[req.crn] = [req];
+			}else{
+				if( !('buzzport_id' in req) ){
+					aggregatorObj[req.crn].push(req);
+				}
+			}
+		}
+	}
+
+
 }
+
 
 Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest){
 	var self = this;
+	console.log("scrape exec");
 
 	var options = {
 	  hostname: 'oscar.gatech.edu',
