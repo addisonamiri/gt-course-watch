@@ -307,6 +307,7 @@ function getActivePollers(){
 //re-init pollers every day in the event of new term
 setInterval(function(){
 	initPollers();
+	myMongoController.cleanExpiredReqs();
 }, millisInDay)
 
 //polling job

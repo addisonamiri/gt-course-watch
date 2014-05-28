@@ -125,6 +125,26 @@ MongoController.prototype.createSuccessStat = function (regular, sms, auto){
 	});
 }
 
+//delete reqs from last yr.
+MongoController.prototype.cleanExpiredReqs = function(){
+	var d = new Date();
+	var yr = (d.getFullYear() - 1).toString();
+
+	var regex = new RegExp(".*" + yr + ".*");
+	console.log("executed: " + regex.toString());
+
+	this.autoRegReq.find( { term: regex }, helper );
+	this.Request.find( { term: regex }, helper );
+	this.smsRequest.find( { term: regex }, helper );
+
+	function helper(err, foundReqs){
+		if(err) console.log(err);
+		for(i in foundReqs){
+			foundReqs[i].remove();
+		}
+	}
+}
+
 
 module.exports = MongoController;
 
