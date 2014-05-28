@@ -529,8 +529,8 @@ function getStats(cb){
 			spinner.stop();			
 
 			//dom manipulation to display returned data
-			$('#class_stats_div').html("<h6> Stats for CRN: " + crn + "</h6>");
-			$('#class_stats_div').append("<h6>" + data.numWatchers + " people are watching this class. </h6>");
+			$('#class_stats_div').html("<h5> Stats for CRN: " + crn + "</h5>");
+			// $('#class_stats_div').append("<h5>" + data.numWatchers + " people are watching this class. </h5>");
 
 			var tableHTML = '<br/> <table class="table table-striped" style="width:500px"> <tr> <th></th> <th>Seat Stats</th>' + 
 				'<th>Waitlist Stats</th> </tr> <tr> <td>Remaining</td>' +
@@ -625,8 +625,9 @@ var updateAlias;
 $(document).ready(function(){
 
 var svg = d3.select("#pieChart")
-	.append("svg")
-	.append("g")
+	.append("svg").attr("width", "500px").attr("height", "500px")
+	.append("g");
+
 
 svg.append("g")
 	.attr("class", "slices");
@@ -653,7 +654,7 @@ var outerArc = d3.svg.arc()
 	.innerRadius(radius * 0.9)
 	.outerRadius(radius * 0.9);
 
-svg.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+svg.attr("transform", "translate(" + width / 1.75 + "," + height / 1.75 + ")");
 
 var key = function(d){ return d.data.label; };
 
