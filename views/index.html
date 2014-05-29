@@ -45,7 +45,7 @@
 
 
 <!-- Nav tabs -->
-	<ul class="nav nav-tabs" id="myTab">
+	<ul class="nav nav-tabs red">
 	  <li class="active"><a href="#home" data-toggle="tab">Course Watch</a></li>
 	  <li><a href="#auto_reg" data-toggle="tab">Automated Registration</a></li>
 	  <li><a href="#class_stats" data-toggle="tab">Course Stats</a></li>
@@ -54,36 +54,90 @@
 
 	<div class="tab-content">
 	  	<div class="tab-pane fade in active" id="home" style="position:relative;">
-
-  			<h2 id="lastRequested"> </h2>
 <!-- 			<h4 id="otherWatchers"></h4>
  -->
-			<h5 style="padding-left:25px;">*Note: When multiple people request course watches on the same CRN, notifications are sent out to everyone at the same time. So if you want to greatly improve your chances of getting the class before any other watchers, use the automated registration feature.<h5>
 
-			<div>
-				<h6>
-					<ul>
-						<li>
-							You must verify your CRN before making a request, the red button will turn green when you're good.
-						</li>
+			<div class = "container">
+		        <div class = "row">
+		               
+		<!--                Remember, there's 12 possible grid boxes to be divided amongst your grid items.
+		-->
 
-						<li>
-							After you make a request, system will check on your seat every two minutes.
-						</li>
+					<div class="col-md-7">
 
-						<li>
-							You will be e-mailed and/or texted as soon as the system realizes a seat is open.
-						</li>
-						<li>
-							Everything will automatically update and be ready when a new term comes around.
-						</li>
-						<li>
-							Unfortunately, the sms feature has been spotty with some carriers.
-						</li>
-					</ul>
-				</h6>
+						<div class="bs-callout bs-callout-info">
+							<h4>Course Watch Info</h4>
 
+							<ul>
+								<li>
+									You must verify your CRN before making a request, the red button will turn green when you're good.
+								</li>
+
+								<li>
+									After you make a request, system will check on your seat every two minutes.
+								</li>
+
+								<li>
+									You will be e-mailed and/or texted as soon as the system realizes a seat is open.
+								</li>
+								<li>
+									Everything will automatically update and be ready when a new term comes around.
+								</li>
+								<li>
+									Unfortunately, the sms feature has been spotty with some carriers.
+								</li>
+							</ul>
+						</div>
+
+					</div>
+
+
+		            <div class = "col-md-5">
+						<div class="bs-callout bs-callout-warning">
+							<h4>Course Watch Warning</h4>
+							<ul>
+								<li>
+									When multiple people request course watches on the same CRN, notifications are sent out to everyone at the same time to be fair. 						
+								</li>
+								<li>
+									So if you want to greatly improve your chances of getting the class before any other watchers, use the automated registration feature.		
+								</li>
+							</ul>
+
+						</div>
+					</div>
+
+				</div>
+			</div>				
+
+
+
+<!-- 			<div class="bs-callout bs-callout-warning">
+				<h4>*Note: </h4>
+				When multiple people request course watches on the same CRN, notifications are sent out to everyone at the same time. So if you want to greatly improve your chances of getting the class before any other watchers, use the automated registration feature.
 			</div>
+
+			<div class="bs-callout bs-callout-info" style="w">
+				<ul>
+					<li>
+						You must verify your CRN before making a request, the red button will turn green when you're good.
+					</li>
+
+					<li>
+						After you make a request, system will check on your seat every two minutes.
+					</li>
+
+					<li>
+						You will be e-mailed and/or texted as soon as the system realizes a seat is open.
+					</li>
+					<li>
+						Everything will automatically update and be ready when a new term comes around.
+					</li>
+					<li>
+						Unfortunately, the sms feature has been spotty with some carriers.
+					</li>
+				</ul>
+			</div> -->
 
 			<div id="cwRegStatus">
 				<div id="cwRegCrnCheck" style="display:none">
@@ -163,6 +217,7 @@
 			<div>
 				<button id= "send_request" class="btn btn-danger">Request Watch</button>
 				<button id="makeAnother" class="btn btn-info">Make Another</button>
+			  	<h2 id="lastRequested"> </h2>
 			</div> <!--form center -->
 			
 
@@ -177,21 +232,19 @@
 			<!--                Remember, there's 12 possible grid boxes to be divided amongst your grid items.
 			-->
 			            <div class = "col-md-2">
-							<div>
-								<h6 style="width:375px;margin-left:-25px;">
-									<ul>
-										<li>
-											Load seat stats for a CRN of your choice without having to log in to BuzzPort.
-										</li>
-										<li>
-											This feature is mainly useful when your interested in the wait-list, or your waiting for an overloaded class to free up.
-										</li>
-										<li>
-											Enjoy the animated chart.
-										</li>
-									</ul>
-								</h6>
-
+							<div class="bs-callout bs-callout-info" style="width:400px;">
+								<h4>Course Stats Info</h4>
+								<ul>
+									<li>
+										Load seat stats for a CRN of your choice without having to log in to BuzzPort.
+									</li>
+									<li>
+										This feature is mainly useful when your interested in the wait-list, or your waiting for an overloaded class to free up.
+									</li>
+									<li>
+										Enjoy the animated chart.
+									</li>
+								</ul>
 							</div>			
 
 							<div class="form-group">
@@ -261,25 +314,53 @@
 
 
 		<div class="tab-pane fade" id="auto_reg">
-			<h6>
-				<ul>
-					<li>
-						You must verify your CRN &amp; BuzzPort before making a request, the red button will turn green when you're good.
-					</li>				
-					<li>
-						When the system realizes a seat is free, it will log in to BuzzPort and register your class for you.
-					</li>				
-					<li>
-						Your information is stored on a secure server, and is deleted once either your request expires or is fulfilled.
-					</li>
-					<li>
-						If multiple requests for the same CRN exist, they are auto-registered on a first come first served basis as seats open up.
-					</li>
-					<li>
-						You'll also be e-mailed upon successful registration.<br>
-					</li>													
-				</ul>
-			</h6>
+
+
+			<div class = "container">
+		        <div class = "row">
+		               
+		<!--                Remember, there's 12 possible grid boxes to be divided amongst your grid items.
+		-->
+
+					<div class="col-md-7">
+						<div class="bs-callout bs-callout-info">
+							<h4>Automated Registration Info</h4>
+
+							<ul>			
+								<li>
+									When the system realizes a seat is free, it will log in to BuzzPort and register your class for you; additionally, you'll receive a registration-success e-mail notification.
+								</li>
+								<li>
+									If multiple requests for the same CRN exist, they are auto-registered on a first come first served basis as seats open up.
+								</li>												
+								<li>
+									Your information is stored on a secure server, and is deleted once either your request expires or is fulfilled.
+								</li>
+							</ul>
+						</div>
+					</div>
+
+
+		            <div class = "col-md-5">
+						<div class="bs-callout bs-callout-danger">
+							<h4>Automated Registration Requirements</h4>
+								<ul>
+									<li>
+										First, you must be signed in to this website to use this feature!
+									</li>
+									<li>
+										After you've signed in, verify your CRN &amp; BuzzPort before making a request, the red button will turn green when you're good.
+									</li>	
+									<li>
+										This feature will be free for a limited time.
+									</li>
+								</ul>					
+						</div>       
+					</div>
+
+				</div>
+			</div>
+
 
 			<div id="autoRegVerificationStatus">
 				<div id="autoRegBuzzCheck" style="display:none">
@@ -330,7 +411,10 @@
 
 		<div class="tab-pane fade" id="live_chat">
 
-			<h6>Anyone on this page right now can see what you're saying. no history saved.</h6>
+			<div class="bs-callout bs-callout-info" style="width:500px;">
+				<h4>Live Chat Info</h4>
+				Anyone on this page right now can see what you're saying. no history saved.
+			</div>
 
 			<div id="content" style='width: 500px; height: 300px; margin: 0 0 20px 0; border: solid 1px #999; overflow-y: scroll;'> </div>
 
