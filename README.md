@@ -23,3 +23,11 @@ This feature would not be possible without PhantomJS, which is a really cool and
 A request to the server is made to scrape oscar for course information, which is then displayed in an animated pie chart made with Mike Bostock's fantastic d3.js data visualization library.
 ### Live Chat
 Since I decided to experiment with WebSockets and socket.io when I started this project, adding live chat was quite simple. WebSockets are the supposed to be the future, and I can totally believe it.
+
+## Tools Used
+- Node.js
+- MongoDB
+- PhantomJS
+- d3.js (Data Visualization Library)
+- socket.io (WebSocket Library)
+- Twitter Bootstrap
