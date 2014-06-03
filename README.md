@@ -1,42 +1,21 @@
-gtcw
+GT Course Watch (Registration Assistance System)
 =====
-Access this website at courseassist.co.nr
+Access this website at [gtcoursewatch.us](gtcoursewatch.us)
 
-gt course watcher written in node.js with mongodb back end.
 
-allows users to make course watch requests and be notified at the email they provide upon open slot.
-
-to run a local instance, do:
-
+### Running Locally
+```
 node app.js
+```
 
-to run the start forever script do:
+### Server Deployment
+```
 chmod +x ./start
 ./start
+```
 
-running list of things this project has helped me learn:
-
-using websockets
-
-javascript:
-	closures
-	making objects with prototype
-	(among other js related things)
-
-making custom modules in node
-
-mongodb
-
-twitter bootstrap
-
-express framework
-
-handlebars templating
-
-asynchronous nature of javascript (and coping with it)
-
-scraping websites
-
-using SMTP
-
-and most importantly, general project organization for clean, modular, maintainable code
+## Features
+### Course Watch
+The core of the course watching system is a web scraping poller in Node.js that checks OSCAR for available seats every two minutes or so using setInterval. The system also automatically updates itself for new terms based on the date by using setInterval. Course watch requests are persisted using MongoDB.
+### Automated Registration
+This feature would not be possible without PhantomJS, which is a really cool and powerful tool. Basically, using the information a user provides, we can log in and register them for a course with Phantom running as a child process of Node.js on the server.
