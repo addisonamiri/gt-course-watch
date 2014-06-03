@@ -1,6 +1,6 @@
-GTCourseWatch (Registration Assistance System)
+GTCourseWatch
 =====
-Access this website at [gtcoursewatch.us](gtcoursewatch.us)
+This is a registration assistance web application written in Node.js; access the site at [gtcoursewatch.us](gtcoursewatch.us)
 
 
 ### Running Locally
