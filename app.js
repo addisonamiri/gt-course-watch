@@ -188,7 +188,7 @@ app.get('/verifyCRN/:crn/:term', function(req, res){
 io.sockets.on('connection', socketHandler);
 
 function socketHandler(socket){
-	socket.emit('message', {message:'Welcome to the chat!'});
+	socket.emit('message', {message:'WebSocket connection established; Welcome to the chat!'});
 
 	socket.on('sendMessage', function(data){
 		io.sockets.emit('message', data);

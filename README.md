@@ -1,42 +1,33 @@
-gtcw
+GTCourseWatch
 =====
-Access this website at courseassist.co.nr
+This is a registration assistance web application written in Node.js; access the site at [gtcoursewatch.us](gtcoursewatch.us)
 
-gt course watcher written in node.js with mongodb back end.
 
-allows users to make course watch requests and be notified at the email they provide upon open slot.
-
-to run a local instance, do:
-
+### Running Locally
+```
 node app.js
+```
 
-to run the start forever script do:
+### Server Deployment
+```
 chmod +x ./start
 ./start
+```
 
-running list of things this project has helped me learn:
+## Features
+### Course Watch
+The core of the course watching system is a web scraping poller in Node.js that checks OSCAR for available seats every two minutes or so using setInterval. The system also automatically updates itself for new terms based on the date by using setInterval. Course watch requests are persisted using MongoDB.
+### Automated Registration
+This feature would not be possible without PhantomJS, which is a really cool and powerful tool. Basically, using the information a user provides, we can log in and register them for a course with Phantom running as a child process of Node.js on the server.
+### Course Watch
+A request to the server is made to scrape oscar for course information, which is then displayed in an animated pie chart made with Mike Bostock's fantastic d3.js data visualization library.
+### Live Chat
+Since I decided to experiment with WebSockets and socket.io when I started this project, adding live chat was quite simple. WebSockets are the supposed to be the future, and I can totally believe it.
 
-using websockets
-
-javascript:
-	closures
-	making objects with prototype
-	(among other js related things)
-
-making custom modules in node
-
-mongodb
-
-twitter bootstrap
-
-express framework
-
-handlebars templating
-
-asynchronous nature of javascript (and coping with it)
-
-scraping websites
-
-using SMTP
-
-and most importantly, general project organization for clean, modular, maintainable code
+## Tools Used
+- Node.js
+- MongoDB
+- PhantomJS
+- d3.js (Data Visualization Library)
+- socket.io (WebSocket Library)
+- Twitter Bootstrap
