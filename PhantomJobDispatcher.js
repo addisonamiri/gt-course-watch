@@ -25,7 +25,7 @@ PhantomJobDispatcher.prototype.addRegisterTaskToQueue = function(autoRegReq){
 PhantomJobDispatcher.prototype.startDispatcher = function(eventLoopDelay){
 	var self=this;
 
-	eventLoopInterval = setInterval(function(){self.dispatcherEventLoop()}, eventLoopDelay);
+	eventLoopInterval = setInterval(function(){dispatcherEventLoop()}, eventLoopDelay);
 }
 
 PhantomJobDispatcher.prototype.stopDispatcher = function(){
@@ -33,7 +33,7 @@ PhantomJobDispatcher.prototype.stopDispatcher = function(){
 }
 
 //consumer
-PhantomJobDispatcher.prototype.dispatcherEventLoop = function(){
+function dispatcherEventLoop(){
 	var self = this;
 
 	if(registrationJobsQueue.length > 0){
