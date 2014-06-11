@@ -131,7 +131,6 @@ MongoController.prototype.cleanExpiredReqs = function(){
 	var yr = (d.getFullYear() - 1).toString();
 
 	var regex = new RegExp(".*" + yr + ".*");
-	console.log("executed: " + regex.toString());
 
 	this.autoRegReq.find( { term: regex }, helper );
 	this.Request.find( { term: regex }, helper );
