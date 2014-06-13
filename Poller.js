@@ -92,7 +92,7 @@ Poller.prototype.pollAllSeats = function (){
 		executeUnpaidReqs(function(){			
 			for (var crn in aggregatedReqs) {
 				self.getSeatStats(crn, function(crn, result){
-					if(result!=undefined && result["remaining"] > 0){
+					if(result.hasOwnProperty("remaining") && result["remaining"] > 0){
 						//found a class with an empty seat
 						var aggArray = aggregatedReqs[crn];
 
@@ -104,7 +104,7 @@ Poller.prototype.pollAllSeats = function (){
 								self.scrapeSeats(req, false);
 							}
 						}
-					}else if(result==undefined){
+					}else if(result == {}){
 						//cleanup bad crns from db
 						var aggArray = aggregatedReqs[crn];
 
