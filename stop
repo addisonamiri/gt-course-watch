@@ -1,2 +1,5 @@
 ./node_modules/forever/bin/forever stop app.js
-sudo service mongod stop 
+sudo service mongod stop
+ps aux | grep mongod
+#kill $(ps aux | grep 'mongod' | awk '{print $2}')
+#mongod stopping being funky. use this commmand:
