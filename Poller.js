@@ -86,10 +86,11 @@ Poller.prototype.pollAllSeats = function (){
 		if(err){
 			console.log(err);
 		}
-
+		
+		//aggregate paid automated reqs first to give them priority
 		aggregateRequests(aggregatedReqs, requestPool);
 
-		executeUnpaidReqs(function(){			
+		aggregateUnpaidReqs(function(){			
 			for (var crn in aggregatedReqs) {
 				self.getSeatStats(crn, function(crn, result){
 					if(result.hasOwnProperty("remaining") && result["remaining"] > 0){
@@ -112,7 +113,7 @@ Poller.prototype.pollAllSeats = function (){
 	});
 
 
-	function executeUnpaidReqs(cb){
+	function aggregateUnpaidReqs(cb){
 		self.mongoController.Request.find({term:self.term}, function(err, requestPool){
 			if(err){
 				console.log(err);
