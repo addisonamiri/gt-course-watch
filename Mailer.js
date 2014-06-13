@@ -108,8 +108,8 @@ Mailer.prototype.sendConfirmationMail = function sendConfirmationMail(requestEma
 	    var bodyText="Your Requested Class: " + requestCRN + 
 
 	    (autoRegReq ? "\nYou signed up for automatic registration." : 
-	    	("\nSigned up for SMS notification: " + (smsRequest ? "yes" : "no") ) ) + 
-	    "\n\nThank you for using my service!";
+	    	("\nSigned up for SMS notification: " + (smsRequest ? "yes" : "no") ) + 
+	    "\n\nThank you for using my service!" );
 
 	// setup e-mail data with unicode symbols
 	var mailOptions = {
