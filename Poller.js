@@ -91,9 +91,9 @@ Poller.prototype.pollAllSeats = function (){
 
 		executeUnpaidReqs(function(){			
 			for (var crn in aggregatedReqs) {
-				self.getSeatStats(crn, function(result){
+				self.getSeatStats(crn, function(crn, result){
 					if(result!=undefined && result["remaining"] > 0){
-
+						//found a class with an empty seat
 						var aggArray = aggregatedReqs[crn];
 
 						for(i in aggArray){
