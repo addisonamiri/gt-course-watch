@@ -52,7 +52,7 @@ PhantomJobDispatcher.prototype.dispatcherEventLoop = function(){
 				//encountered an error so remove from DB
 				var subj = "Registration Error";
 				var msg = "Your automatated registration request encountered the following error: " + res.status +
-					"\n\nAs a result, your request has been removed from the system.";
+					"\n\n\nAs a result, your request has been removed from the system.";
 
 				self.mailer.sendGenericMail(job.email, subj, msg);
 				job.remove();
@@ -84,8 +84,7 @@ function execRegistrationTask(job, cb){
 	var execStatement = 'phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 PhantomRegisterTask.js ' 
 		+ job.buzzport_id + " " + job.buzzport_pass + " " + job.term + " " + job.crn;
 
-	child = exec(execStatement,function (error, stdout, stderr) {
-	});
+	child = exec(execStatement,function (error, stdout, stderr) {});
 
 	child.stdout.on("data", function(data){
 		if(data.indexOf("SUCCESS")>-1){
@@ -104,13 +103,13 @@ function execRegistrationTask(job, cb){
 			clearTimeout(killJob);
 			jobInProgress = false;
 			numConcurrentJobs--;							
-			cb({status: "INVALID TERM ERROR, You don't have a time ticket for the term you signed up for."});
+			cb({status: "INVALID TERM ERROR:\nYou don't have a time ticket for the term you signed up for."});
 		}		
 		else if(data.indexOf("REGISTRATION_ERROR")>-1){
 			clearTimeout(killJob);
 			jobInProgress = false;
 			numConcurrentJobs--;								
-			cb({status: "REGISTRATION ERROR.\nThis means you can't register for the class for some reason\n"+
+			cb({status: "REGISTRATION ERROR:\nThis means you can't register for the class for some reason\n"+
 				"For specifics, log into BuzzPort and try to add the class to see what the error is."});
 		}
 	});
