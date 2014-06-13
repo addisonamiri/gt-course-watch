@@ -4,7 +4,6 @@ function Mailer(email, pass){
 // create reusable transport method (opens pool of SMTP connections)
 	this.emailID = email;
 	this.emailPass = pass;
-	this.contactMail = email;
 	
 	this.smtpTransport = nodemailer.createTransport("SMTP",{
 	    service: "Gmail",
@@ -147,7 +146,7 @@ Mailer.prototype.contactMailJob = function(email, name, msg){
 	var mailOptions = {
 //	    from: "GT Course Watch Mailer ✔ <tofubeast1111@gmail.com>", // sender address
 	    from: "CONTACT MESSAGE <tofubeast1111@gmail.com>", // sender address
-	    to: this.contactMail, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
+	    to: this.emailID, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
 	    subject: "CONTACT MESSAGE FROM " + name, // Subject line
 	    text: bodyText, // plaintext body
 	}
