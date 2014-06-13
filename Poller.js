@@ -104,14 +104,6 @@ Poller.prototype.pollAllSeats = function (){
 								self.scrapeSeats(req, false);
 							}
 						}
-					}else if(result == {}){
-						//cleanup bad crns from db
-						var aggArray = aggregatedReqs[crn];
-
-						for(i in aggArray){
-							console.log("Found a bad CRN entry, removing...");
-							aggArray[i].remove();
-						}
 					}
 				});
 			}
