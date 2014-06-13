@@ -103,13 +103,13 @@ function execRegistrationTask(job, cb){
 			clearTimeout(killJob);
 			jobInProgress = false;
 			numConcurrentJobs--;							
-			cb({status: "INVALID TERM ERROR:\nYou don't have a time ticket for the term you signed up for."});
+			cb({status: "INVALID TERM ERROR\nYou don't have a time ticket for the term you signed up for."});
 		}		
 		else if(data.indexOf("REGISTRATION_ERROR")>-1){
 			clearTimeout(killJob);
 			jobInProgress = false;
 			numConcurrentJobs--;								
-			cb({status: "REGISTRATION ERROR:\nThis means you can't register for the class for some reason\n"+
+			cb({status: "REGISTRATION ERROR\nThis means you can't register for the class for some reason\n"+
 				"For specifics, log into BuzzPort and try to add the class to see what the error is."});
 		}
 	});
