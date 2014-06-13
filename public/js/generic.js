@@ -57,7 +57,8 @@ window.onload = function() {
 
 
 
-$(document).ready(function(){
+$(document).ready(function(){	
+
 	$('#contact-sub').click(function(){
 			var iName = $('#contact-name').val();
 			var iMessage = $('#contact-msg').val();
@@ -277,7 +278,8 @@ $(document).ready(function(){
 				console.log(res.status);
 				if(res.status=="SUCCESS"){
 					$('#success_alert').show();
-			
+					document.body.scrollTop = document.documentElement.scrollTop = 0; 
+
 					if (typeof autoRegistrationSubmit.registrationComplete == 'undefined') {
 						autoRegistrationSubmit.registrationComplete = true;
 					}
@@ -386,6 +388,8 @@ function processInputAndSend(){
 			$("#success_alert").show();
 			$("#send_request").hide();
 			$("#makeAnother").show();
+			document.body.scrollTop = document.documentElement.scrollTop = 0; 
+			
 			submittedRequest = currentRequest;
 			socket.emit('makeRequest', { email: emailInput, crn: crnInput, term: term});
 			updateLastRequested(crnInput);
@@ -433,6 +437,7 @@ function processInputAndSend(){
 			$("#success_alert").show();
 			$("#send_request").hide();
 			$("#makeAnother").show();
+			document.body.scrollTop = document.documentElement.scrollTop = 0; 
 			submittedRequest = currentRequest;
 			socket.emit('makeSMSRequest', { email: emailInput, crn: crnInput, gatewayedNumber: gatewayedInput, term:term});
 			updateLastRequested(crnInput);
