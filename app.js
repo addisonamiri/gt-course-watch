@@ -144,7 +144,7 @@ app.get('/getStats/:crn/:term', function(req, res){
 			}
 
 			if(termPoller){
-				termPoller.getSeatStats(req.params.crn, function(result){
+				termPoller.getSeatStats(req.params.crn, function(crn, result){
 					result['numWatchers'] = requests.length + smsRequests.length;
 					res.send(result);
 				});
@@ -167,7 +167,7 @@ app.get('/verifyCRN/:crn/:term', function(req, res){
 	}
 
 	if(termPoller){
-		termPoller.getSeatStats(req.params.crn, function(result){
+		termPoller.getSeatStats(req.params.crn, function(crn, result){
 			if(result.hasOwnProperty('remaining')){
 				res.send({verification_status:1})
 			}else{
@@ -318,4 +318,4 @@ setInterval(function(){
 			if(pollers[key]) pollers[key].pollAllSeats();
 		}
 	}
-}, 2*millisInMinute);
+}, 2000); //*millisInMinute

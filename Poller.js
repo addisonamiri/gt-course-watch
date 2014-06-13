@@ -57,7 +57,7 @@ Poller.prototype.getSeatStats = function (crn, cb){
 		    	}
 		    });
 
-		    cb(result);
+		    cb(crn, result);
 		});
 
 	});
@@ -65,11 +65,12 @@ Poller.prototype.getSeatStats = function (crn, cb){
 	req.end();
 
 	req.on('error', function(e) {
-	  console.error(e);
+	   console.log("Error: " + e.message); 
+	   console.log( e.stack );
 	});	
 }
 
-Poller.prototype.pollAllSeats = function pollAllSeats(){
+Poller.prototype.pollAllSeats = function (){
 	var self = this;
 
 	//need to adjust term for auto reg reqs
@@ -77,6 +78,7 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 	var adjustedTerm = self.term.slice(0, indexOf2) + "-" + self.term.slice(indexOf2);
 	adjustedTerm = adjustedTerm.charAt(0).toUpperCase() + adjustedTerm.slice(1);
 
+	//a hash of "crn" => [requests...]
 	var aggregatedReqs = {};
 
 	//auto regs must be handled before unpaid reqs for aggregation to work!
@@ -87,12 +89,11 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 
 		aggregateRequests(aggregatedReqs, requestPool);
 
-		executeUnpaidReqs(function(){
-
+		executeUnpaidReqs(function(){			
 			for (var crn in aggregatedReqs) {
-			
 				self.getSeatStats(crn, function(result){
-					if(result.hasOwnProperty("remaining") && result["remaining"] > 0){
+					if(result!=undefined && result["remaining"] > 0){
+
 						var aggArray = aggregatedReqs[crn];
 
 						for(i in aggArray){
@@ -103,9 +104,16 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 								self.scrapeSeats(req, false);
 							}
 						}
+					}else if(result==undefined){
+						//cleanup bad crns from db
+						var aggArray = aggregatedReqs[crn];
+
+						for(i in aggArray){
+							console.log("Found a bad CRN entry, removing...");
+							aggArray[i].remove();
+						}
 					}
 				});
-			
 			}
 
 		});
@@ -151,7 +159,7 @@ Poller.prototype.pollAllSeats = function pollAllSeats(){
 }
 
 
-Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest){
+Poller.prototype.scrapeSeats = function (existingRequest, smsRequest){
 	var self = this;
 	console.log("scrape exec");
 
@@ -185,6 +193,7 @@ Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest)
 		    	if(i==3){
 		    		var remainingSeats = parseInt($(this).text().trim());
 		    		//perserve this reference by calling on self
+
 		    		self.checkSeats(remainingSeats, existingRequest, smsRequest);
 		    	}
 		    });
@@ -198,7 +207,7 @@ Poller.prototype.scrapeSeats = function scrapeSeats(existingRequest, smsRequest)
 	});
 }
 
-Poller.prototype.checkSeats = function checkSeats(numSeats, existingRequest, smsRequest){
+Poller.prototype.checkSeats = function(numSeats, existingRequest, smsRequest){
 	if(numSeats > 0){
 		// console.log('there is a seat open! ' + numSeats);
 		if('buzzport_id' in existingRequest){
@@ -211,14 +220,8 @@ Poller.prototype.checkSeats = function checkSeats(numSeats, existingRequest, sms
 			}
 
 		}else{
-
-
-			if(smsRequest){
-				this.mongoController.createSuccessStat(0,1,0);
-			}else{
-				this.mongoController.createSuccessStat(1,0,0);
-			}
-
+			if(smsRequest) this.mongoController.createSuccessStat(0,1,0);
+			else this.mongoController.createSuccessStat(1,0,0);
 
 			this.mailer.sendNotificationMail(existingRequest, smsRequest);
 			existingRequest.remove();
@@ -228,8 +231,7 @@ Poller.prototype.checkSeats = function checkSeats(numSeats, existingRequest, sms
 	}
 }
 
-Poller.prototype.buildPath = function buildPath(crn){
-	//format : /pls/bprod/bwckschd.p_disp_detail_sched?term_in=201402&crn_in=
+Poller.prototype.buildPath = function (crn){
 	return this.basePath + crn;
 }
 

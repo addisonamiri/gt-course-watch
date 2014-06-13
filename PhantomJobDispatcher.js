@@ -52,7 +52,7 @@ PhantomJobDispatcher.prototype.dispatcherEventLoop = function(){
 				//encountered an error so remove from DB
 				var subj = "Registration Error";
 				var msg = "Your automatated registration request encountered the following error: " + res.status +
-					"\nAs a result, your request has been removed from the system.";
+					"\n\nAs a result, your request has been removed from the system.";
 
 				self.mailer.sendGenericMail(job.email, subj, msg);
 				job.remove();
