@@ -318,4 +318,4 @@ setInterval(function(){
 			if(pollers[key]) pollers[key].pollAllSeats();
 		}
 	}
-}, 2000); //*millisInMinute
+}, 2*millisInMinute); //*millisInMinute
