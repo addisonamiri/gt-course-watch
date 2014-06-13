@@ -249,8 +249,10 @@ $(document).ready(function(){
 		}
 
 		if(!$('#buzz_register').hasClass('btn-success')){
-			alert("You need to verify your CRN and BuzzPort before you can do that.");
+			$('#verify_alert').show();
 			return;
+		}else{
+			$('#verify_alert').hide();
 		}
 
 		if( !isEmail( $('#auto-reg-email').val() ) ){
@@ -337,8 +339,10 @@ function updateThrottle(cb){
 
 function processInputAndSend(){
 	if(!$('#send_request').hasClass('btn-success')){
-		alert("You need to verify your CRN before you can do that.");
+		$('#verify_alert').show();
 		return;
+	}else{
+		$('#verify_alert').hide();
 	}
 
 	var errorCount = 0;

@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
-var server = require('http').createServer(app);
+var server = require('http').createServer(app).listen(process.env.PORT || 8080);
+// var secureServer = require('https').createServer(app).listen(443);
 var io = require('socket.io').listen(server);
 var hbs = require('hbs');
 
@@ -20,8 +21,6 @@ var mongoConnectionUrl = 'mongodb://localhost/gtcw';
 app.use(express.cookieParser());
 var store = new express.session.MemoryStore;
 app.use(express.session({secret:"blahblabhla", store:store}));
-
-server.listen(process.env.PORT || 8080);
 
 //*CONSTANTS
 var millisInSecond = 1000;
