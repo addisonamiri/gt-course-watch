@@ -280,7 +280,7 @@ $(document).ready(function(){
 				console.log(res.status);
 				if(res.status=="SUCCESS"){
 					$('#success_alert').show();
-					document.body.scrollTop = document.documentElement.scrollTop = 0; 
+					scrollToTop();
 
 					if (typeof autoRegistrationSubmit.registrationComplete == 'undefined') {
 						autoRegistrationSubmit.registrationComplete = true;
@@ -304,8 +304,8 @@ $(document).ready(function(){
 		window.location = window.location.origin;
 		// updateThrottle(processInputAndSend);
 	});
-	$("#send_request").click(function(){updateThrottle(processInputAndSend)});
-	$('#buzz_register').click(function(){updateThrottle(autoRegistrationSubmit)});
+	$("#send_request").click(function(){scrollToTop(); updateThrottle(processInputAndSend)});
+	$('#buzz_register').click(function(){scrollToTop(); updateThrottle(autoRegistrationSubmit)});
 	$('#buzz_verify_sub').click(function(){updateThrottle(verifyBuzzport)});
 
 	//SMS gateway
@@ -392,7 +392,7 @@ function processInputAndSend(){
 			$("#success_alert").show();
 			$("#send_request").hide();
 			$("#makeAnother").show();
-			document.body.scrollTop = document.documentElement.scrollTop = 0; 
+			scrollToTop();
 			
 			submittedRequest = currentRequest;
 			socket.emit('makeRequest', { email: emailInput, crn: crnInput, term: term});
@@ -441,7 +441,7 @@ function processInputAndSend(){
 			$("#success_alert").show();
 			$("#send_request").hide();
 			$("#makeAnother").show();
-			document.body.scrollTop = document.documentElement.scrollTop = 0; 
+			scrollToTop();
 			submittedRequest = currentRequest;
 			socket.emit('makeSMSRequest', { email: emailInput, crn: crnInput, gatewayedNumber: gatewayedInput, term:term});
 			updateLastRequested(crnInput);
@@ -594,7 +594,7 @@ function updateLastRequested(lastCrn){
 }
 
 function updateWaitMessage(time){
-	$('#wait_alert').html("(Throttling) You need to wait the following number of seconds to do that: " + time);
+	$('#wait_alert').html("Throttle ~ You need to wait the following number of seconds to do that: " + time);
 }
 
 function checkDuplicateRequest(req1, req2){
@@ -621,6 +621,9 @@ function isCRN(crn){
 	return regex.test(crn)
 }
 
+function scrollToTop(){
+	document.body.scrollTop = document.documentElement.scrollTop = 0;
+}
 
 
 /*********
