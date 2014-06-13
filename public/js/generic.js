@@ -66,6 +66,7 @@ $(document).ready(function(){
 
 			if(!iName || !iMessage || !iEmail){
 				$('#contact_alert').show();
+				scrollToTop();
 				return;
 			}
 
@@ -103,6 +104,7 @@ $(document).ready(function(){
 
 		if(!isCRN(iCRN)){
 			$('#crn_alert').show();
+			scrollToTop();
 			return;
 		}else{
 			$('#crn_alert').hide();
@@ -154,6 +156,7 @@ $(document).ready(function(){
 
 		if(!isCRN(iCRN)){
 			$('#crn_alert').show();
+			scrollToTop();
 			return;
 		}else{
 			$('#crn_alert').hide();
@@ -185,6 +188,7 @@ $(document).ready(function(){
 
 		if( !(buzzUser.length>2) || !(buzzPass.length>4) ){
 			$('#buzzport_alert').show();
+			scrollToTop();
 			return;
 		}else{
 			$('#buzzport_alert').hide();
@@ -250,6 +254,7 @@ $(document).ready(function(){
 
 		if(!$('#buzz_register').hasClass('btn-success')){
 			$('#verify_alert').show();
+			scrollToTop();
 			return;
 		}else{
 			$('#verify_alert').hide();
@@ -257,6 +262,7 @@ $(document).ready(function(){
 
 		if( !isEmail( $('#auto-reg-email').val() ) ){
 			$('#email_alert').show();
+			scrollToTop();
 			return;
 		}else{
 			$('#email_alert').hide();
@@ -330,6 +336,7 @@ function updateThrottle(cb){
 			if(data.status == "bad"){
 				updateWaitMessage(data.timeLeft);
 				$('#wait_alert').show();
+				scrollToTop();
 			}else{
 				$('#wait_alert').hide("fold");
 				cb();
@@ -340,6 +347,7 @@ function updateThrottle(cb){
 function processInputAndSend(){
 	if(!$('#send_request').hasClass('btn-success')){
 		$('#verify_alert').show();
+		scrollToTop();
 		return;
 	}else{
 		$('#verify_alert').hide();
@@ -447,7 +455,8 @@ function processInputAndSend(){
 			updateLastRequested(crnInput);
 			updateOtherWatchers(crnInput);
 		}
-
+	}else{
+		scrollToTop();
 	}
 }
 
