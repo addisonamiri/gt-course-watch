@@ -105,11 +105,10 @@ Mailer.prototype.sendAutoRegSuccessMail = function(existingRequest){
 
 Mailer.prototype.sendConfirmationMail = function sendConfirmationMail(requestEmail, requestCRN, smsRequest, autoRegReq){
 
-	    var bodyText="Your Requested Class: " + requestCRN + 
-
-	    (autoRegReq ? "\nYou signed up for automatic registration." : 
-	    	("\nSigned up for SMS notification: " + (smsRequest ? "yes" : "no") ) + 
-	    "\n\nThank you for using my service!" );
+    var bodyText="Your Requested Class: " + requestCRN + 
+    (autoRegReq ? "\nYou signed up for automatic registration." : 
+    	("\nSigned up for SMS notification: " + (smsRequest ? "yes" : "no") ) ) + 
+    "\n\nThank you for using my service!";
 
 	// setup e-mail data with unicode symbols
 	var mailOptions = {
