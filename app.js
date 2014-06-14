@@ -13,16 +13,16 @@ var PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
 //AWS Pub DNS
 //http://ec2-54-234-151-220.compute-1.amazonaws.com
 
-var https_opts = {
-	key: fs.readFileSync("/home/ec2-user/ssl_key.pem").toString(),
-	cert: fs.readFileSync("/home/ec2-user/certs/www_gtcoursewatch_us.crt").toString(),
-	ca: [
-		fs.readFileSync("/home/ec2-user/certs/AddTrustExternalCARoot.crt").toString(),
-		fs.readFileSync("/home/ec2-user/certs/COMODORSAAddTrustCA.crt").toString(),
-		fs.readFileSync("/home/ec2-user/certs/COMODORSADomainValidationSecureServerCA.crt").toString()
-	]
-}
-var secureServer = require('https').createServer(app, https_opts).listen(443);
+// var https_opts = {
+// 	key: fs.readFileSync("/home/ec2-user/ssl_key.pem").toString(),
+// 	cert: fs.readFileSync("/home/ec2-user/certs/www_gtcoursewatch_us.crt").toString(),
+// 	ca: [
+// 		fs.readFileSync("/home/ec2-user/certs/AddTrustExternalCARoot.crt").toString(),
+// 		fs.readFileSync("/home/ec2-user/certs/COMODORSAAddTrustCA.crt").toString(),
+// 		fs.readFileSync("/home/ec2-user/certs/COMODORSADomainValidationSecureServerCA.crt").toString()
+// 	]
+// }
+// var secureServer = require('https').createServer(app, https_opts).listen(443);
 
 //*CONFIG
 var mailerEmail = "tofubeast1111@gmail.com";
