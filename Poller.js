@@ -81,57 +81,46 @@ Poller.prototype.pollAllSeats = function (){
 	//a hash of "crn" => [requests...]
 	var aggregatedReqs = {};
 
-	//auto regs must be handled before unpaid reqs for aggregation to work!
-	this.mongoController.autoRegReq.find({term:adjustedTerm}, function(err, requestPool){
-		if(err){
-			console.log(err);
-		}
-		
-		//aggregate paid automated reqs first to give them priority
-		aggregateRequests(aggregatedReqs, requestPool);
+	aggregateInOrder(function(){			
+		for (var crn in aggregatedReqs) {
+			self.getSeatStats(crn, function(crn, result){
+				if(result.hasOwnProperty("remaining") && result["remaining"] > 0){
+					//found a class with an empty seat if in this block
+					var aggArray = aggregatedReqs[crn];
 
-		aggregateUnpaidReqs(function(){			
-			for (var crn in aggregatedReqs) {
-				self.getSeatStats(crn, function(crn, result){
-					if(result.hasOwnProperty("remaining") && result["remaining"] > 0){
-						//found a class with an empty seat
-						var aggArray = aggregatedReqs[crn];
-
-						for(i in aggArray){
-							var req = aggArray[i];
-							if('gatewayedNumber' in req){
-								self.scrapeSeats(req, true);
-							}else{
-								self.scrapeSeats(req, false);
-							}
+					for(i in aggArray){
+						var req = aggArray[i];
+						if('gatewayedNumber' in req){
+							self.scrapeSeats(req, true);
+						}else{
+							self.scrapeSeats(req, false);
 						}
 					}
-				});
-			}
-
-		});
+				}
+			});
+		}
 	});
 
 
-	function aggregateUnpaidReqs(cb){
-		self.mongoController.Request.find({term:self.term}, function(err, requestPool){
-			if(err){
-				console.log(err);
-			}
-
+	function aggregateInOrder(cb){
+		//auto regs must be handled before unpaid reqs for aggregation to work!	
+		//aggregate paid automated reqs first to give them priority
+		self.mongoController.autoRegReq.find({term:adjustedTerm}, function(err, requestPool){
+			if(err) console.log(err);
 			aggregateRequests(aggregatedReqs, requestPool);
 
-			self.mongoController.smsRequest.find({term:self.term}, function(err, requestPool){
-				if(err){
-					console.log(err);
-				}
-
+			self.mongoController.Request.find({term:self.term}, function(err, requestPool){
+				if(err) console.log(err);
 				aggregateRequests(aggregatedReqs, requestPool);
 
-				cb();
-			});
-		});		
+				self.mongoController.smsRequest.find({term:self.term}, function(err, requestPool){
+					if(err) console.log(err);
+					aggregateRequests(aggregatedReqs, requestPool);
 
+					cb();
+				});
+			});
+		});
 	}
 
 	function aggregateRequests(aggregatorObj, requestPool){
@@ -141,13 +130,14 @@ Poller.prototype.pollAllSeats = function (){
 			if(!aggregatorObj.hasOwnProperty(req.crn)){
 				aggregatorObj[req.crn] = [req];
 			}else{
+				//only one automated-reg request per CRN is contained in aggregatorObj
+				//this way, the person next in line for auto-reg gets registered fairly before anyone else
 				if( !('buzzport_id' in req) ){
 					aggregatorObj[req.crn].push(req);
 				}
 			}
 		}
 	}
-
 
 }
 

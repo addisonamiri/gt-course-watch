@@ -503,6 +503,7 @@ function getStats(cb){
 
 	if(!isCRN(crn)){
 		$('#crn_alert').show();
+		scrollToTop();
 		return;
 	}else{
 		$('#crn_alert').hide();
