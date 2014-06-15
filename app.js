@@ -30,8 +30,8 @@ var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
 
 app.use(express.cookieParser());
-var store = new express.session.MemoryStore;
-app.use(express.session({secret:"blahblabhla", store:store}));
+var sessionStore = new express.session.MemoryStore;
+app.use(express.session({secret:"blahblabhla", store:sessionStore}));
 
 //*CONSTANTS
 var millisInSecond = 1000;
@@ -222,6 +222,7 @@ function socketHandler(socket){
 	});
 }
 
+//figure out what terms are open presently and initalize pollers for them.
 function initPollers(){
 	var d = new Date();
 	var pathComponents= ['/pls/bprod/bwckschd.p_disp_detail_sched?term_in=','4digityear','2digitmonth','&crn_in='];
@@ -285,18 +286,7 @@ function initPollers(){
 	pollers = {spring:springPoller, summer:summerPoller, fall:fallPoller};
 }
 
-function createLabel(term){
-	var length = term.length;
-	var year = term.slice(length-4,length);
-	var season = term.slice(0,length-4);
-	season = capitalizeFirstLetter(season);
-	return season + " " + year;
-}
-
-function capitalizeFirstLetter(string){
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
+//get all pollers for current school-terms.
 function getActivePollers(){
 	var result = [];
 
@@ -312,12 +302,35 @@ function getActivePollers(){
 	return result;
 }
 
-//*SCHEDULED JOBS, hopefully they don't collide lol
+//periodically access unused sessions so that they are expired by Express.
+function sessionCleanup() {
+    sessionStore.all(function(err, sessions) {
+        for (var i = 0; i < sessions.length; i++) {
+            sessionStore.get(sessions[i], function() {} );
+        }
+    });
+}
+
+//create labels for front-end term selectors
+function createLabel(term){
+	var length = term.length;
+	var year = term.slice(length-4,length);
+	var season = term.slice(0,length-4);
+	season = capitalizeFirstLetter(season);
+	return season + " " + year;
+}
+
+function capitalizeFirstLetter(string){
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+//*SCHEDULED JOBS
 
 //re-init pollers every day in the event of new term
 setInterval(function(){
 	initPollers();
 	myMongoController.cleanExpiredReqs();
+	sessionCleanup();
 }, millisInDay)
 
 //polling job
