@@ -30,7 +30,7 @@ var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
 
 app.use(express.cookieParser());
-var sessionStore = new express.session.MemoryStore;
+var sessionStore = new express.session.MemoryStore; //equivalent to new express.session.MemoryStore()
 app.use(express.session({secret:"blahblabhla", store:sessionStore}));
 
 //*CONSTANTS
@@ -75,6 +75,7 @@ app.post('/verifyBuzzport', function(req, res){
 			password:post.password 
 		}, 
 		function(status){
+			console.log(status);
 			res.json({status: status});
 		}
 	);
@@ -224,7 +225,7 @@ function socketHandler(socket){
 
 //figure out what terms are open presently and initalize pollers for them.
 function initPollers(){
-	var d = new Date();
+	var d =  new Date();
 	var pathComponents= ['/pls/bprod/bwckschd.p_disp_detail_sched?term_in=','4digityear','2digitmonth','&crn_in='];
 	var month = d.getMonth();
 	var year; //can't initalize due to spring edge cases
