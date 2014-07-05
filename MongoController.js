@@ -1,4 +1,6 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+	Schema = mongoose.Schema,
+	bcrypt = require('bcrypt');
 
 //
 // MONGO SETUP
@@ -48,14 +50,62 @@ function MongoController(url){
 		auto_reqs: Number
 	});
 
+	this.userSchema = mongoose.Schema({
+		email: String,
+		password_hash: String,
+		uuid: String,
+		activated: Boolean,
+		reg_reqs: [],
+		sms_reqs: [],
+		auto_reqs: []
+	})
+
 	this.Request = mongoose.model('Request', this.requestSchema);
 	this.smsRequest = mongoose.model('smsRequest', this.smsRequestSchema);
 	this.autoRegReq = mongoose.model('autoRegReq', this.autoRegReqSchema);
 	this.confirmationStat = mongoose.model('confirmationStat', this.confirmationStatSchema);
 	this.successStat = mongoose.model('successStat', this.successStatSchema);
+	this.user = mongoose.model('user', this.userSchema);
 
 	this.myDB.once('open', function(){
 		console.log('db successfully opened');
+	});
+}
+
+MongoController.prototype.createUser = function (email, password, uuid){
+	var self = this;
+
+	bcrypt.genSalt(10, function(err, salt) {
+	    bcrypt.hash(password, salt, function(err, hash) {
+	        // Store hash in your password DB.
+			var newUser = new self.user({
+				email: email,
+				password_hash: hash,
+				uuid: uuid,
+				activated: false
+			});
+
+			newUser.save(function(err, doc){
+				if(err) console.log('save error: ' + err);
+			});
+	    });
+	});
+}
+
+MongoController.prototype.authenticate = function (email, password, next){
+
+	this.user.findOne({email:email}, function(err, foundUser){
+		if(err) return console.log("find user error: " + err);
+		
+		if(!foundUser) next(false, null);
+		else{
+			bcrypt.compare(password, foundUser.password_hash, function(err, res){
+				if (err) return console.log('bcrypt compare error: ' + err);
+
+				//res == true on match
+				next(res, foundUser);
+			});		
+		}
 	});
 }
 

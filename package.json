@@ -9,6 +9,7 @@
 		"mongoose" : "latest",
 		"socket.io" : "latest",
 		"cheerio" : "latest",
-		"forever" : "latest"
+		"forever" : "latest",
+		"bcrypt" : "latest"	
 	}
 }

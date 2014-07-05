@@ -28,6 +28,7 @@ var PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
 var mailerEmail = "tofubeast1111@gmail.com";
 var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
+var hostName = "gtcoursewatch.us";
 
 app.use(express.cookieParser());
 var sessionStore = new express.session.MemoryStore; //equivalent to new express.session.MemoryStore()
@@ -191,6 +192,24 @@ app.get('/verifyCRN/:crn/:term', function(req, res){
 
 });
 
+//Account Related Stuffs.
+
+app.get('/verifyEmail', function(req, res){
+	var email = req.query.email,
+		uuid = req.query.uuid;
+
+		console.log("email: " + email);
+		console.log("uuid: " + uuid);
+});
+
+app.post('/sign_up', function(req, res){
+	// myMongoController.createUser("jo@jo.com", "password", "uuid");	
+});
+
+app.post('/log_in', function(req, res){
+
+});
+
 //*WEBSOCKET HANDLING
 
 // io.disable('heartbeats');
@@ -310,6 +329,18 @@ function sessionCleanup() {
             sessionStore.get(sessions[i], function() {} );
         }
     });
+}
+
+function generateUUID(){
+	return 	'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+	    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+	    return v.toString(16);
+	});	
+}
+
+function generateEmailVerificationURL(email, uuid){
+	return hostName+"verifyEmail?email=" +
+	email + "&uuid=" + uuid;
 }
 
 //create labels for front-end term selectors
