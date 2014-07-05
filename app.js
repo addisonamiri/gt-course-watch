@@ -28,7 +28,9 @@ var PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
 var mailerEmail = "tofubeast1111@gmail.com";
 var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
-var hostName = "http://www.gtcoursewatch.us";
+// var hostName = "http://www.gtcoursewatch.us";
+var hostName = "http://localhost:8080";
+
 var THROTTLE_DELAY_SECS = 8;
 
 //*CONSTANTS
@@ -221,8 +223,22 @@ app.get('/verifyEmail', function(req, res){
 	var email = req.query.email,
 		uuid = req.query.uuid;
 
-		console.log("email: " + email);
-		console.log("uuid: " + uuid);
+	myMongoController.userAccessor(email, function(user){
+		if(user.uuid == uuid){
+			if(user.activated == false){
+				req.session.warning_flash = "Your account has already been activated."
+				res.redirect('/');
+				return
+			}
+			user.activated = true;
+			user.save();
+			req.session.success_flash = "Account activated!"
+			res.redirect('/');
+		}else{
+			req.session.danger_flash = "Account activation failed."
+			res.redirect('/');
+		}
+	});
 });
 
 app.get('/sign_up', function(req, res){
@@ -250,14 +266,21 @@ app.post('/create_account', function(req, res){
 		res.redirect('back');
 	}
 	else{ // valid credentials
-		var uuid=generateUUID(),
-			emailLink = generateEmailVerificationURL(email, uuid);
+		myMongoController.userAccessor(email, function(user_arr){
+			if(user_arr.length > 0){
+				req.session.danger_flash = "That e-mail address has already been taken."
+				res.redirect('back');
+			}else{
+				var uuid=generateUUID(),
+					emailLink = generateEmailVerificationURL(email, uuid);
 
-		myMongoController.createUser(email, password, uuid);
-		myMailer.sendEmailVerification(email, emailLink);
+				myMongoController.createUser(email, password, uuid);
+				myMailer.sendEmailVerification(email, emailLink);
 
-		req.session.success_flash = 'You have successfully signed up!';
-		res.redirect('/');
+				req.session.success_flash = 'You have successfully signed up!';
+				res.redirect('/');
+			}
+		});
 	}
 });
 

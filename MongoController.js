@@ -72,6 +72,14 @@ function MongoController(url){
 	});
 }
 
+MongoController.prototype.userAccessor = function (email, f){
+	this.user.find({email:email},function(err, foundUser){
+		if (err) return console.log('find user error: ' + err);
+		if(!foundUser) return console.log('could not find user');
+		f(foundUser);
+	});
+}
+
 MongoController.prototype.createUser = function (email, password, uuid){
 	var self = this;
 
@@ -99,11 +107,11 @@ MongoController.prototype.authenticate = function (email, password, next){
 		
 		if(!foundUser) next(false, null);
 		else{
-			bcrypt.compare(password, foundUser.password_hash, function(err, res){
+			bcrypt.compare(password, foundUser.password_hash, function(err, authRes){
 				if (err) return console.log('bcrypt compare error: ' + err);
 
-				//res == true on match
-				next(res, foundUser);
+				//authRes == true on match
+				next(authRes, foundUser);
 			});		
 		}
 	});
