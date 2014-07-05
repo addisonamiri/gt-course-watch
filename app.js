@@ -217,6 +217,7 @@ app.get('/log_in', function(req, res){
 	res.render('login',{title:"Login", user: req.session.username});
 });
 
+//need to add throttle support
 app.post('/login_auth', function(req, res){
 	var user = req.body.email;
 	var pass = req.body.password;

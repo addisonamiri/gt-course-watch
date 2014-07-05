@@ -55,9 +55,31 @@ window.onload = function() {
 	});
 }
 
-
-
 $(document).ready(function(){	
+
+	$("#loginForm").submit(function(e){
+		e.preventDefault();
+		var form = $(this);
+
+		updateThrottle(function(){
+
+		$("#invalid_alert").hide()
+			loginOk(function(){
+
+				$.ajax({url:"/login_auth",
+						type: "POST",
+						data: form.serialize(),
+						dataType: 'json',
+						success: function(data){
+							if (data.redirect) window.location = data.redirect;
+
+							if(data.toString() == "false") $("#invalid_alert").show();
+							else $("#invalid_alert").hide()
+						}
+				});
+			});
+		});
+	});
 
 	$('#contact-sub').click(function(){
 			var iName = $('#contact-name').val();
@@ -344,6 +366,32 @@ function updateThrottle(cb){
 	});
 }
 
+function loginOk(next){
+	var emailContent = $('#email').val();
+	var passContent = $('#password').val();
+	var errorCount = 0;
+
+	if(checkEmpty(emailContent)){
+		$('#username_alert').show();
+		errorCount++;
+	}else{
+		$('#username_alert').hide();
+	}
+
+	if(checkEmpty(passContent)){
+		$('#pass_alert').show();
+		errorCount++;
+	}else{
+		$('#pass_alert').hide();
+	}
+
+	if(errorCount){
+		return false;
+	}else{
+		next();
+	}
+};
+
 function processInputAndSend(){
 	if(!$('#send_request').hasClass('btn-success')){
 		$('#verify_alert').show();
@@ -605,6 +653,10 @@ function updateLastRequested(lastCrn){
 
 function updateWaitMessage(time){
 	$('#wait_alert').html("Throttle ~ You need to wait the following number of seconds to do that: " + time);
+}
+
+function checkEmpty(content){
+	return (content.length > 0 ? false : true);
 }
 
 function checkDuplicateRequest(req1, req2){
