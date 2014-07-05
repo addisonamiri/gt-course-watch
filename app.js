@@ -106,11 +106,12 @@ app.get('/', function(req, res) {
 						fall:fallTerm,
 						springLabel: springLabel,
 						summerLabel: summerLabel,
-						fallLabel: fallLabel});
+						fallLabel: fallLabel,
+						user: req.session.username});
 });
 
 app.get('/about', function(req, res) {
-	res.render('about', {title:"About"});
+	res.render('about', {title:"About", user: req.session.username});
 });
 
 app.get('/getTimeoutStatus', function(req, res){
@@ -193,7 +194,6 @@ app.get('/verifyCRN/:crn/:term', function(req, res){
 });
 
 //Account Related Stuffs.
-
 app.get('/verifyEmail', function(req, res){
 	var email = req.query.email,
 		uuid = req.query.uuid;
@@ -204,12 +204,17 @@ app.get('/verifyEmail', function(req, res){
 		console.log("uuid: " + uuid);
 });
 
-app.post('/sign_up', function(req, res){
-	// myMongoController.createUser("jo@jo.com", "password", "uuid");	
+app.get('/sign_up', function(req, res){
+	//pass param user: req.session.username
+});
+
+app.post('/create_account', function(req, res){
+	// myMongoController.createUser("jo@jo.com", "password", "uuid");
+
 });
 
 app.get('/log_in', function(req, res){
-	res.render('login',{title:"Login"});
+	res.render('login',{title:"Login", user: req.session.username});
 });
 
 app.post('/login_auth', function(req, res){
@@ -228,6 +233,18 @@ app.post('/login_auth', function(req, res){
 		}
 	});
 });
+
+app.get('/my_account/:id', checkAuth, function(req, res){
+	console.log(req.params.id);
+});
+
+app.get('/cancel_req/:id', checkAuth, function(req, res){
+
+});
+
+
+
+
 //*WEBSOCKET HANDLING
 
 // io.disable('heartbeats');

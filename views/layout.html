@@ -49,7 +49,12 @@
               <li><a href="/">Home</a></li>
               <li><a href="/about">About</a></li>
               <li><a href="#contact_modal" data-toggle="modal">Contact</a></li>
-              <li><a href="/log_in">Login</a></li>
+
+              {{#if user}}
+                <li><a href="/my_account">Account</a></li>
+              {{else}}
+                <li><a href="/log_in">Login</a></li>
+              {{/if}}
 
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Quick Links <b class="caret"></b> </a>
