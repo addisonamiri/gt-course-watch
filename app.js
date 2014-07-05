@@ -28,7 +28,8 @@ var PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
 var mailerEmail = "tofubeast1111@gmail.com";
 var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
-var hostName = "gtcoursewatch.us";
+var hostName = "http://www.gtcoursewatch.us";
+var THROTTLE_DELAY_SECS = 8;
 
 //*CONSTANTS
 var millisInSecond = 1000;
@@ -60,7 +61,9 @@ app.use(express.cookieParser());
 var sessionStore = new express.session.MemoryStore; //equivalent to new express.session.MemoryStore()
 app.use(express.session({secret:"blahblabhla", store:sessionStore}));
 
+
 app.configure(function(){
+	//middleware + res.locals
   app.use(function(req, res, next){
     res.locals.username = req.session.username;
     next();
@@ -135,7 +138,7 @@ app.post('/autoRegReq', function(req, res){
 
 //Throttle
 app.get('/getTimeoutStatus', function(req, res){
-	var TIMEOUT = 8*millisInSecond; // 15 sec
+	var TIMEOUT = THROTTLE_DELAY_SECS*millisInSecond; // 15 sec
 
 	if(req.session.throttleTime == null){
 		//initial hit
@@ -218,8 +221,6 @@ app.get('/verifyEmail', function(req, res){
 	var email = req.query.email,
 		uuid = req.query.uuid;
 
-
-
 		console.log("email: " + email);
 		console.log("uuid: " + uuid);
 });
@@ -231,16 +232,39 @@ app.get('/sign_up', function(req, res){
 
 app.post('/create_account', function(req, res){
 	// myMongoController.createUser("jo@jo.com", "password", "uuid");
-	req.session.success_flash = 'You have successfully signed up!';
-	res.redirect('/');
-	// res.send(req.body)
+	var post = req.body;
+
+	var email = post.email,
+		password = post.password,
+		password_conf = post.password_conf;
+
+	if(password != password_conf){
+		req.session.danger_flash = "Passwords did not match!";
+		res.redirect('back');
+	}else if(password.length < 6){
+		req.session.danger_flash = "Password must be at least 6 characters in length.";
+		res.redirect('back');		
+	}
+	else if(!isEmail(email)){
+		req.session.danger_flash = "Invalid email format!";
+		res.redirect('back');
+	}
+	else{ // valid credentials
+		var uuid=generateUUID(),
+			emailLink = generateEmailVerificationURL(email, uuid);
+
+		myMongoController.createUser(email, password, uuid);
+		myMailer.sendEmailVerification(email, emailLink);
+
+		req.session.success_flash = 'You have successfully signed up!';
+		res.redirect('/');
+	}
 });
 
 app.get('/log_in', function(req, res){
 	res.render('login',{title:"Login"});
 });
 
-//need to add throttle support
 app.post('/login_auth', function(req, res){
 	var user = req.body.email;
 	var pass = req.body.password;
@@ -251,7 +275,6 @@ app.post('/login_auth', function(req, res){
 			req.session.userId = foundUser._id;
 			req.session.success_flash = "You have successfully logged in."
 
-			// res.redirect('/')
 			res.send({redirect: '/'});
 		}else{
 			res.set('Content-Type', 'text/plain');
@@ -407,7 +430,7 @@ function generateUUID(){
 }
 
 function generateEmailVerificationURL(email, uuid){
-	return hostName+"verifyEmail?email=" +
+	return hostName+"/verifyEmail?email=" +
 	email + "&uuid=" + uuid;
 }
 
@@ -422,6 +445,11 @@ function createLabel(term){
 
 function capitalizeFirstLetter(string){
     return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function isEmail(email) {
+	var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	return regex.test(email);
 }
 
 //*SCHEDULED JOBS

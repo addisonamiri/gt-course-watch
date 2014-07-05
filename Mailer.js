@@ -18,11 +18,32 @@ function Mailer(email, pass){
 Mailer.prototype.sendGenericMail = function(email, subj, msg){
 	var mailOptions = {
 //	    from: "GT Course Watch Mailer ✔ <tofubeast1111@gmail.com>", // sender address
-	    from: "GT Course Watch Mailer <"+ this.emailID +">", // sender address
+	    from: "GT Course Watch Mailer ✔ <"+ this.emailID +">", // sender address
 	    to: email, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
 	    subject: subj, // Subject line
 	    text: msg, // plaintext body
 	    // html: "<b>Hello world ✔</b>" // html body
+	}
+
+	// send mail with defined transport object
+	this.smtpTransport.sendMail(mailOptions, function(error, response){
+	    if(error){
+	        console.log(error);
+	    }
+	});		
+}
+
+Mailer.prototype.sendEmailVerification = function(email, link){
+	var htmlBody = "<h1>Click the Link to Complete Verification </h1> <br> " +
+	    	'<a href="' + link + '"> Verification Link </a>';
+
+	console.log(htmlBody);
+
+	var mailOptions = {
+	    from: "GT Course Watch Mailer ✔ <"+ this.emailID +">", // sender address
+	    to: email, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
+	    subject: "Email Verification", // Subject line
+	    html: htmlBody
 	}
 
 	// send mail with defined transport object
@@ -125,16 +146,7 @@ Mailer.prototype.sendConfirmationMail = function sendConfirmationMail(requestEma
 	    if(error){
 	        console.log(error);
 	    }
-	    else{
-	    	// console.log('email sent');
-	        // console.log("Message sent: " + response.message);
-	    }
-
-	    // if you don't want to use this transport object anymore, uncomment following line
-	    //smtpTransport.close(); // shut down the connection pool, no more messages
 	});
-
-
 }
 
 Mailer.prototype.contactMailJob = function(email, name, msg){
@@ -157,13 +169,6 @@ Mailer.prototype.contactMailJob = function(email, name, msg){
 	    if(error){
 	        console.log(error);
 	    }
-	    else{
-	    	// console.log('email sent');
-	        // console.log("Message sent: " + response.message);
-	    }
-
-	    // if you don't want to use this transport object anymore, uncomment following line
-	    //smtpTransport.close(); // shut down the connection pool, no more messages
 	});
 
 
