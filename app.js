@@ -198,6 +198,8 @@ app.get('/verifyEmail', function(req, res){
 	var email = req.query.email,
 		uuid = req.query.uuid;
 
+
+
 		console.log("email: " + email);
 		console.log("uuid: " + uuid);
 });
@@ -206,10 +208,26 @@ app.post('/sign_up', function(req, res){
 	// myMongoController.createUser("jo@jo.com", "password", "uuid");	
 });
 
-app.post('/log_in', function(req, res){
-
+app.get('/log_in', function(req, res){
+	res.render('login',{title:"Login"});
 });
 
+app.post('/login_auth', function(req, res){
+	var user = req.body.email;
+	var pass = req.body.password;
+
+	myMongoController.authenticate(user, pass, function(authRes, foundUser){
+		if(authRes == true){
+			req.session.username = user;
+			req.session.userId = foundUser._id;
+
+			res.send({redirect: '/'});
+		}else{
+			res.set('Content-Type', 'text/plain');
+			res.send(authRes);
+		}
+	});
+});
 //*WEBSOCKET HANDLING
 
 // io.disable('heartbeats');
@@ -320,6 +338,14 @@ function getActivePollers(){
 	}
 
 	return result;
+}
+
+function checkAuth(req, res, next) {
+  if (!req.session.username) {
+    res.send('Unauthorized action.');
+  } else {
+    next();
+  }
 }
 
 //periodically access unused sessions so that they are expired by Express.

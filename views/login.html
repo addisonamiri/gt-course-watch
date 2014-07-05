@@ -1,0 +1,98 @@
+<script>
+
+$(document).ready(function(){
+
+	$(".alert").hide();
+
+	$("#loginForm").submit(function(e){
+		e.preventDefault();
+		
+		var form = $(this);
+
+		$("#invalid_alert").hide()
+
+		loginOk(function(){
+
+			$.ajax({url:"/login_auth",
+					type: "POST",
+					data: form.serialize(),
+					dataType: 'json',
+					success: function(data){
+						if (data.redirect) window.location = data.redirect;
+
+						if(data.toString() == "false") $("#invalid_alert").show();
+						else $("#invalid_alert").hide()
+					}
+			});
+		});
+	});
+
+});
+
+function loginOk(next){
+	var emailContent = $('#email').val();
+	var passContent = $('#password').val();
+	var errorCount = 0;
+
+	if(checkEmpty(emailContent)){
+		$('#username_alert').show();
+		errorCount++;
+	}else{
+		$('#username_alert').hide();
+	}
+
+	if(checkEmpty(passContent)){
+		$('#pass_alert').show();
+		errorCount++;
+	}else{
+		$('#pass_alert').hide();
+	}
+
+	if(errorCount){
+		return false;
+	}else{
+		next();
+	}
+};
+
+function checkEmpty(content){
+	return (content.length > 0 ? false : true);
+}
+
+function isEmail(email) {
+	var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	return regex.test(email);
+}
+
+</script>
+
+<div id = "username_alert" class="alert alert-danger">
+  Email can't be balnk
+</div>
+
+<div id = "pass_alert" class="alert alert-danger">
+  Password can't be blank
+</div>
+
+<div id = "invalid_alert" class="alert alert-danger">
+  Invalid password/email combination
+</div>
+
+<form id="loginForm" name="loginForm">
+	<h1>Please Login</h1>
+
+	<label for="email">Email </label>
+	<input type="text" class="form-control" name="email" id="email">
+
+	<label for="password">Password </label>
+	<input type="password" class="form-control" name="password" id="password">
+
+	<br>
+
+	<div>
+		<input id= "login" type="submit" class="btn btn-primary" value="Login">
+		<span style="margin-left:15px;">
+			Don't have an account? <a href="/sign_up">Sign up </a>
+		</span>
+	</div>
+</form>
