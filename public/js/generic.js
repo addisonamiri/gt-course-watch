@@ -326,6 +326,7 @@ $(document).ready(function(){
 	//validation
 
 	$(".alert").hide();
+	$(".flash_alert").show();
 	$("#makeAnother").hide();
 
 	$("#makeAnother").click(function(){

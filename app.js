@@ -30,10 +30,6 @@ var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
 var hostName = "gtcoursewatch.us";
 
-app.use(express.cookieParser());
-var sessionStore = new express.session.MemoryStore; //equivalent to new express.session.MemoryStore()
-app.use(express.session({secret:"blahblabhla", store:sessionStore}));
-
 //*CONSTANTS
 var millisInSecond = 1000;
 var millisInMinute = millisInSecond*60;
@@ -59,13 +55,57 @@ console.log('Spring Null? ' + (pollers['spring']==null).toString());
 console.log('Fall Null? ' + (pollers['fall']==null).toString());
 console.log('Summer Null? ' + (pollers['summer']==null).toString());
 
-//*ROUTING
+//*Express Config
+app.use(express.cookieParser());
+var sessionStore = new express.session.MemoryStore; //equivalent to new express.session.MemoryStore()
+app.use(express.session({secret:"blahblabhla", store:sessionStore}));
+
+app.configure(function(){
+  app.use(function(req, res, next){
+    res.locals.username = req.session.username;
+    next();
+  });
+
+  //my implementation of flash
+  app.use(function(req, res, next){
+    res.locals.success_flash = req.session.success_flash;
+    res.locals.warning_flash = req.session.warning_flash;
+    res.locals.danger_flash = req.session.danger_flash;
+    req.session.success_flash = null;
+    req.session.warning_flash = null;
+    req.session.danger_flash = null;
+    next();
+  });
+});
 
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 
 app.use(express.bodyParser());
+app.use(app.router);
 app.use(express.static('public'));
+
+
+app.get('/', function(req, res) {
+	var springLabel, summerLabel, fallLabel;
+
+	if(springTerm) springLabel = createLabel(springTerm);
+	if(summerTerm) summerLabel = createLabel(summerTerm);
+	if(fallTerm) fallLabel = createLabel(fallTerm);
+
+	res.render('index',{title:"Home", 
+						spring:springTerm, 
+						summer:summerTerm, 
+						fall:fallTerm,
+						springLabel: springLabel,
+						summerLabel: summerLabel,
+						fallLabel: fallLabel
+					});
+});
+
+app.get('/about', function(req, res) {
+	res.render('about', {title:"About"});
+});
 
 app.post('/verifyBuzzport', function(req, res){
 	var post = req.body;
@@ -93,29 +133,9 @@ app.post('/autoRegReq', function(req, res){
 	res.json({status: "SUCCESS"});
 });
 
-app.get('/', function(req, res) {
-	var springLabel, summerLabel, fallLabel;
-
-	if(springTerm) springLabel = createLabel(springTerm);
-	if(summerTerm) summerLabel = createLabel(summerTerm);
-	if(fallTerm) fallLabel = createLabel(fallTerm);
-
-	res.render('index',{title:"Home", 
-						spring:springTerm, 
-						summer:summerTerm, 
-						fall:fallTerm,
-						springLabel: springLabel,
-						summerLabel: summerLabel,
-						fallLabel: fallLabel,
-						user: req.session.username});
-});
-
-app.get('/about', function(req, res) {
-	res.render('about', {title:"About", user: req.session.username});
-});
-
+//Throttle
 app.get('/getTimeoutStatus', function(req, res){
-	var TIMEOUT = 15*millisInSecond; // 15 sec
+	var TIMEOUT = 8*millisInSecond; // 15 sec
 
 	if(req.session.throttleTime == null){
 		//initial hit
@@ -206,15 +226,18 @@ app.get('/verifyEmail', function(req, res){
 
 app.get('/sign_up', function(req, res){
 	//pass param user: req.session.username
+	res.render('sign_up',{title:"Sign Up"});
 });
 
 app.post('/create_account', function(req, res){
 	// myMongoController.createUser("jo@jo.com", "password", "uuid");
-
+	req.session.success_flash = 'You have successfully signed up!';
+	res.redirect('/');
+	// res.send(req.body)
 });
 
 app.get('/log_in', function(req, res){
-	res.render('login',{title:"Login", user: req.session.username});
+	res.render('login',{title:"Login"});
 });
 
 //need to add throttle support
@@ -226,7 +249,9 @@ app.post('/login_auth', function(req, res){
 		if(authRes == true){
 			req.session.username = user;
 			req.session.userId = foundUser._id;
+			req.session.success_flash = "You have successfully logged in."
 
+			// res.redirect('/')
 			res.send({redirect: '/'});
 		}else{
 			res.set('Content-Type', 'text/plain');
@@ -242,7 +267,6 @@ app.get('/my_account/:id', checkAuth, function(req, res){
 app.get('/cancel_req/:id', checkAuth, function(req, res){
 
 });
-
 
 
 

@@ -50,7 +50,7 @@
               <li><a href="/about">About</a></li>
               <li><a href="#contact_modal" data-toggle="modal">Contact</a></li>
 
-              {{#if user}}
+              {{#if username}}
                 <li><a href="/my_account">Account</a></li>
               {{else}}
                 <li><a href="/log_in">Login</a></li>
@@ -77,6 +77,83 @@
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         You didn't fully fill out the contact form.
       </div>
+
+      <div id = "email_alert" class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Invalid Email
+      </div>
+      <!-- <link href="/css/generic.css" rel="stylesheet"> -->
+
+      <div id = "buzzport_alert" class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Invalid BuzzPort Credentials
+      </div>
+
+      <div id = "crn_alert" class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Invalid CRN
+      </div>
+
+      <div id = "phone_alert" class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Invalid Phone Number
+      </div>  
+
+      <div id = "duplicate_alert" class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Duplicate request, please do not flood the database
+      </div>  
+
+      <div id = "verify_alert" class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Verify the required fields before proceeding
+      </div>  
+
+      <div id = "success_alert" class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Request submitted to server! You'll be emailed when a spot is open
+      </div>
+
+      <div id = "wait_alert" class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>     
+        You need to wait the following number of second to do that: 
+      </div>
+
+      <div id = "username_alert" class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>  
+        Email can't be blank
+      </div>
+
+      <div id = "pass_alert" class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Password can't be blank
+      </div>
+
+      <div id = "invalid_alert" class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Invalid password/email combination
+      </div>
+
+      {{#if success_flash}}
+        <div id = "success_alert" class="alert alert-success flash_alert">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          {{success_flash}}
+        </div>
+      {{/if}}
+
+      {{#if danger_flash}}
+        <div id = "success_alert" class="alert alert-success flash_alert">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          {{danger_flash}}
+        </div>
+      {{/if}}
+
+      {{#if warning_flash}}
+        <div id = "success_alert" class="alert alert-success flash_alert">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          {{warning_flash}}
+        </div>
+      {{/if}}      
 
     	{{{body}}}
 

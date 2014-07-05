@@ -112,7 +112,8 @@ Mailer.prototype.sendConfirmationMail = function sendConfirmationMail(requestEma
 	// setup e-mail data with unicode symbols
 	var mailOptions = {
 //	    from: "GT Course Watch Mailer ✔ <tofubeast1111@gmail.com>", // sender address
-	    from: "Confirmation @ GT Course Watch ✔ <"+ this.emailID +">", // sender address
+	    // from: "Confirmation @ GT Course Watch ✔ <"+ this.emailID +">", // sender address
+	    from: "GT Course Watch Mailer ✔ <"+ this.emailID +">", // sender address
 	    to: requestEmail, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
 	    subject: "Course Watch Confirmation for CRN: " + requestCRN, // Subject line
 	    text: bodyText, // plaintext body
