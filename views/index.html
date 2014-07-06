@@ -418,6 +418,14 @@
 
 </div>
 
+
+{{#if username}}
+	<script type="text/javascript">
+	  $('#inputEmail').val("{{username}}");
+	  $('#auto-reg-email').val("{{username}}");
+	</script>
+{{/if}}
+
 <!-- <div style="position:absolute;bottom:0;right:0;">
 	<a href="http://www.FreeDomain.co.nr">
 		<img src="http://www.freedomain.co.nr/images/bars/anima.gif" width="88" height="31" border="0" alt="Link to Us : Help with CO.NR development">
