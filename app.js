@@ -29,8 +29,8 @@ var PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
 var mailerEmail = "tofubeast1111@gmail.com";
 var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
-// var hostName = "http://www.gtcoursewatch.us";
-var hostName = "http://localhost:8080";
+var hostName = "http://www.gtcoursewatch.us";
+// var hostName = "http://localhost:8080";
 
 var THROTTLE_DELAY_SECS = 8;
 
