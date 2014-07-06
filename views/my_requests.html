@@ -1,6 +1,67 @@
-{{#each sms_reqs}}
-	{{_id}}
-<!-- 	<h2><a href="/posts/{{../permalink}}#{{id}}">{{title}}</a></h2>
-	<div>{{body}}</div>
- -->
- {{/each}}
+<div class="container" style="width:90%;">
+	<h1 style="text-align:center;">My Requests</h1>
+
+	<h3>Email Requests </h3>
+	<table id="email_reqs_tbl" class="table table-striped">
+		<thead>
+			<th>CRN</th>
+			<th>Term</th>
+			<th>Tied Email</th>
+			<th></th>
+		</thead>
+		<tbody>
+			{{#each reg_reqs}}
+			<tr>
+				<td>{{email}}</td>
+				<td>{{term}}</td>
+				<td>{{email}}</td>
+				<td> <a class="btn btn-danger" href="/cancel_req/EMAIL/{{_id}}">Cancel</a></td>
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
+
+	<h3>SMS Requests </h3>
+	<table id="sms_reqs_tbl" class="table table-striped">
+		<thead>
+			<th>CRN</th>
+			<th>Term</th>
+			<th>Tied Email</th>
+			<th>Tied Phone #</th>
+			<th></th>
+		</thead>
+		<tbody>
+			{{#each sms_reqs}}
+			<tr>
+				<td>{{crn}}</td>
+				<td>{{term}}</td>
+				<td>{{email}}</td>
+				<td>{{gatewayedNumber}}</td>
+				<td> <a class="btn btn-danger" href="/cancel_req/SMS/{{_id}}">Cancel</a></td>
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
+
+	<h3>SMS Requests </h3>
+	<table id="sms_reqs_tbl" class="table table-striped">
+		<thead>
+			<th>CRN</th>
+			<th>Term</th>
+			<th>Tied Email</th>
+			<th>Tied Phone #</th>
+			<th></th>
+		</thead>
+		<tbody>
+			{{#each sms_reqs}}
+			<tr>
+				<td>{{crn}}</td>
+				<td>{{term}}</td>
+				<td>{{email}}</td>
+				<td>{{gatewayedNumber}}</td>
+				<td> <a class="btn btn-danger" href="/cancel_req/SMS/{{_id}}">Cancel</a></td>
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
+</div>

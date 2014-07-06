@@ -407,10 +407,14 @@ app.get('/my_requests', checkAuth, function(req, res){
 
 		find_reqs(user.reg_reqs, myMongoController.Request, function(result){
 			reg_reqs = result;
+
 			find_reqs(user.sms_reqs, myMongoController.smsRequest, function(result){
 				sms_reqs = result;
+				
 				find_reqs(user.auto_reqs, myMongoController.autoRegReq, function(result){
 					auto_reqs = result;
+
+					format_terms(reg_reqs, sms_reqs, auto_reqs);
 
 					res.render('my_requests', {
 						sms_reqs: sms_reqs,
@@ -421,6 +425,22 @@ app.get('/my_requests', checkAuth, function(req, res){
 			});
 		});
 
+		//the for-each are blocking, therefore no async issues
+		function format_terms(reg_arr, sms_arr, auto_arr){
+			reg_arr.forEach(function(e, i, a){
+				a[i].term = format_watch_req(e.term);
+			});
+
+			sms_arr.forEach(function(e, i, a){
+				a[i].term = format_watch_req(e.term);
+				a[i].gatewayedNumber = e.gatewayedNumber.replace(/@.+/,'');
+			});
+
+			auto_arr.forEach(function(e, i, a){
+				a[i].term = format_auto_reqs(e.term);
+			});
+		}
+
 		function find_reqs(collection, model, next){
 			var result = [];
 			var collection = collection;
@@ -428,17 +448,18 @@ app.get('/my_requests', checkAuth, function(req, res){
 			var requests_remaining = collection.length;
 
 			if( requests_remaining > 0){
-				for(var i in collection){
-					var id = collection[i]
+				collection.forEach(function(id){
 					model.findById(id, function(err, doc){
 						result.push(doc);
-					
+						console.log("pushing a doc" + doc);
+
 						requests_remaining--;
 						if(requests_remaining == 0){ //only the last executed async call will meet this condition.
+							console.log("righ before cb" + result);
 							next(result);
 						}
-					});
-				}
+					});					
+				});
 			}else{
 				next(result);
 			}
@@ -456,7 +477,7 @@ app.get('/cancel_req/:type/:id', checkAuth, function(req, res){
 			myMongoController.Request.findByIdAndRemove(id, cancellation_redirect);
 			break;
 		case "SMS":
-			myMongoController.smsRequest.findByIdAndRemove(id, cancellation_redirect;
+			myMongoController.smsRequest.findByIdAndRemove(id, cancellation_redirect);
 			break;
 		case "AUTOMATED":
 			myMongoController.autoRegReq.findByIdAndRemove(id, cancellation_redirect);
@@ -599,6 +620,19 @@ function generateUUID(){
 function generateEmailVerificationURL(email, uuid){
 	return hostName+"/verifyEmail?email=" +
 	email + "&uuid=" + uuid;
+}
+
+//Semi-alias for create createLabel method, although different implementation..
+function format_watch_req(term){
+	var year_idx = term.indexOf(2);
+	var season = term.slice(0,year_idx);
+	var year = term.slice(year_idx);
+	var capitalizedSeason = season.charAt(0).toUpperCase() + season.slice(1);
+	return capitalizedSeason + " " + year;
+}
+
+function format_auto_reqs(term){
+	return term.replace('-', ' ');
 }
 
 //create labels for front-end term selectors
