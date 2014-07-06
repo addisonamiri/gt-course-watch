@@ -324,7 +324,7 @@ app.post('/create_account', function(req, res){
 	}
 	else{ // valid credentials
 		myMongoController.userAccessor(email, function(user_arr){
-			if(user_arr.length > 0){
+			if(user_arr.length > 0 && user_arr[0].activated){
 				req.session.danger_flash = "That e-mail address has already been taken"
 				res.redirect('back');
 			}else{
