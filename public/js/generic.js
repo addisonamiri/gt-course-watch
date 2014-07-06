@@ -92,6 +92,8 @@ $(document).ready(function(){
 				return;
 			}
 
+
+
             socket.emit('contactReq', { message: iMessage, 
             							email: iEmail,
             							name:  iName});		
@@ -452,7 +454,29 @@ function processInputAndSend(){
 			scrollToTop();
 			
 			submittedRequest = currentRequest;
-			socket.emit('makeRequest', { email: emailInput, crn: crnInput, term: term});
+
+			$.ajax({
+				url:"/reg_req_sub",
+				dataType: "json",
+				timeout: 30000,
+				data: {	crn: crnInput, 
+						term: term,
+						email: emailInput},
+				type: "POST",
+				success: function(res){
+					console.log(res.status);
+					if(res.status=="SUCCESS"){
+						$('#success_alert').show();
+						scrollToTop();
+					}else{
+						alert("AJAX error.");
+					}
+				},
+				error: function(){
+					console.log("connection timeout");				
+				}
+			});
+
 			updateLastRequested(crnInput);
 			updateOtherWatchers(crnInput);
 		}
@@ -500,7 +524,31 @@ function processInputAndSend(){
 			$("#makeAnother").show();
 			scrollToTop();
 			submittedRequest = currentRequest;
-			socket.emit('makeSMSRequest', { email: emailInput, crn: crnInput, gatewayedNumber: gatewayedInput, term:term});
+
+			$.ajax({
+				url:"/sms_req_sub",
+				dataType: "json",
+				timeout: 30000,
+				data: {	crn: crnInput, 
+						term: term,
+						email: emailInput,
+						gatewayedNumber: gatewayedInput
+					},
+				type: "POST",
+				success: function(res){
+					console.log(res.status);
+					if(res.status=="SUCCESS"){
+						$('#success_alert').show();
+						scrollToTop();
+					}else{
+						alert("AJAX error.");
+					}
+				},
+				error: function(){
+					console.log("connection timeout");				
+				}
+			});
+
 			updateLastRequested(crnInput);
 			updateOtherWatchers(crnInput);
 		}
@@ -598,7 +646,7 @@ function getStats(cb){
 
 			//dom manipulation to display returned data
 			$('#class_stats_div').html("<h5> Stats for CRN: " + crn + "</h5>");
-			// $('#class_stats_div').append("<h5>" + data.numWatchers + " people are watching this class. </h5>");
+			$('#class_stats_div').append("<h5>" + data.numWatchers + " people are watching this class. </h5>");
 
 			var tableHTML = '<br/> <table class="table table-striped" style="width:500px"> <tr> <th></th> <th>Seat Stats</th>' + 
 				'<th>Waitlist Stats</th> </tr> <tr> <td>Remaining</td>' +

@@ -37,8 +37,6 @@ Mailer.prototype.sendEmailVerification = function(email, link){
 	var htmlBody = "<h1>Click the Link to Complete Verification </h1> <br> " +
 	    	'<a href="' + link + '"> Verification Link </a>';
 
-	console.log(htmlBody);
-
 	var mailOptions = {
 	    from: "GT Course Watch Mailer ✔ <"+ this.emailID +">", // sender address
 	    to: email, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"

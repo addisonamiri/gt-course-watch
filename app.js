@@ -90,6 +90,8 @@ app.use(express.bodyParser());
 app.use(app.router);
 app.use(express.static('public'));
 
+//username and email are synonymous through this application
+
 
 app.get('/', function(req, res) {
 	var springLabel, summerLabel, fallLabel;
@@ -127,13 +129,8 @@ app.post('/verifyBuzzport', function(req, res){
 	);
 });
 
-app.post('/autoRegReq', function(req, res){
+app.post('/autoRegReq', checkAuth, function(req, res){
 	var post = req.body;
-
-	if(!req.session.username){
-		req.session.danger_flash = "You must be logged in to make an automated registration request.";
-		res.redirect('back');
-	}
 
 	post.term = post.term.replace(' ', '-');
 	myMongoController.createAutoRegReq(post.crn, post.email, post.term, post.username, post.password);
@@ -142,6 +139,47 @@ app.post('/autoRegReq', function(req, res){
 
 	res.json({status: "SUCCESS"});
 });
+
+app.post('/reg_req_sub', function(req, res){
+	var post = req.body;
+
+	myMongoController.createRequest(post.crn, post.email, post.term, function(doc){
+		var user = req.session.username;
+
+		if(user){
+			myMongoController.userAccessor(user, function(user_arr){
+				user_arr[0].reg_reqs.push(doc._id);				
+				user_arr[0].save();
+			});
+		}
+
+		myMailer.sendConfirmationMail(post.email, post.crn, false, false);
+		myMongoController.createConfirmationStat(1,0,0);
+
+		res.json({status: "SUCCESS"});
+	});
+});
+
+app.post('/sms_req_sub', function(req, res){
+	var post = req.body;
+
+	myMongoController.createSMSRequest(post.crn, post.email, post.gatewayedNumber, post.term, function(doc){
+		var user = req.session.username;
+
+		if(user){
+			myMongoController.userAccessor(user, function(user_arr){
+				user_arr[0].sms_reqs.push(doc._id);				
+				user_arr[0].save();	
+			});
+		}
+
+		myMailer.sendConfirmationMail(post.email, post.crn, true, false);
+		myMongoController.createConfirmationStat(0,1,0);
+
+		res.json({status: "SUCCESS"});
+	});
+});
+
 
 //Throttle
 app.get('/getTimeoutStatus', function(req, res){
@@ -163,7 +201,6 @@ app.get('/getTimeoutStatus', function(req, res){
 			res.json({status:"good"})
 		}
 	}
-
 });
 
 app.get('/getNumWatchers/:crn', function(req, res){
@@ -220,7 +257,6 @@ app.get('/verifyCRN/:crn/:term', function(req, res){
 	}else{
 		res.send({verification_status:0})
 	}
-
 });
 
 //Account Related Stuffs.
@@ -228,9 +264,11 @@ app.get('/verifyEmail', function(req, res){
 	var email = req.query.email,
 		uuid = req.query.uuid;
 
-	myMongoController.userAccessor(email, function(user){
+	myMongoController.userAccessor(email, function(user_arr){
+		var user = user_arr[0];
+
 		if(user.uuid == uuid){
-			if(user.activated == false){
+			if(user.activated == true){
 				req.session.warning_flash = "Your account has already been activated."
 				res.redirect('/');
 				return
@@ -282,7 +320,7 @@ app.post('/create_account', function(req, res){
 				myMongoController.createUser(email, password, uuid);
 				myMailer.sendEmailVerification(email, emailLink);
 
-				req.session.success_flash = 'You have successfully signed up!';
+				req.session.success_flash = 'You have successfully signed up, now you need to verify your email.';
 				res.redirect('/');
 			}
 		});
@@ -299,11 +337,16 @@ app.post('/login_auth', function(req, res){
 
 	myMongoController.authenticate(user, pass, function(authRes, foundUser){
 		if(authRes == true){
-			req.session.username = user;
-			req.session.userId = foundUser._id;
-			req.session.success_flash = "You have successfully logged in."
+			if(foundUser.activated == false){
+				req.session.danger_flash = "You need to activate your account from your e-mail before you can log in."
+				res.send({redirect: '/log_in'});
+			}else{
+				req.session.username = user;
+				req.session.success_flash = "You have successfully logged in."
 
-			res.send({redirect: '/'});
+				res.send({redirect: '/'});				
+			}
+
 		}else{
 			res.set('Content-Type', 'text/plain');
 			res.send(authRes);
@@ -328,19 +371,6 @@ app.get('/cancel_req/:id', checkAuth, function(req, res){
 
 // io.sockets.on('connection', socketHandler);
 
-io.on('connection', function(socket_client) {
-	var cookie_string = socket_client.request.headers.cookie;
-	var parsed_cookies = connect.utils.parseCookie(cookie_string);
-	var connect_sid = parsed_cookies['connect.sid'];
-	if (connect_sid) {
-		session_store.get(connect_sid, function (error, session) {
-      //HOORAY NOW YOU'VE GOT THE SESSION OBJECT!!!!
-
-
-  		});
-	}
-});
-
 function socketHandler(socket){
 	socket.emit('message', {message:'WebSocket connection established; Welcome to the chat!'});
 
@@ -351,28 +381,6 @@ function socketHandler(socket){
 	socket.on('contactReq', function(data){
 		myMailer.contactMailJob(data.email, data.name, data.message);
 	})
-
-	socket.on('makeRequest', function(data){
-		console.log('req made');
-		myMongoController.createRequest(data.crn, data.email, data.term, function(doc){
-			myMongoController.userAccessor()
-			console.log("cb invoked");
-			console.log(doc);
-		});
-
-		myMailer.sendConfirmationMail(data.email, data.crn, false, false);
-		myMongoController.createConfirmationStat(1,0,0);
-
-	});
-
-	socket.on('makeSMSRequest', function(data){
-		myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber, data.term, function(doc){
-
-		});
-
-		myMailer.sendConfirmationMail(data.email, data.crn, true, false);
-		myMongoController.createConfirmationStat(0,1,0);
-	});
 }
 
 //figure out what terms are open presently and initalize pollers for them.
@@ -457,7 +465,8 @@ function getActivePollers(){
 
 function checkAuth(req, res, next) {
   if (!req.session.username) {
-    res.send('Unauthorized action.');
+	req.session.danger_flash = "You must be logged in to make an automated registration request.";
+	res.redirect('back');
   } else {
     next();
   }
