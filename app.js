@@ -509,7 +509,7 @@ app.get('/cancel_req/:type/:id', checkAuth, function(req, res){
 
 	function cancellation_redirect(){
 		req.session.success_flash = "Request successfully cancelled";
-		res.redirect('/');
+		res.redirect('back');
 	}
 });
 
