@@ -462,6 +462,8 @@ app.post('/request_pass_change', function(req, res){
 
 			res.send("success");			
 		}
+		
+		res.send("failure");
 	});
 });
 
