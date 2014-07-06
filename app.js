@@ -334,7 +334,7 @@ app.post('/create_account', function(req, res){
 				myMongoController.createUser(email, password, uuid);
 				myMailer.sendEmailVerification(email, emailLink);
 
-				req.session.success_flash = 'You have successfully signed up, now you need to verify your email';
+				req.session.success_flash = 'You have successfully signed up, now check your e-mail for a verification link';
 				res.redirect('/');
 			}
 		});
