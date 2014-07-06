@@ -130,6 +130,11 @@ app.post('/verifyBuzzport', function(req, res){
 app.post('/autoRegReq', function(req, res){
 	var post = req.body;
 
+	if(!req.session.username){
+		req.session.danger_flash = "You must be logged in to make an automated registration request.";
+		res.redirect('back');
+	}
+
 	post.term = post.term.replace(' ', '-');
 	myMongoController.createAutoRegReq(post.crn, post.email, post.term, post.username, post.password);
 	myMongoController.createConfirmationStat(0,0,1);
@@ -306,7 +311,8 @@ app.post('/login_auth', function(req, res){
 	});
 });
 
-app.get('/my_account/:id', checkAuth, function(req, res){
+app.get('/my_account', checkAuth, function(req, res){
+	var username = req.session.username;
 	console.log(req.params.id);
 });
 
@@ -315,13 +321,25 @@ app.get('/cancel_req/:id', checkAuth, function(req, res){
 });
 
 
-
 //*WEBSOCKET HANDLING
 
 // io.disable('heartbeats');
 //io.set('transports', ['xhr-polling']);
 
-io.sockets.on('connection', socketHandler);
+// io.sockets.on('connection', socketHandler);
+
+io.on('connection', function(socket_client) {
+	var cookie_string = socket_client.request.headers.cookie;
+	var parsed_cookies = connect.utils.parseCookie(cookie_string);
+	var connect_sid = parsed_cookies['connect.sid'];
+	if (connect_sid) {
+		session_store.get(connect_sid, function (error, session) {
+      //HOORAY NOW YOU'VE GOT THE SESSION OBJECT!!!!
+
+
+  		});
+	}
+});
 
 function socketHandler(socket){
 	socket.emit('message', {message:'WebSocket connection established; Welcome to the chat!'});
@@ -335,14 +353,23 @@ function socketHandler(socket){
 	})
 
 	socket.on('makeRequest', function(data){
-		myMongoController.createRequest(data.crn, data.email, data.term);
+		console.log('req made');
+		myMongoController.createRequest(data.crn, data.email, data.term, function(doc){
+			myMongoController.userAccessor()
+			console.log("cb invoked");
+			console.log(doc);
+		});
+
 		myMailer.sendConfirmationMail(data.email, data.crn, false, false);
 		myMongoController.createConfirmationStat(1,0,0);
 
 	});
 
 	socket.on('makeSMSRequest', function(data){
-		myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber, data.term);
+		myMongoController.createSMSRequest(data.crn, data.email, data.gatewayedNumber, data.term, function(doc){
+
+		});
+
 		myMailer.sendConfirmationMail(data.email, data.crn, true, false);
 		myMongoController.createConfirmationStat(0,1,0);
 	});

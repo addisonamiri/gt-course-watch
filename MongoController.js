@@ -118,28 +118,33 @@ MongoController.prototype.authenticate = function (email, password, next){
 }
 
 //STANDARD REQUEST
-MongoController.prototype.createRequest = function createRequest(crnInput, emailInput, termInput){
+MongoController.prototype.createRequest = function (crnInput, emailInput, termInput, next){
 	var newRequest = new this.Request({crn:crnInput,email:emailInput,term:termInput});
+
 	newRequest.save(function(err, doc){
 		if(err){
 			console.log('save error:' + err);
+		}else{
+			next(doc);
 		}
 	});
 }
 
 //SMS REQUEST (same as standard with added sms capability)
-MongoController.prototype.createSMSRequest = function createSMSRequest(crnInput, emailInput, gatewayedInput, termInput){
+MongoController.prototype.createSMSRequest = function createSMSRequest(crnInput, emailInput, gatewayedInput, termInput, next){
 	var newSMSRequest = new this.smsRequest({crn:crnInput,email:emailInput,
 		gatewayedNumber:gatewayedInput, term:termInput});
 	
 	newSMSRequest.save(function(err, doc){
 		if(err){
 			console.log('save error:' + err);
+		}else{
+			next(doc);
 		}
 	});
 }
 
-MongoController.prototype.createAutoRegReq = function(iCrn, iEmail, iTerm, iBuzzId, iBuzzPass){
+MongoController.prototype.createAutoRegReq = function(iCrn, iEmail, iTerm, iBuzzId, iBuzzPass, next){
 	var newAutoRegReq = new this.autoRegReq({
 			crn: iCrn,
 			email: iEmail,
@@ -152,15 +157,8 @@ MongoController.prototype.createAutoRegReq = function(iCrn, iEmail, iTerm, iBuzz
 	newAutoRegReq.save(function(err, doc){
 		if(err){
 			console.log(err);
-		}
-	});
-}
-
-MongoController.prototype.createRequest = function createRequest(crnInput, emailInput, termInput){
-	var newRequest = new this.Request({crn:crnInput,email:emailInput,term:termInput});
-	newRequest.save(function(err, doc){
-		if(err){
-			console.log('save error:' + err);
+		}else{
+			next(doc);
 		}
 	});
 }
