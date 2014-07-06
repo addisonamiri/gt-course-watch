@@ -4,6 +4,7 @@ var server = require('http').createServer(app).listen(process.env.PORT || 8080);
 var io = require('socket.io').listen(server);
 var hbs = require('hbs');
 var fs = require('fs');
+var ObjectId = require('mongoose').Types.ObjectId;
 
 var MongoController = require('./MongoController.js');
 var Mailer = require('./Mailer.js');
@@ -398,6 +399,68 @@ app.post('/change_password', checkAuth, function(req, res){
 	}
 });
 
+app.post('/change_forgotten_password', function(req, res){
+	var post = req.body,
+		password = post.password,
+		password_conf = post.password_conf,
+		email = post.email;
+
+	if(password != password_conf){
+		req.session.danger_flash = "Passwords did not match!";
+		res.redirect('back');
+	}else if(password.length < 6){
+		req.session.danger_flash = "Password must be at least 6 characters in length";
+		res.redirect('back');		
+	}else{
+		myMongoController.userAccessor(email, function(user_arr){
+			if(user_arr[0].uuid == req.session.uuid){
+				user_arr[0].uuid = generateUUID(); //so that the old link doesn't work anymore
+				user_arr[0].save();
+				myMongoController.changePassword(email, password);
+				req.session.success_flash = "Password changed successfully"
+				res.redirect('/');
+			}else{
+				req.session.danger_flash = "Bad token.";
+				res.redirect('/');
+			}
+		});
+	}
+});
+
+app.get('/verify_pass_change', function(req, res){
+	var email = req.query.email,
+		uuid = req.query.uuid;
+
+	myMongoController.userAccessor(email, function(user_arr){
+		var user = user_arr[0];
+
+		if(user.uuid == uuid){
+			req.session.uuid = uuid;
+			res.render('change_password', {email: email});
+		}else{
+			req.session.danger_flash = "Invalid change password link"
+			res.redirect('/');
+		}
+	});
+});
+
+app.post('/request_pass_change', function(req, res){
+	var email = req.body.email
+
+	myMongoController.userAccessor(email, function(user_arr){
+		var uuid=generateUUID(),
+			emailLink = generateEmailPassChangeURL(email, uuid), 
+			user = user_arr[0];
+
+		user.uuid = uuid;
+		user.save();
+
+		myMailer.sendPassChangeVerification(email, emailLink);
+
+		res.send("success");
+	});
+});
+
 app.get('/my_requests', checkAuth, function(req, res){
 	myMongoController.userAccessor(req.session.username, function(user_arr){
 		var user = user_arr[0],
@@ -467,11 +530,6 @@ app.get('/my_requests', checkAuth, function(req, res){
 
 	});
 });
-
-var ObjectId = require('mongoose').Types.ObjectId;
-// myMongoController.user.update({email:"vikster93@gmail.com"}, {$pull:{reg_reqs:(new ObjectId("53b9160f0e06cf8e294dbf3d"))}});
-
-
 
 app.get('/cancel_req/:type/:id', checkAuth, function(req, res){
 	var id = req.params.id,
@@ -640,6 +698,11 @@ function generateUUID(){
 
 function generateEmailVerificationURL(email, uuid){
 	return hostName+"/verifyEmail?email=" +
+	email + "&uuid=" + uuid;
+}
+
+function generateEmailPassChangeURL(email, uuid){
+	return hostName+"/verify_pass_change?email=" +
 	email + "&uuid=" + uuid;
 }
 

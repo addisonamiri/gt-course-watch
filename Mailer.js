@@ -52,6 +52,27 @@ Mailer.prototype.sendEmailVerification = function(email, link){
 	});		
 }
 
+Mailer.prototype.sendPassChangeVerification = function(email, link){
+	var htmlBody = "<h1>Click the Link to Change Your Password </h1> <br> " +
+	    	'<a href="' + link + '"> Change Password </a>';
+
+	var mailOptions = {
+	    from: "GT Course Watch Mailer ✔ <"+ this.emailID +">", // sender address
+	    to: email, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
+	    subject: "Change Password", // Subject line
+	    html: htmlBody
+	}
+
+	// send mail with defined transport object
+	this.smtpTransport.sendMail(mailOptions, function(error, response){
+	    if(error){
+	        console.log(error);
+	    }
+	});		
+}
+
+
+
 Mailer.prototype.sendNotificationMail = function(existingRequest, smsRequest){
 
 	// setup e-mail data with unicode symbols

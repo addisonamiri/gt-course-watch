@@ -3,7 +3,7 @@
 
 	<h3>Email Watch Requests</h3>
 	{{#if reg_reqs}}
-	<table id="email_reqs_tbl" class="table table-striped">
+	<table id="email_reqs_tbl" class="table " style="width:auto;">
 		<thead>
 			<th>CRN</th>
 			<th>Term</th>
@@ -16,6 +16,7 @@
 				<td>{{crn}}</td>
 				<td>{{term}}</td>
 				<td>{{email}}</td>
+				<!-- Have to return the boolean value in onclick attr so that we can break the flow of execution of click-->
 				<td> <a class="btn btn-danger" onclick="return confirm_alert(this);" href="/cancel_req/EMAIL/{{_id}}">Cancel</a></td>
 			</tr>
 			{{/each}}
@@ -27,7 +28,7 @@
 
 	<h3>SMS Watch Requests</h3>
 	{{#if sms_reqs}}
-	<table id="sms_reqs_tbl" class="table table-striped">
+	<table id="sms_reqs_tbl" class="table" style="width:auto;">
 		<thead>
 			<th>CRN</th>
 			<th>Term</th>
@@ -53,7 +54,7 @@
 
 	<h3>Automated Registration Requests</h3>
 	{{#if auto_reqs}}
-	<table id="auto_reqs_tbl" class="table table-striped">
+	<table id="auto_reqs_tbl" class="table" style="width:auto;">
 		<thead>
 			<th>CRN</th>
 			<th>Term</th>

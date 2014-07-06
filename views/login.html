@@ -14,9 +14,52 @@
 		<div>
 			<input id= "login" type="submit" class="btn btn-primary" value="Login">
 			<span style="margin-left:15px;">
-				Don't have an account? <a href="/sign_up">Sign up </a>
+				</a> Can't log in? <a href="/sign_up">Sign up </a> | <a id="forgot_pass" rel="popover" href="#"
+					data-html="true" data-original-title="Request Password Change" class="popover-dismiss" 
+					data-content='E-Mail: <input id="emailInput"></input>
+					<br/>
+					<br/>
+					<button id="emailSubmit" type="button" class="btn" onclick="emailSubmitFunc()">
+						Send E-Mail
+					</button>'>Forgot password
 			</span>
 		</div>
 	</form>
 
 </div>
+
+
+
+<script>
+	$(function() {
+		$('#forgot_pass').popover();
+	});
+
+	function emailSubmitFunc(){
+		var emailInput = $("#emailInput").val();
+
+		if(isEmail(emailInput)){
+			$("#email_alert").hide();
+
+			$.ajax({
+				type: "POST",
+				url: "/request_pass_change",
+				data: $.param({email: emailInput}),
+				dataType: "json",
+				success: function(data){
+					$('#link_sent_alert').show();
+					$('#forgot_pass').popover('toggle');
+				}
+
+			});
+		}else{
+			$("#email_alert").show();
+		}
+	}
+
+	// function isEmail(email) {
+	//     var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	//     return regex.test(email);
+	// }
+
+</script>
