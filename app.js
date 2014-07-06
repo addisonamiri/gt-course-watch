@@ -447,8 +447,23 @@ app.get('/my_requests', checkAuth, function(req, res){
 	});
 });
 
-app.get('/cancel_req/:id', checkAuth, function(req, res){
+app.get('/cancel_req/:type/:id', checkAuth, function(req, res){
+	var id = req.params.id,
+		type = req.params.type;
 
+	switch(type) {
+		case "EMAIL":
+			myMongoController.Request.findOneAndRemove(id);
+			break;
+		case "SMS":
+			myMongoController.smsRequest.findOneAndRemove(id);
+			break;
+		case "AUTOMATED":
+			myMongoController.autoRegReq.findOneAndRemove(id);
+			break;
+		default:
+			console.log("Cancellation error... No type matched.");
+	}
 });
 
 
