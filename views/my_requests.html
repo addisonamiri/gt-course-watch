@@ -1,7 +1,8 @@
 <div class="container" style="width:90%;">
 	<h1 style="text-align:center;">My Requests</h1>
 
-	<h3>Email Requests </h3>
+	<h3>Email Watch Requests</h3>
+	{{#if reg_reqs}}
 	<table id="email_reqs_tbl" class="table table-striped">
 		<thead>
 			<th>CRN</th>
@@ -12,7 +13,7 @@
 		<tbody>
 			{{#each reg_reqs}}
 			<tr>
-				<td>{{email}}</td>
+				<td>{{crn}}</td>
 				<td>{{term}}</td>
 				<td>{{email}}</td>
 				<td> <a class="btn btn-danger" href="/cancel_req/EMAIL/{{_id}}">Cancel</a></td>
@@ -20,8 +21,12 @@
 			{{/each}}
 		</tbody>
 	</table>
+	{{else}}
+	You don't have any e-mail watch requests currently. <br>
+	{{/if}}
 
-	<h3>SMS Requests </h3>
+	<h3>SMS Watch Requests</h3>
+	{{#if sms_reqs}}
 	<table id="sms_reqs_tbl" class="table table-striped">
 		<thead>
 			<th>CRN</th>
@@ -42,26 +47,34 @@
 			{{/each}}
 		</tbody>
 	</table>
+	{{else}}
+	You don't have any SMS watch requests currently.
+	{{/if}}
 
-	<h3>SMS Requests </h3>
-	<table id="sms_reqs_tbl" class="table table-striped">
+	<h3>Automated Registration Requests</h3>
+	{{#if auto_reqs}}
+	<table id="auto_reqs_tbl" class="table table-striped">
 		<thead>
 			<th>CRN</th>
 			<th>Term</th>
 			<th>Tied Email</th>
-			<th>Tied Phone #</th>
+			<th>BuzzPort ID</th>
 			<th></th>
 		</thead>
 		<tbody>
-			{{#each sms_reqs}}
+			{{#each auto_reqs}}
 			<tr>
 				<td>{{crn}}</td>
 				<td>{{term}}</td>
 				<td>{{email}}</td>
-				<td>{{gatewayedNumber}}</td>
-				<td> <a class="btn btn-danger" href="/cancel_req/SMS/{{_id}}">Cancel</a></td>
+				<td>{{buzzport_id}}</td>
+				<td> <a class="btn btn-danger" href="/cancel_req/AUTOMATED/{{_id}}">Cancel</a></td>
 			</tr>
+			{{else}}
 			{{/each}}
 		</tbody>
 	</table>
+	{{else}}
+	You don't have any automated registration requests currently.
+	{{/if}}
 </div>

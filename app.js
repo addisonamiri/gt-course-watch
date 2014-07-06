@@ -418,7 +418,7 @@ app.get('/my_requests', checkAuth, function(req, res){
 
 					res.render('my_requests', {
 						sms_reqs: sms_reqs,
-						email_reqs: reg_reqs,
+						reg_reqs: reg_reqs,
 						auto_reqs: auto_reqs
 					});
 				});
@@ -428,16 +428,18 @@ app.get('/my_requests', checkAuth, function(req, res){
 		//the for-each are blocking, therefore no async issues
 		function format_terms(reg_arr, sms_arr, auto_arr){
 			reg_arr.forEach(function(e, i, a){
-				a[i].term = format_watch_req(e.term);
+				if(e) a[i].term = format_watch_req(e.term);
 			});
 
 			sms_arr.forEach(function(e, i, a){
-				a[i].term = format_watch_req(e.term);
-				a[i].gatewayedNumber = e.gatewayedNumber.replace(/@.+/,'');
+				if(e){
+					a[i].term = format_watch_req(e.term);
+					a[i].gatewayedNumber = e.gatewayedNumber.replace(/@.+/,'');					
+				}
 			});
 
 			auto_arr.forEach(function(e, i, a){
-				a[i].term = format_auto_reqs(e.term);
+				if(e) a[i].term = format_auto_reqs(e.term);
 			});
 		}
 
@@ -451,11 +453,9 @@ app.get('/my_requests', checkAuth, function(req, res){
 				collection.forEach(function(id){
 					model.findById(id, function(err, doc){
 						result.push(doc);
-						console.log("pushing a doc" + doc);
 
 						requests_remaining--;
 						if(requests_remaining == 0){ //only the last executed async call will meet this condition.
-							console.log("righ before cb" + result);
 							next(result);
 						}
 					});					
@@ -468,18 +468,39 @@ app.get('/my_requests', checkAuth, function(req, res){
 	});
 });
 
+var ObjectId = require('mongoose').Types.ObjectId;
+// myMongoController.user.update({email:"vikster93@gmail.com"}, {$pull:{reg_reqs:(new ObjectId("53b9160f0e06cf8e294dbf3d"))}});
+
+
+
 app.get('/cancel_req/:type/:id', checkAuth, function(req, res){
 	var id = req.params.id,
-		type = req.params.type;
+		type = req.params.type,
+		username = req.session.username;
 
 	switch(type) {
 		case "EMAIL":
+			myMongoController.user.update({email:username}, //initial query 
+				{$pull:{reg_reqs: new ObjectId(id)}}, //array pull query
+				function(err,data){} //REQUIRED callback..
+			);
+
 			myMongoController.Request.findByIdAndRemove(id, cancellation_redirect);
 			break;
 		case "SMS":
+			myMongoController.user.update({email:username}, //initial query 
+				{$pull:{sms_reqs: new ObjectId(id)}}, //array pull query
+				function(err,data){} //REQUIRED callback..
+			);
+
 			myMongoController.smsRequest.findByIdAndRemove(id, cancellation_redirect);
 			break;
 		case "AUTOMATED":
+			myMongoController.user.update({email:username}, //initial query 
+				{$pull:{auto_reqs: new ObjectId(id)}}, //array pull query
+				function(err,data){} //REQUIRED callback..
+			);
+	
 			myMongoController.autoRegReq.findByIdAndRemove(id, cancellation_redirect);
 			break;
 		default:
