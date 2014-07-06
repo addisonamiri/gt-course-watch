@@ -35,11 +35,14 @@
 		$('#forgot_pass').popover();
 	});
 
+
 	function emailSubmitFunc(){
 		var emailInput = $("#emailInput").val();
 
 		if(isEmail(emailInput)){
 			$("#email_alert").hide();
+			$('#link_sent_alert').show();
+			$('#forgot_pass').popover('toggle');
 
 			$.ajax({
 				type: "POST",
@@ -47,8 +50,6 @@
 				data: $.param({email: emailInput}),
 				dataType: "json",
 				success: function(data){
-					$('#link_sent_alert').show();
-					$('#forgot_pass').popover('toggle');
 				}
 
 			});

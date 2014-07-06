@@ -281,7 +281,7 @@ app.get('/verifyEmail', function(req, res){
 	myMongoController.userAccessor(email, function(user_arr){
 		var user = user_arr[0];
 
-		if(user.uuid == uuid){
+		if(user && user.uuid == uuid){
 			if(user.activated == true){
 				req.session.warning_flash = "Your account has already been activated"
 				res.redirect('/');
@@ -413,7 +413,9 @@ app.post('/change_forgotten_password', function(req, res){
 		res.redirect('back');		
 	}else{
 		myMongoController.userAccessor(email, function(user_arr){
-			if(user_arr[0].uuid == req.session.uuid){
+			var user = user_arr[0];
+
+			if(user && user.uuid == req.session.uuid){
 				user_arr[0].uuid = generateUUID(); //so that the old link doesn't work anymore
 				user_arr[0].save();
 				myMongoController.changePassword(email, password);
@@ -434,7 +436,7 @@ app.get('/verify_pass_change', function(req, res){
 	myMongoController.userAccessor(email, function(user_arr){
 		var user = user_arr[0];
 
-		if(user.uuid == uuid){
+		if(user && user.uuid == uuid){
 			req.session.uuid = uuid;
 			res.render('change_password', {email: email});
 		}else{
@@ -452,12 +454,14 @@ app.post('/request_pass_change', function(req, res){
 			emailLink = generateEmailPassChangeURL(email, uuid), 
 			user = user_arr[0];
 
-		user.uuid = uuid;
-		user.save();
+		if(user){
+			user.uuid = uuid;
+			user.save();
 
-		myMailer.sendPassChangeVerification(email, emailLink);
+			myMailer.sendPassChangeVerification(email, emailLink);
 
-		res.send("success");
+			res.send("success");			
+		}
 	});
 });
 
