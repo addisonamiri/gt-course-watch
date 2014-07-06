@@ -453,16 +453,21 @@ app.get('/cancel_req/:type/:id', checkAuth, function(req, res){
 
 	switch(type) {
 		case "EMAIL":
-			myMongoController.Request.findOneAndRemove(id);
+			myMongoController.Request.findByIdAndRemove(id, cancellation_redirect);
 			break;
 		case "SMS":
-			myMongoController.smsRequest.findOneAndRemove(id);
+			myMongoController.smsRequest.findByIdAndRemove(id, cancellation_redirect;
 			break;
 		case "AUTOMATED":
-			myMongoController.autoRegReq.findOneAndRemove(id);
+			myMongoController.autoRegReq.findByIdAndRemove(id, cancellation_redirect);
 			break;
 		default:
 			console.log("Cancellation error... No type matched.");
+	}
+
+	function cancellation_redirect(){
+		req.session.success_flash = "Request successfully cancelled";
+		res.redirect('/');
 	}
 });
 
