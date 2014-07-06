@@ -574,7 +574,7 @@ function updateOtherWatchers(crn){
 		dataType: "json",
 		type: "GET",
 		success: function(data){
-			$('#otherWatchers').html(data.numWatchers + " other people are watching this class.");
+			$('#otherWatchers').html(data.numWatchers + " other people are watching this class.").show();
 		}
 	});
 }
@@ -697,7 +697,7 @@ function getStats(cb){
 }
 
 function updateLastRequested(lastCrn){
-	$('#lastRequested').html("Last Requested CRN: " + lastCrn)
+	$('#lastRequested').html("Last Requested CRN: " + lastCrn).show();
 }
 
 function updateWaitMessage(time){
