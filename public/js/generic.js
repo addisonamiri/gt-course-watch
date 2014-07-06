@@ -315,9 +315,11 @@ $(document).ready(function(){
 					if (typeof autoRegistrationSubmit.registrationComplete == 'undefined') {
 						autoRegistrationSubmit.registrationComplete = true;
 					}
+				}else if(res.status=="NOT_LOGGED_IN"){
+					alert("You need to sign in before you can request auto registration!");
 				}else{
-					alert("Couldn't sign you up due to an error.");
-				}	
+					alert("Couldn't sign you up due to an error.");					
+				}
 			},
 			error: function(){
 				console.log("connection timeout");				

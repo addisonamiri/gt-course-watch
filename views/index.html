@@ -305,6 +305,11 @@
 			</div>
 
 
+            {{#if username}}
+            {{else}}
+            	<h5 style="margin-top:-5px;">You need to login before you can use this feature!</h5>
+            {{/if}}
+
 			<div id="autoRegVerificationStatus">
 				<div id="autoRegBuzzCheck" style="display:none">
 					<i class="glyphicon glyphicon-ok" style="color:green;"></i> BuzzPort Verified!

@@ -51,7 +51,15 @@
               <li><a href="#contact_modal" data-toggle="modal">Contact</a></li>
 
               {{#if username}}
-                <li><a href="/my_account">Account</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b> </a>
+
+                <ul class="dropdown-menu">
+                  <li><a href = "https://buzzport.gatech.edu/cp/home/displaylogin" target="_blank">My Requests</a></li>
+                  <li><a href = "/my_account" target="_blank">Settings</a></li>
+                  <li><a href = "http://maps.gatech.edu/d7/drupal/map" target="_blank">Log Out</a></li>
+                </ul>
+              </li>
               {{else}}
                 <li><a href="/log_in">Login</a></li>
               {{/if}}

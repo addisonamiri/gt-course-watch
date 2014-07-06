@@ -129,15 +129,28 @@ app.post('/verifyBuzzport', function(req, res){
 	);
 });
 
-app.post('/autoRegReq', checkAuth, function(req, res){
+app.post('/autoRegReq', function(req, res){
 	var post = req.body;
-
 	post.term = post.term.replace(' ', '-');
-	myMongoController.createAutoRegReq(post.crn, post.email, post.term, post.username, post.password);
-	myMongoController.createConfirmationStat(0,0,1);
-	myMailer.sendConfirmationMail(post.email, post.crn, false, true);
 
-	res.json({status: "SUCCESS"});
+	var user = req.session.username;
+
+	if(user){
+		myMongoController.createAutoRegReq(post.crn, post.email, post.term, post.username, post.password, function(doc){
+
+			myMongoController.userAccessor(user, function(user_arr){
+				user_arr[0].auto_reqs.push(doc._id);				
+				user_arr[0].save();
+			});
+
+			myMongoController.createConfirmationStat(0,0,1);
+			myMailer.sendConfirmationMail(post.email, post.crn, false, true);
+		});	
+
+		res.json({status: "SUCCESS"});
+	}else{
+		res.json({status: "NOT_LOGGED_IN"});
+	}
 });
 
 app.post('/reg_req_sub', function(req, res){
@@ -465,8 +478,8 @@ function getActivePollers(){
 
 function checkAuth(req, res, next) {
   if (!req.session.username) {
-	req.session.danger_flash = "You must be logged in to make an automated registration request.";
-	res.redirect('back');
+	req.session.danger_flash = "You must be logged in to perform that action.";
+	res.redirect('/');
   } else {
     next();
   }
