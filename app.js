@@ -282,7 +282,7 @@ app.get('/verifyEmail', function(req, res){
 
 		if(user.uuid == uuid){
 			if(user.activated == true){
-				req.session.warning_flash = "Your account has already been activated."
+				req.session.warning_flash = "Your account has already been activated"
 				res.redirect('/');
 				return
 			}
@@ -291,7 +291,7 @@ app.get('/verifyEmail', function(req, res){
 			req.session.success_flash = "Account activated!"
 			res.redirect('/');
 		}else{
-			req.session.danger_flash = "Account activation failed."
+			req.session.danger_flash = "Account activation failed"
 			res.redirect('/');
 		}
 	});
@@ -314,7 +314,7 @@ app.post('/create_account', function(req, res){
 		req.session.danger_flash = "Passwords did not match!";
 		res.redirect('back');
 	}else if(password.length < 6){
-		req.session.danger_flash = "Password must be at least 6 characters in length.";
+		req.session.danger_flash = "Password must be at least 6 characters in length";
 		res.redirect('back');		
 	}
 	else if(!isEmail(email)){
@@ -324,7 +324,7 @@ app.post('/create_account', function(req, res){
 	else{ // valid credentials
 		myMongoController.userAccessor(email, function(user_arr){
 			if(user_arr.length > 0){
-				req.session.danger_flash = "That e-mail address has already been taken."
+				req.session.danger_flash = "That e-mail address has already been taken"
 				res.redirect('back');
 			}else{
 				var uuid=generateUUID(),
@@ -333,7 +333,7 @@ app.post('/create_account', function(req, res){
 				myMongoController.createUser(email, password, uuid);
 				myMailer.sendEmailVerification(email, emailLink);
 
-				req.session.success_flash = 'You have successfully signed up, now you need to verify your email.';
+				req.session.success_flash = 'You have successfully signed up, now you need to verify your email';
 				res.redirect('/');
 			}
 		});
@@ -351,11 +351,11 @@ app.post('/login_auth', function(req, res){
 	myMongoController.authenticate(user, pass, function(authRes, foundUser){
 		if(authRes == true){
 			if(foundUser.activated == false){
-				req.session.warning_flash = "You need to activate your account from your e-mail before you can log in."
+				req.session.warning_flash = "You need to activate your account from your e-mail before you can log in"
 				res.send({redirect: '/log_in'});
 			}else{
 				req.session.username = user;
-				req.session.success_flash = "You have successfully logged in."
+				req.session.success_flash = "You have successfully logged in"
 
 				res.send({redirect: '/'});				
 			}
@@ -389,13 +389,62 @@ app.post('/change_password', checkAuth, function(req, res){
 		req.session.danger_flash = "Passwords did not match!";
 		res.redirect('back');
 	}else if(password.length < 6){
-		req.session.danger_flash = "Password must be at least 6 characters in length.";
+		req.session.danger_flash = "Password must be at least 6 characters in length";
 		res.redirect('back');		
 	}else{ //success
 		myMongoController.changePassword(req.session.username, password);
-		req.session.success_flash = "Password changed successfully."
+		req.session.success_flash = "Password changed successfully"
 		res.redirect('back');
 	}
+});
+
+app.get('/my_requests', checkAuth, function(req, res){
+	myMongoController.userAccessor(req.session.username, function(user_arr){
+		var user = user_arr[0],
+			reg_reqs,
+			sms_reqs,
+			auto_reqs;
+
+		find_reqs(user.reg_reqs, myMongoController.Request, function(result){
+			reg_reqs = result;
+			find_reqs(user.sms_reqs, myMongoController.smsRequest, function(result){
+				sms_reqs = result;
+				find_reqs(user.auto_reqs, myMongoController.autoRegReq, function(result){
+					auto_reqs = result;
+
+					res.render('my_requests', {
+						sms_reqs: sms_reqs,
+						email_reqs: reg_reqs,
+						auto_reqs: auto_reqs
+					});
+				});
+			});
+		});
+
+		function find_reqs(collection, model, next){
+			var result = [];
+			var collection = collection;
+			var model = model;
+			var requests_remaining = collection.length;
+
+			if( requests_remaining > 0){
+				for(var i in collection){
+					var id = collection[i]
+					model.findById(id, function(err, doc){
+						result.push(doc);
+					
+						requests_remaining--;
+						if(requests_remaining == 0){ //only the last executed async call will meet this condition.
+							next(result);
+						}
+					});
+				}
+			}else{
+				next(result);
+			}
+		}
+
+	});
 });
 
 app.get('/cancel_req/:id', checkAuth, function(req, res){
@@ -504,7 +553,7 @@ function getActivePollers(){
 
 function checkAuth(req, res, next) {
   if (!req.session.username) {
-	req.session.danger_flash = "You must be logged in to perform that action.";
+	req.session.danger_flash = "You must be logged in to perform that action";
 	res.redirect('/');
   } else {
     next();

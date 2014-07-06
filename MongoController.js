@@ -15,7 +15,6 @@ function MongoController(url){
 	this.myDB.on('error', console.error.bind(console, 'connection error'));
 
 	//investigate why closure with self wont work..
-
 	this.requestSchema = mongoose.Schema({
 		crn: String,
 		email: String,
