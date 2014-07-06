@@ -583,7 +583,7 @@ app.get('/cancel_req/:type/:id', checkAuth, function(req, res){
 // io.disable('heartbeats');
 //io.set('transports', ['xhr-polling']);
 
-// io.sockets.on('connection', socketHandler);
+io.sockets.on('connection', socketHandler);
 
 function socketHandler(socket){
 	socket.emit('message', {message:'WebSocket connection established; Welcome to the chat!'});
