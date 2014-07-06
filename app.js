@@ -367,6 +367,11 @@ app.post('/login_auth', function(req, res){
 	});
 });
 
+app.get('/logout', checkAuth, function(req, res){
+	req.session.destroy();
+	res.redirect('/');
+});
+
 app.get('/my_account', checkAuth, function(req, res){
 	var username = req.session.username;
 	console.log(req.params.id);
