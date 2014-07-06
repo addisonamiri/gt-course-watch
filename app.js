@@ -351,7 +351,7 @@ app.post('/login_auth', function(req, res){
 	myMongoController.authenticate(user, pass, function(authRes, foundUser){
 		if(authRes == true){
 			if(foundUser.activated == false){
-				req.session.danger_flash = "You need to activate your account from your e-mail before you can log in."
+				req.session.warning_flash = "You need to activate your account from your e-mail before you can log in."
 				res.send({redirect: '/log_in'});
 			}else{
 				req.session.username = user;
@@ -374,7 +374,28 @@ app.get('/logout', checkAuth, function(req, res){
 
 app.get('/my_account', checkAuth, function(req, res){
 	var username = req.session.username;
-	console.log(req.params.id);
+
+	myMongoController.userAccessor(username, function(user_arr){
+		res.render('settings', {user:user_arr[0]});
+	});
+});
+
+app.post('/change_password', checkAuth, function(req, res){
+	var post = req.body,
+		password = post.password,
+		password_conf = post.password_conf;
+
+	if(password != password_conf){
+		req.session.danger_flash = "Passwords did not match!";
+		res.redirect('back');
+	}else if(password.length < 6){
+		req.session.danger_flash = "Password must be at least 6 characters in length.";
+		res.redirect('back');		
+	}else{ //success
+		myMongoController.changePassword(req.session.username, password);
+		req.session.success_flash = "Password changed successfully."
+		res.redirect('back');
+	}
 });
 
 app.get('/cancel_req/:id', checkAuth, function(req, res){

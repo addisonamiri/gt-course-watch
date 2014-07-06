@@ -117,6 +117,23 @@ MongoController.prototype.authenticate = function (email, password, next){
 	});
 }
 
+MongoController.prototype.changePassword = function(email, password){
+	this.user.findOne({email:email}, function(err, user){
+		if(err) return console.log("find user error: " + err);
+
+		if(!user) return
+		else{
+			bcrypt.genSalt(10, function(err, salt) {
+			    bcrypt.hash(password, salt, function(err, hash) {
+			        // Store hash in your password DB.
+			        user.password_hash = hash;
+			        user.save();
+			    });
+			});
+		}
+	});
+}
+
 //STANDARD REQUEST
 MongoController.prototype.createRequest = function (crnInput, emailInput, termInput, next){
 	var newRequest = new this.Request({crn:crnInput,email:emailInput,term:termInput});

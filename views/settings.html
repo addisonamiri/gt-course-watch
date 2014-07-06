@@ -1,0 +1,37 @@
+
+<div class="container" style="width:75%;">
+		<h1>Account Settings</h1>
+
+		<div class="settings_container" style="margin-top:25px;">
+			<h4>
+			{{#if user.activated}}
+				Activation Satus: <span style="margin-left:10px;">Activated</span>
+			{{else}}
+				Activation Satus: <span>Not Activated</span>
+			{{/if}}
+			</h4>
+
+			<h4>
+			Email Address: <span style="margin-left:26px;">{{user.email}}</span> 
+			</h4>
+
+			<input id="change_pass" type="button" class="btn btn-info" value="Change Password"></input>
+
+			<form id="change_pass_form" action="/change_password" method="POST" style="display:none;">
+				<label for="password">New Password </label>
+				<input type="password" class="form-control" name="password" id="password">
+
+				<label for="password_conf">Confirm Password </label>
+				<input type="password" class="form-control" name="password_conf" id="password_conf">
+
+				<input id= "sign_up" type="submit" class="btn btn-primary" value="Update">
+			</form>
+		</div>
+</div>
+
+
+<script>
+	$("#change_pass").click(function(){
+		$(change_pass_form).toggle('fold');
+	})
+</script>
