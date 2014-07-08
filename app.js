@@ -62,7 +62,7 @@ console.log('Summer Null? ' + (pollers['summer']==null).toString());
 //*Express Config
 app.use(express.cookieParser());
 var sessionStore = new express.session.MemoryStore; //equivalent to new express.session.MemoryStore()
-app.use(express.session({secret:"blahblabhla", store:sessionStore}));
+app.use(express.session({secret: generateUUID(), store:sessionStore}));
 
 
 app.configure(function(){
@@ -334,7 +334,7 @@ app.post('/create_account', function(req, res){
 				myMongoController.createUser(email, password, uuid);
 				myMailer.sendEmailVerification(email, emailLink);
 
-				req.session.success_flash = 'You have successfully signed up, now check your e-mail for a verification link';
+				req.session.success_flash = 'You have successfully signed up, now check your e-mail and activate your account before you can log in';
 				res.redirect('/');
 			}
 		});
