@@ -568,6 +568,7 @@ function getTimeoutStatus(callback){
 	})
 }
 
+//used to update DOM when sms or email requests are made
 function updateOtherWatchers(crn){
 	var numWatchers;
 
@@ -596,6 +597,7 @@ function verifyCRN(crn, term, cb){
 	});
 }
 
+//used for get stats tab
 function getStats(cb){
 	var crn = $('#stats_crn').val();
 	var term = $('#stats_term').val();
@@ -638,7 +640,7 @@ function getStats(cb){
 		dataType: "json",
 		type: "GET",
 		success: function(data){
-			if(data.remaining == undefined){
+			if(data && data.remaining == undefined){
 				alert("Your crn couldn't be found on BuzzPort.");
 				spinner.stop();
 				return;

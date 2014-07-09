@@ -30,9 +30,9 @@ var mailerEmail = "tofubeast1111@gmail.com";
 var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
 var hostName = "http://www.gtcoursewatch.us";
-// var hostName = "http://localhost:8080";
-
 var THROTTLE_DELAY_SECS = 8;
+var PHANTOM_EVENTLOPP_DELAY_MS = 2000;
+// var hostName = "http://localhost:8080";
 
 //*CONSTANTS
 var millisInSecond = 1000;
@@ -44,26 +44,23 @@ var millisInDay = millisInHour*24;
 var myMailer = new Mailer(mailerEmail, mailerPass);
 var myMongoController = new MongoController(mongoConnectionUrl);
 var myDispatcher = new PhantomJobDispatcher( myMailer, myMongoController);
-myDispatcher.startDispatcher(2000);
+myDispatcher.startDispatcher(PHANTOM_EVENTLOPP_DELAY_MS);
 
 var springPoller, fallPoller, summerPoller; //pollers
-var pollers; //collection of json objects
-
+var current_pollers; //object that holds all current pollers
 var springTerm, fallTerm, summerTerm; //string ids of current terms, also used to tell which terms to poll
-
 var rejectRequests = false;
 
 initPollers();
 
-console.log('Spring Null? ' + (pollers['spring']==null).toString());
-console.log('Fall Null? ' + (pollers['fall']==null).toString());
-console.log('Summer Null? ' + (pollers['summer']==null).toString());
+console.log('Spring Null? ' + (current_pollers['spring']==null).toString());
+console.log('Fall Null? ' + (current_pollers['fall']==null).toString());
+console.log('Summer Null? ' + (current_pollers['summer']==null).toString());
 
 //*Express Config
 app.use(express.cookieParser());
 var sessionStore = new express.session.MemoryStore; //equivalent to new express.session.MemoryStore()
 app.use(express.session({secret: generateUUID(), store:sessionStore}));
-
 
 app.configure(function(){
 	//middleware + res.locals
@@ -91,20 +88,22 @@ app.use(express.bodyParser());
 app.use(app.router);
 app.use(express.static('public'));
 
-//username and email are synonymous through this application
-
+/*****
+username and email are synonymous through this application
+*****/
 
 app.get('/', function(req, res) {
 	var springLabel, summerLabel, fallLabel;
 
+	//initialize labels only if terms are active
 	if(springTerm) springLabel = createLabel(springTerm);
 	if(summerTerm) summerLabel = createLabel(summerTerm);
 	if(fallTerm) fallLabel = createLabel(fallTerm);
 
 	res.render('index',{title:"Home", 
-						spring:springTerm, 
-						summer:summerTerm, 
-						fall:fallTerm,
+						spring: springTerm,
+						summer: summerTerm,
+						fall: fallTerm,
 						springLabel: springLabel,
 						summerLabel: summerLabel,
 						fallLabel: fallLabel
@@ -115,21 +114,22 @@ app.get('/about', function(req, res) {
 	res.render('about', {title:"About"});
 });
 
+//verify buzzport for automated registration
 app.post('/verifyBuzzport', function(req, res){
 	var post = req.body;
 
 	myDispatcher.addVerifyTaskToQueue(
 		{	
 			username: post.username, 
-			password:post.password 
+			password: post.password 
 		}, 
 		function(status){
-			console.log(status);
 			res.json({status: status});
 		}
 	);
 });
 
+//submit and automated registration request.
 app.post('/autoRegReq', function(req, res){
 	var post = req.body;
 	post.term = post.term.replace(' ', '-');
@@ -154,6 +154,7 @@ app.post('/autoRegReq', function(req, res){
 	}
 });
 
+//submit a regular, email only request
 app.post('/reg_req_sub', function(req, res){
 	var post = req.body;
 
@@ -174,6 +175,7 @@ app.post('/reg_req_sub', function(req, res){
 	});
 });
 
+//submit a email + sms reuqest
 app.post('/sms_req_sub', function(req, res){
 	var post = req.body;
 
@@ -195,70 +197,72 @@ app.post('/sms_req_sub', function(req, res){
 });
 
 
-//Throttle
+//Throttling
 app.get('/getTimeoutStatus', function(req, res){
-	var TIMEOUT = THROTTLE_DELAY_SECS*millisInSecond; // 15 sec
+	var THROTTLE_DELAY_MS = THROTTLE_DELAY_SECS*millisInSecond;
 
-	if(req.session.throttleTime == null){
+	if(req.session.last_throttle_time == null){
 		//initial hit
-		req.session.throttleTime = Date.now();
+		req.session.last_throttle_time = Date.now();
 		res.json({status:"good"});
 	}else{
 		//check if timeoout is up
-		var timeDelta = Date.now() - req.session.throttleTime;
-		if( timeDelta < TIMEOUT){
-			//send bad resonse
-			res.json({status:"bad", timeLeft: (TIMEOUT-timeDelta)/1000});
-		}else{
-			//send good response
-			req.session.throttleTime = Date.now();
+		var timeDelta = Date.now() - req.session.last_throttle_time;
+		if( timeDelta < THROTTLE_DELAY_MS) res.json({status:"bad", timeLeft: (THROTTLE_DELAY_MS-timeDelta)/1000});
+		else{
+			req.session.last_throttle_time = Date.now();
 			res.json({status:"good"})
 		}
 	}
 });
 
+//get the number of other people in our database watching a particular CRN when a user makse a request
 app.get('/getNumWatchers/:crn', function(req, res){
 	myMongoController.Request.find({crn:req.params.crn}, function(err, requests){
 		myMongoController.smsRequest.find({crn:req.params.crn}, function(err, smsRequests){
-			res.json({numWatchers:smsRequests.length + requests.length - 1});
+			//since stat is for 'other watcher' we don't include the request just made by the user, hence the -1
+			//we also don't want to accidently display a negative value
+			var numWatchers = Math.max(smsRequests.length + requests.length - 1 , 0);
+			res.json({numWatchers: numWatchers}); 
 		});
 	});
 });
 
+//Send OSCAR scraped stats for capacity, remaining, etc. AND number of people in our database watching a seat.
 app.get('/getStats/:crn/:term', function(req, res){
 	myMongoController.Request.find({crn:req.params.crn}, function(err, requests){
 		myMongoController.smsRequest.find({crn:req.params.crn}, function(err, smsRequests){
 			var pollers = getActivePollers();
 			var termPoller;
 
-			for(var i in pollers){
-				if(pollers[i].term == req.params.term){
-					termPoller = pollers[i];
-				}
-			}
+			pollers.forEach(function(poller){
+				if(poller.term == req.params.term) termPoller = poller;
+			});
 
+			//not executed asyncronously since forEach is blocking
 			if(termPoller){
 				termPoller.getSeatStats(req.params.crn, function(crn, result){
 					result['numWatchers'] = requests.length + smsRequests.length;
 					res.send(result);
-				});
+				});				
 			}else{
-				res.send("bad req");
-			}			
+				if(!termPoller) res.send("bad req");
+			}
 
 		});
 	});
 });
 
+//verify a CRN on request forms
 app.get('/verifyCRN/:crn/:term', function(req, res){
 	var pollers = getActivePollers();
 	var termPoller;
 
-	for(var i in pollers){
-		if(pollers[i].term == req.params.term){
-			termPoller = pollers[i];
-		}
-	}
+	pollers.forEach(function(poller){
+		if(poller.term==req.params.term) termPoller = poller;
+	});
+
+	console.log(termPoller.term);
 
 	if(termPoller){
 		termPoller.getSeatStats(req.params.crn, function(crn, result){
@@ -273,36 +277,12 @@ app.get('/verifyCRN/:crn/:term', function(req, res){
 	}
 });
 
-//Account Related Stuffs.
-app.get('/verifyEmail', function(req, res){
-	var email = req.query.email,
-		uuid = req.query.uuid;
-
-	myMongoController.userAccessor(email, function(user_arr){
-		var user = user_arr[0];
-
-		if(user && user.uuid == uuid){
-			if(user.activated == true){
-				req.session.warning_flash = "Your account has already been activated"
-				res.redirect('/');
-				return
-			}
-			user.activated = true;
-			user.save();
-			req.session.success_flash = "Account activated!"
-			res.redirect('/');
-		}else{
-			req.session.danger_flash = "Account activation failed"
-			res.redirect('/');
-		}
-	});
-});
-
 app.get('/sign_up', function(req, res){
 	//pass param user: req.session.username
 	res.render('sign_up',{title:"Sign Up"});
 });
 
+//create an account and send out an email verification link
 app.post('/create_account', function(req, res){
 	// myMongoController.createUser("jo@jo.com", "password", "uuid");
 	var post = req.body;
@@ -341,10 +321,36 @@ app.post('/create_account', function(req, res){
 	}
 });
 
+//endpoint used to confirm validation of an email account
+app.get('/verifyEmail', function(req, res){
+	var email = req.query.email,
+		uuid = req.query.uuid;
+
+	myMongoController.userAccessor(email, function(user_arr){
+		var user = user_arr[0];
+
+		if(user && user.uuid == uuid){
+			if(user.activated == true){
+				req.session.warning_flash = "Your account has already been activated"
+				res.redirect('/');
+				return
+			}
+			user.activated = true;
+			user.save();
+			req.session.success_flash = "Account activated!"
+			res.redirect('/');
+		}else{
+			req.session.danger_flash = "Account activation failed"
+			res.redirect('/');
+		}
+	});
+});
+
 app.get('/log_in', function(req, res){
 	res.render('login',{title:"Login"});
 });
 
+//endpoint to authenticate a user
 app.post('/login_auth', function(req, res){
 	var user = req.body.email;
 	var pass = req.body.password;
@@ -381,6 +387,7 @@ app.get('/my_account', checkAuth, function(req, res){
 	});
 });
 
+//endpoint to change a password from account settings.
 app.post('/change_password', checkAuth, function(req, res){
 	var post = req.body,
 		password = post.password,
@@ -399,6 +406,52 @@ app.post('/change_password', checkAuth, function(req, res){
 	}
 });
 
+//send out a forgotten password link
+app.post('/request_pass_change', function(req, res){
+	var email = req.body.email
+
+	myMongoController.userAccessor(email, function(user_arr){
+		var uuid=generateUUID(),
+			emailLink = generateEmailPassChangeURL(email, uuid), 
+			user = user_arr[0];
+
+		if(user){
+			user.uuid = uuid;
+			user.save();
+
+			myMailer.sendPassChangeVerification(email, emailLink);
+
+			res.send("success");			
+		}else{
+			res.send("failure");
+		}
+		
+	});
+});
+
+//render change password form ONLY if the email and UUID from the URL match a user in the DB
+app.get('/verify_pass_change', function(req, res){
+	var email = req.query.email,
+		uuid = req.query.uuid;
+
+	myMongoController.userAccessor(email, function(user_arr){
+		var user = user_arr[0];
+
+		if(user && user.uuid == uuid){
+			req.session.uuid = uuid;
+			res.render('change_password', {email: email});
+		}else{
+			req.session.danger_flash = "Invalid change password link";
+			res.redirect('/');
+		}
+	});
+});
+
+// endpoint submitted to from 'change_password' form;
+// validates password and ONLY accepts password change if the session UUID matches the UUID of user being reset
+// this way, we confirm the user in the current session clicked on the verification link 
+// (since the verification link route sets session UUID), and it wasn't just some random guy submitting a 
+// POST request to our endpoint with email and password params to change
 app.post('/change_forgotten_password', function(req, res){
 	var post = req.body,
 		password = post.password,
@@ -415,7 +468,7 @@ app.post('/change_forgotten_password', function(req, res){
 		myMongoController.userAccessor(email, function(user_arr){
 			var user = user_arr[0];
 
-			if(user && user.uuid == req.session.uuid){
+			if(user && (user.uuid == req.session.uuid)){
 				user_arr[0].uuid = generateUUID(); //so that the old link doesn't work anymore
 				user_arr[0].save();
 				myMongoController.changePassword(email, password);
@@ -429,44 +482,10 @@ app.post('/change_forgotten_password', function(req, res){
 	}
 });
 
-app.get('/verify_pass_change', function(req, res){
-	var email = req.query.email,
-		uuid = req.query.uuid;
+//LESSON LEARNED: In a one to many relationship, store the value of the one object as a field in each of the
+// many objects... This way, querying is SO much easier.
 
-	myMongoController.userAccessor(email, function(user_arr){
-		var user = user_arr[0];
-
-		if(user && user.uuid == uuid){
-			req.session.uuid = uuid;
-			res.render('change_password', {email: email});
-		}else{
-			req.session.danger_flash = "Invalid change password link"
-			res.redirect('/');
-		}
-	});
-});
-
-app.post('/request_pass_change', function(req, res){
-	var email = req.body.email
-
-	myMongoController.userAccessor(email, function(user_arr){
-		var uuid=generateUUID(),
-			emailLink = generateEmailPassChangeURL(email, uuid), 
-			user = user_arr[0];
-
-		if(user){
-			user.uuid = uuid;
-			user.save();
-
-			myMailer.sendPassChangeVerification(email, emailLink);
-
-			res.send("success");			
-		}
-		
-		res.send("failure");
-	});
-});
-
+//display a user's current requests
 app.get('/my_requests', checkAuth, function(req, res){
 	myMongoController.userAccessor(req.session.username, function(user_arr){
 		var user = user_arr[0],
@@ -508,7 +527,7 @@ app.get('/my_requests', checkAuth, function(req, res){
 			});
 
 			auto_arr.forEach(function(e, i, a){
-				if(e) a[i].term = format_auto_reqs(e.term);
+				if(e) a[i].term = format_auto_req(e.term);
 			});
 		}
 
@@ -521,7 +540,8 @@ app.get('/my_requests', checkAuth, function(req, res){
 			if( requests_remaining > 0){
 				collection.forEach(function(id){
 					model.findById(id, function(err, doc){
-						result.push(doc);
+						//Disregard null requests from user's request collection.
+						if(doc) result.push(doc);
 
 						requests_remaining--;
 						if(requests_remaining == 0){ //only the last executed async call will meet this condition.
@@ -537,6 +557,8 @@ app.get('/my_requests', checkAuth, function(req, res){
 	});
 });
 
+
+//endpoint that handles request cancellations
 app.get('/cancel_req/:type/:id', checkAuth, function(req, res){
 	var id = req.params.id,
 		type = req.params.type,
@@ -658,18 +680,17 @@ function initPollers(){
 
 	if(atLeastOnePoller) rejectRequests = false;
 
-	pollers = {spring:springPoller, summer:summerPoller, fall:fallPoller};
+	current_pollers = {spring:springPoller, summer:summerPoller, fall:fallPoller};
 }
 
 //get all pollers for current school-terms.
 function getActivePollers(){
 	var result = [];
 
-	for (var key in pollers) {
-		if (pollers.hasOwnProperty(key)) {
-			//alert(key + " -> " + p[key]);
-			if(pollers[key]){
-				result.push(pollers[key]);
+	for (var key in current_pollers) {
+		if (current_pollers.hasOwnProperty(key)) {
+			if(current_pollers[key]){
+				result.push(current_pollers[key]);
 			}
 		}
 	}
@@ -678,12 +699,12 @@ function getActivePollers(){
 }
 
 function checkAuth(req, res, next) {
-  if (!req.session.username) {
-	req.session.danger_flash = "You must be logged in to perform that action";
-	res.redirect('/');
-  } else {
-    next();
-  }
+	if (!req.session.username) {
+		req.session.danger_flash = "You must be logged in to perform that action";
+		res.redirect('/');
+	} else {
+		next();
+	}
 }
 
 //periodically access unused sessions so that they are expired by Express.
@@ -699,7 +720,7 @@ function generateUUID(){
 	return 	'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
 	    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
 	    return v.toString(16);
-	});	
+	});
 }
 
 function generateEmailVerificationURL(email, uuid){
@@ -721,7 +742,7 @@ function format_watch_req(term){
 	return capitalizedSeason + " " + year;
 }
 
-function format_auto_reqs(term){
+function format_auto_req(term){
 	return term.replace('-', ' ');
 }
 
@@ -750,14 +771,14 @@ setInterval(function(){
 	initPollers();
 	myMongoController.cleanExpiredReqs();
 	sessionCleanup();
-}, millisInDay)
+}, millisInDay);
 
 //polling job
 setInterval(function(){
-	for (var key in pollers) {
-		if (pollers.hasOwnProperty(key)) {
+	for (var key in current_pollers) {
+		if (current_pollers.hasOwnProperty(key)) {
 			//alert(key + " -> " + p[key]);
-			if(pollers[key]) pollers[key].pollAllSeats();
+			if(current_pollers[key]) current_pollers[key].pollAllSeats();
 		}
 	}
 }, 2*millisInMinute); //*millisInMinute

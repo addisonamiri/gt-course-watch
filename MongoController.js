@@ -210,9 +210,10 @@ MongoController.prototype.cleanExpiredReqs = function(){
 
 	function helper(err, foundReqs){
 		if(err) console.log(err);
-		for(i in foundReqs){
-			foundReqs[i].remove();
-		}
+
+		foundReqs.forEach(function(e){
+			e.remove();
+		});
 	}
 }
 
