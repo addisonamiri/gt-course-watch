@@ -5,7 +5,7 @@ sudo chown $(whoami) /data
 sudo cp mongod.conf /etc/mongod.conf
 sudo mongod --config /etc/mongod.conf
 
-./node_modules/forever/bin/forever \
+sudo ./node_modules/forever/bin/forever \
 start \
 -al forever.log \
 -ao out.log \
