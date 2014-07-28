@@ -6,15 +6,14 @@ function Mailer(email, pass){
 	this.emailID = email;
 	this.emailPass = pass;
 
-	if(service=='Gmail'){
-		this.smtpTransport = nodemailer.createTransport("SMTP",{
-		    service: "Gmail",
-		    auth: {
-		        user: email,
-		        pass: pass
-		    }
-		});
-	}
+	this.smtpTransport = nodemailer.createTransport("SMTP",{
+	    service: "gmail",
+	    auth: {
+	        user: email,
+	        pass: pass
+	    }
+	});
+	
 }
 
 Mailer.prototype.sendGenericMail = function(email, subj, msg){
