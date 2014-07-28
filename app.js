@@ -43,8 +43,8 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 
 	var secureServer = require('https').createServer(https_opts, app).listen(8000);
 	var hostName = "http://localhost:8080";
-	var mailerEmail = "tofubeast1111@gmail.com";
-	var mailerPass = "Vikram888";
+	var mailerEmail = "gtcoursewatch.mailer@gmail.com";
+	var mailerPass = fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_gmail_pass.txt").toString();
 	// var myMailer = new Mailer(mailerEmail, mailerPass, 'Gmail');
 	var myMailer = new Mailer(mailerEmail, mailerPass);
 }

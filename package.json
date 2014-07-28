@@ -6,11 +6,10 @@
 		"express": "3.2",
 		"hbs":"latest",
 		"nodemailer": "0.7.1",
-		"mongoose" : "latest",
+		"mongoose" : "3.8.8",
 		"socket.io" : "latest",
 		"cheerio" : "latest",
 		"forever" : "latest",
-		"bcrypt" : "latest",
-		"nodemailer-ses-transport": "latest"
+		"bcrypt" : "latest"
 	}
 }
