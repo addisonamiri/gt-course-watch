@@ -228,6 +228,13 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/generic.js"></script>
     <script src="/js/spin.min.js"></script>
+ 
+    {{#if username}}
+      <script type="text/javascript">
+        $('#inputEmail').val("{{username}}");
+        $('#auto-reg-email').val("{{username}}");
+      </script>
+    {{/if}}
   </body>
 
 </html>
