@@ -15,7 +15,7 @@
 						Verify your CRN &amp; BuzzPort on this page before making a request; the red button will turn green when you're good.
 					</li>									
 					<li>
-						When the system realizes a seat is free, it will log in to BuzzPort and register your class for you; additionally, you'll receive a registration success e-mail notification.
+						When the system realizes a seat is free, it will log in to BuzzPort and register your class for you; additionally, it will send you a success email.
 					</li>
 					<li>
 						If multiple people request the same CRN, they are registered on a first come first served basis as seats open up.
@@ -51,11 +51,15 @@
 
 
 {{#if username}}
+<h5>
+*Remember to cancel your request in Account -> 'My Requests' if you no longer want a class. You don't want to be automatically registered for a class you forgot about.
+</h5>
 {{else}}
 <h5>You need to login before you can use this feature!
 	<a href="/log_in">Log in</a> | <a href="/sign_up">Sign up</a>
 </h5>
 {{/if}}
+
 
 <div id="autoRegVerificationStatus">
 	<div id="autoRegBuzzCheck" style="display:none">
