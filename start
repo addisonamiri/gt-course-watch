@@ -4,6 +4,7 @@ sudo mkdir -p /data
 sudo chown $(whoami) /data
 sudo cp mongod.conf /etc/mongod.conf
 sudo mongod --config /etc/mongod.conf
+export BUILD_ENVIRONMENT='production'
 
 sudo ./node_modules/forever/bin/forever \
 start \

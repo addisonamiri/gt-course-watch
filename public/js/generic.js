@@ -1,4 +1,5 @@
 // var socket = io.connect(window.location.hostname);
+
 if(window.location.protocol.match(/https/)){
 	var socket = io.connect('https://' + window.location.hostname);
 }else{

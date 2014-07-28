@@ -11,40 +11,39 @@ var Mailer = require('./Mailer.js');
 var Poller = require('./Poller.js');
 var PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
 
-//AWS Pub DNS
-//http://ec2-54-234-151-220.compute-1.amazonaws.com
+if(process.env.BUILD_ENVIRONMENT == 'production'){
+	var https_opts = {
+		key: fs.readFileSync("/home/ec2-user/ssl_key.pem"),
+		cert: fs.readFileSync("/home/ec2-user/certs/www_gtcoursewatch_us.crt"),
+		ca: [
+			fs.readFileSync("/home/ec2-user/certs/AddTrustExternalCARoot.crt"),
+			fs.readFileSync("/home/ec2-user/certs/COMODORSAAddTrustCA.crt"),
+			fs.readFileSync("/home/ec2-user/certs/COMODORSADomainValidationSecureServerCA.crt")
+		]
+	}
 
-// var https_opts = {
-// 	key: fs.readFileSync("/Users/vikram/amazon_ec2/ssl_key.pem"),
-// 	cert: fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/www_gtcoursewatch_us.crt"),
-// 	ca: [
-// 		fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/AddTrustExternalCARoot.crt"),
-// 		fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/COMODORSAAddTrustCA.crt"),
-// 		fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/COMODORSADomainValidationSecureServerCA.crt")
-// 	]
-// }
+	var secureServer = require('https').createServer(https_opts, app).listen(443);
+}else{
+	var https_opts = {
+		key: fs.readFileSync("/Users/vikram/amazon_ec2/ssl_key.pem"),
+		cert: fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/www_gtcoursewatch_us.crt"),
+		ca: [
+			fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/AddTrustExternalCARoot.crt"),
+			fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/COMODORSAAddTrustCA.crt"),
+			fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/COMODORSADomainValidationSecureServerCA.crt")
+		]
+	}
 
-// var secureServer = require('https').createServer(https_opts, app).listen(8000);
-
-
-var https_opts = {
-	key: fs.readFileSync("/home/ec2-user/ssl_key.pem"),
-	cert: fs.readFileSync("/home/ec2-user/certs/www_gtcoursewatch_us.crt"),
-	ca: [
-		fs.readFileSync("/home/ec2-user/certs/AddTrustExternalCARoot.crt"),
-		fs.readFileSync("/home/ec2-user/certs/COMODORSAAddTrustCA.crt"),
-		fs.readFileSync("/home/ec2-user/certs/COMODORSADomainValidationSecureServerCA.crt")
-	]
+	var secureServer = require('https').createServer(https_opts, app).listen(8000);
 }
 
-var secureServer = require('https').createServer(https_opts, app).listen(443);
 io.listen(secureServer);
 
 //*CONFIG
 var mailerEmail = "tofubeast1111@gmail.com";
 var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
-var hostName = "http://www.gtcoursewatch.us";
+var hostName = "https://www.gtcoursewatch.us";
 var THROTTLE_DELAY_SECS = 8;
 var PHANTOM_EVENTLOPP_DELAY_MS = 2000;
 // var hostName = "http://localhost:8080";
@@ -68,6 +67,7 @@ var rejectRequests = false;
 
 initPollers();
 
+//register partials
 (function(){
 	var partials_path = "./views/partials";
 	var partial_files = fs.readdirSync(partials_path);
