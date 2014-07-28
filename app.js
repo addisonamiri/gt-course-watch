@@ -14,40 +14,40 @@ var PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
 //secury copy paste command
 //scp -i GTCW.pem /Users/vikram/amazon_ec2/gtcw_gmail_pass.txt ec2-user@54.204.32.244:/home/ec2-user
 
-var https_opts = {
-	key: fs.readFileSync("/home/ec2-user/ssl_key.pem"),
-	cert: fs.readFileSync("/home/ec2-user/certs/www_gtcoursewatch_us.crt"),
-	ca: [
-		fs.readFileSync("/home/ec2-user/certs/AddTrustExternalCARoot.crt"),
-		fs.readFileSync("/home/ec2-user/certs/COMODORSAAddTrustCA.crt"),
-		fs.readFileSync("/home/ec2-user/certs/COMODORSADomainValidationSecureServerCA.crt")
-	]
-}
+// var https_opts = {
+// 	key: fs.readFileSync("/home/ec2-user/ssl_key.pem"),
+// 	cert: fs.readFileSync("/home/ec2-user/certs/www_gtcoursewatch_us.crt"),
+// 	ca: [
+// 		fs.readFileSync("/home/ec2-user/certs/AddTrustExternalCARoot.crt"),
+// 		fs.readFileSync("/home/ec2-user/certs/COMODORSAAddTrustCA.crt"),
+// 		fs.readFileSync("/home/ec2-user/certs/COMODORSADomainValidationSecureServerCA.crt")
+// 	]
+// }
 
-var secureServer = require('https').createServer(https_opts, app).listen(443);
-var hostName = "https://www.gtcoursewatch.us";
-var mailerEmail = "gtcoursewatch.mailer@gmail.com";
-var mailerPass = fs.readFileSync("/home/ec2-user/gtcw_gmail_pass.txt").toString();
-var myMailer = new Mailer(mailerEmail, mailerPass);
+// var secureServer = require('https').createServer(https_opts, app).listen(443);
+// var hostName = "https://www.gtcoursewatch.us";
+// var mailerEmail = "gtcoursewatch.mailer@gmail.com";
+// var mailerPass = fs.readFileSync("/home/ec2-user/gtcw_gmail_pass.txt").toString();
+// var myMailer = new Mailer(mailerEmail, mailerPass);
 
 // if(process.env.BUILD_ENVIRONMENT == 'production'){
 // }else{
-// 	var https_opts = {
-// 		key: fs.readFileSync("/Users/vikram/amazon_ec2/ssl_key.pem"),
-// 		cert: fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/www_gtcoursewatch_us.crt"),
-// 		ca: [
-// 			fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/AddTrustExternalCARoot.crt"),
-// 			fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/COMODORSAAddTrustCA.crt"),
-// 			fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/COMODORSADomainValidationSecureServerCA.crt")
-// 		]
-// 	}
+	var https_opts = {
+		key: fs.readFileSync("/Users/vikram/amazon_ec2/ssl_key.pem"),
+		cert: fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/www_gtcoursewatch_us.crt"),
+		ca: [
+			fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/AddTrustExternalCARoot.crt"),
+			fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/COMODORSAAddTrustCA.crt"),
+			fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/COMODORSADomainValidationSecureServerCA.crt")
+		]
+	}
 
-// 	var secureServer = require('https').createServer(https_opts, app).listen(8000);
-// 	var hostName = "http://localhost:8080";
-// 	var mailerEmail = "gtcoursewatch.mailer@gmail.com";
-// 	var mailerPass = fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_gmail_pass.txt").toString();
-// 	// var myMailer = new Mailer(mailerEmail, mailerPass, 'Gmail');
-// 	var myMailer = new Mailer(mailerEmail, mailerPass);
+	var secureServer = require('https').createServer(https_opts, app).listen(8000);
+	var hostName = "http://localhost:8080";
+	var mailerEmail = "gtcoursewatch.mailer@gmail.com";
+	var mailerPass = fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_gmail_pass.txt").toString();
+	// var myMailer = new Mailer(mailerEmail, mailerPass, 'Gmail');
+	var myMailer = new Mailer(mailerEmail, mailerPass);
 // }
 
 io.listen(secureServer);
@@ -100,6 +100,9 @@ var sessionStore = new express.session.MemoryStore; //equivalent to new express.
 app.use(express.session({secret: generateUUID(), store:sessionStore}));
 
 app.configure(function(){
+
+	app.use(express.compress());
+
 	//middleware + res.locals
   app.use(function(req, res, next){
     res.locals.username = req.session.username;
