@@ -5,14 +5,14 @@ sudo mkdir -p /data
 sudo chown $(whoami) /data
 sudo cp mongod.conf /etc/mongod.conf
 sudo mongod --config /etc/mongod.conf
+
+sudo -E su
 export BUILD_ENVIRONMENT='production'
 export HTTP_PORT=80
 
-sudo ./node_modules/forever/bin/forever \
+./node_modules/forever/bin/forever \
 start \
 -al forever.log \
 -ao out.log \
 -ae err.log \
 app.js
-
-
