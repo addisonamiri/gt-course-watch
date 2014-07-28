@@ -15,15 +15,30 @@ var PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
 //http://ec2-54-234-151-220.compute-1.amazonaws.com
 
 // var https_opts = {
-// 	key: fs.readFileSync("/home/ec2-user/ssl_key.pem").toString(),
-// 	cert: fs.readFileSync("/home/ec2-user/certs/www_gtcoursewatch_us.crt").toString(),
+// 	key: fs.readFileSync("/Users/vikram/amazon_ec2/ssl_key.pem"),
+// 	cert: fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/www_gtcoursewatch_us.crt"),
 // 	ca: [
-// 		fs.readFileSync("/home/ec2-user/certs/AddTrustExternalCARoot.crt").toString(),
-// 		fs.readFileSync("/home/ec2-user/certs/COMODORSAAddTrustCA.crt").toString(),
-// 		fs.readFileSync("/home/ec2-user/certs/COMODORSADomainValidationSecureServerCA.crt").toString()
+// 		fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/AddTrustExternalCARoot.crt"),
+// 		fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/COMODORSAAddTrustCA.crt"),
+// 		fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/COMODORSADomainValidationSecureServerCA.crt")
 // 	]
 // }
-// var secureServer = require('https').createServer(app, https_opts).listen(443);
+
+// var secureServer = require('https').createServer(https_opts, app).listen(8000);
+
+
+var https_opts = {
+	key: fs.readFileSync("/home/ec2-user/ssl_key.pem"),
+	cert: fs.readFileSync("/home/ec2-user/certs/www_gtcoursewatch_us.crt"),
+	ca: [
+		fs.readFileSync("/home/ec2-user/certs/AddTrustExternalCARoot.crt"),
+		fs.readFileSync("/home/ec2-user/certs/COMODORSAAddTrustCA.crt"),
+		fs.readFileSync("/home/ec2-user/certs/COMODORSADomainValidationSecureServerCA.crt")
+	]
+}
+
+var secureServer = require('https').createServer(https_opts, app).listen(443);
+io.listen(secureServer);
 
 //*CONFIG
 var mailerEmail = "tofubeast1111@gmail.com";

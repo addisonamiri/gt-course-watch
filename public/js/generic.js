@@ -1,4 +1,10 @@
-var socket = io.connect(window.location.hostname);
+// var socket = io.connect(window.location.hostname);
+if(window.location.protocol.match(/https/)){
+	var socket = io.connect('https://' + window.location.hostname);
+}else{
+	var socket = io.connect('http://' + window.location.hostname);
+}
+
 var buzzPortVerified = false;
 var autoCRNVerified = false;
 var watchCRNVerified = false;
