@@ -62,6 +62,17 @@ window.onload = function() {
 	});
 }
 
+//data-hide script
+$(function(){
+    $("[data-hide]").on("click", function(){
+    	// to hide all elements with class specified by data-hide.
+    	// ex. data-hide=alert where alert is the class
+        // $("." + $(this).attr("data-hide")).hide();
+        // -or-, hide just the closest one
+        $(this).closest("." + $(this).attr("data-hide")).hide();
+    });
+});
+
 $(document).ready(function(){	
 
 	$("#loginForm").submit(function(e){
