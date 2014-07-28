@@ -1,5 +1,4 @@
 var nodemailer = require('nodemailer');
-var ses = require('nodemailer-ses-transport');
 
 function Mailer(email, pass){
 // create reusable transport method (opens pool of SMTP connections)
