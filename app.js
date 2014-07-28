@@ -53,6 +53,20 @@ var rejectRequests = false;
 
 initPollers();
 
+(function(){
+	var partials_path = "./views/partials";
+	var partial_files = fs.readdirSync(partials_path);
+
+	partial_files.forEach(function(partial){
+		var matches = /^([^.]+).hbs.html$/.exec(partial);
+		if (!matches) { return };
+		var name = matches[1];
+
+		var partial = fs.readFileSync(partials_path + "/" + partial, 'utf8');
+		hbs.registerPartial(name, partial);
+	});
+}());
+
 console.log('Spring Null? ' + (current_pollers['spring']==null).toString());
 console.log('Fall Null? ' + (current_pollers['fall']==null).toString());
 console.log('Summer Null? ' + (current_pollers['summer']==null).toString());
@@ -314,7 +328,7 @@ app.post('/create_account', function(req, res){
 				myMongoController.createUser(email, password, uuid);
 				myMailer.sendEmailVerification(email, emailLink);
 
-				req.session.success_flash = 'You have successfully signed up, now check your e-mail and activate your account before you can log in';
+				req.session.success_flash = 'You have successfully signed up, now check your e-mail and activate your account before you can log in.';
 				res.redirect('/');
 			}
 		});

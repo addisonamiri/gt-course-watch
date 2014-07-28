@@ -1,0 +1,131 @@
+<h2 id="lastRequested" style="display:none"> </h2>
+<h4 id="otherWatchers" style="display:none"></h4>
+
+<div class = "container">
+	<div class = "row">
+<!--                Remember, there's 12 possible grid boxes to be divided amongst your grid items.
+-->
+
+		<div class="col-md-7" style="margin-left:-15px;">
+
+			<div class="bs-callout bs-callout-info">
+				<h4>Course Watch |
+					<img src="/free.gif" alt="Free" height="22px" width="35px" style="margin-bottom:5px;">
+				</h4>
+
+				<ul>
+					<li>
+						You must verify your CRN before making a request, the red button will turn green when you're good.
+					</li>
+
+					<li>
+						After you make a request, system will check on your seat every two minutes.
+					</li>
+
+					<li>
+						You will be e-mailed and/or texted as soon as the system realizes a seat is open.
+					</li>
+					<li>
+						Everything will automatically update and be ready when a new term comes around.
+					</li>
+					<li>
+						Unfortunately, the sms feature has been spotty with some carriers.
+					</li>
+				</ul>
+			</div>
+
+		</div>
+
+
+		<div class = "col-md-5">
+			<div class="bs-callout bs-callout-warning">
+				<h4>Note</h4>
+				<ul>
+					<li>
+						You do not have to be logged in to use this feature, but you should be if you want the ability to cancel your request later.
+					</li>
+					<li>
+						When multiple people request course watches on the same CRN, notifications are sent out to everyone at the same time to be fair. 						
+					</li>
+		<!-- 								<li>
+								So if you want to greatly improve your chances of getting the class before any other watchers, use the automated registration feature.		
+							</li> -->
+				</ul>
+
+			</div>
+		</div>
+
+	</div>
+</div>				
+
+<div id="cwRegStatus">
+	<div id="cwRegCrnCheck" style="display:none">
+		<i class="glyphicon glyphicon-ok" style="color:green;"></i> CRN Verified!
+	</div>
+</div>
+
+<form role="form" style="padding-left:1px">
+	<!-- <label for="inputEmail">Email </label> -->			
+
+	<div class="form-group">
+		<input type="text" class="form-control" id="inputEmail" placeholder="Email">
+
+		<!-- <label for="inputCRN">CRN </label> -->			
+		<input type="text" class="form-control" id="inputCRN" placeholder="CRN">
+
+		<select id="selectTerm" class="form-control">
+			{{#if fallLabel}}
+			<option value="{{fall}}">{{fallLabel}}</option>
+			{{/if}}
+			{{#if springLabel}}
+			<option value="{{spring}}">{{springLabel}}</option>
+			{{/if}}
+			{{#if summerLabel}}
+			<option value="{{summer}}">{{summerLabel}}</option>
+			{{/if}}
+		</select>
+
+		<div style="margin-top:15px">
+			<input id="cwVerifyCRN" type="button" class="btn btn-primary" value="Verify CRN">
+			<div id="watchSpinner"></div>
+		</div>
+	</div>
+
+	<form class="form-control" id="phoneSupportForm">
+		<p> Do you want to be texted? </p>
+		<div>
+			<label for="phoneSupportYes" class="radio inline control-label">
+				<input type="radio" id="phoneSupportYes" name="phoneSupport" value="yes"/>
+				Yes
+			</label>
+
+			<label for="phoneSupportNo" class="radio inline control-label">
+				<input type="radio" id="phoneSupportNo" name="phoneSupport" value="no"/>
+				No
+			</label>
+		</div>
+	</form>
+
+	<div id="sms_stuff" style="display: none;">
+		<label for="serviceProvider">Choose Your Service Provider:</label>
+		<select id="serviceProvider" class="form-control">
+			<option value="att">AT&T</option>
+			<option value="verizon">Verizon</option>
+			<option value="sprint">Sprint</option>
+			<option value="tmobile">T-Mobile</option>
+			<option value="virginmobile">Virgin Mobile</option>		  
+			<option value="metropcs">Metro PCS</option>
+			<option value="alltel">Alltel</option>
+			<option value="boost">Boost Mobile</option>
+		</select>
+
+		<input type="text" class="form-control" id="inputPhoneNum" placeholder="Phone #"/>		
+	</div>
+</form>
+
+<br>
+
+<div>
+	<button id= "send_request" class="btn btn-danger">Request Watch</button>
+	<button id="makeAnother" class="btn btn-info">Make Another</button>
+</div> <!--form center -->

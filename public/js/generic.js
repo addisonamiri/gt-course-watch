@@ -355,358 +355,359 @@ $(document).ready(function(){
 	});
 
 	$("#get_stats_btn").click(getStats);
-});
 
-function updateThrottle(cb){
-	// window.location.replace("/");
-	getTimeoutStatus(function(data){
-			if(data.status == "bad"){
-				updateWaitMessage(data.timeLeft);
-				$('#wait_alert').show();
-				scrollToTop();
-			}else{
-				$('#wait_alert').hide("fold");
-				cb();
-			}
-	});
-}
 
-function loginOk(next){
-	var emailContent = $('#email').val();
-	var passContent = $('#password').val();
-	var errorCount = 0;
-
-	if(checkEmpty(emailContent)){
-		$('#username_alert').show();
-		errorCount++;
-	}else{
-		$('#username_alert').hide();
-	}
-
-	if(checkEmpty(passContent)){
-		$('#pass_alert').show();
-		errorCount++;
-	}else{
-		$('#pass_alert').hide();
-	}
-
-	if(errorCount){
-		return false;
-	}else{
-		next();
-	}
-};
-
-function processInputAndSend(){
-	if(!$('#send_request').hasClass('btn-success')){
-		$('#verify_alert').show();
-		scrollToTop();
-		return;
-	}else{
-		$('#verify_alert').hide();
-	}
-
-	var errorCount = 0;
-
-	var crnInput = $('#inputCRN').val();
-	var emailInput = $('#inputEmail').val();
-	var phoneInput = $('#inputPhoneNum').val();
-	var term = $("#selectTerm").val();
-
-	if(!isEmail(emailInput)){
-		$('#email_alert').show();
-		errorCount++;
-	}else{
-		$('#email_alert').hide();
-	}
-
-	if(!isCRN(crnInput)){
-		$('#crn_alert').show();
-		errorCount++;
-	}else{
-		$('#crn_alert').hide();
-	}
-
-	if(smsEnabled){
-		if(!isPhoneNumber(phoneInput)){
-			$('#phone_alert').show();
-			errorCount++; 
-		}else{
-			$('#phone_alert').hide();
-			phoneInput = formatPhoneNumber(phoneInput);
-		}
-	}
-
-	if(!errorCount && !smsEnabled){
-		$(".alert").hide();
-
-		var currentRequest = {
-			"crn" : crnInput,
-			"email" : emailInput,
-			"gatewayedInput" : null
-		};
-
-		if(checkDuplicateRequest(submittedRequest, currentRequest)){
-			$("#duplicate_alert").show();
-		}else{
-			$("#duplicate_alert").hide();
-			$("#success_alert").show();
-			$("#send_request").hide();
-			$("#makeAnother").show();
-			scrollToTop();
-			
-			submittedRequest = currentRequest;
-
-			$.ajax({
-				url:"/reg_req_sub",
-				dataType: "json",
-				timeout: 30000,
-				data: {	crn: crnInput, 
-						term: term,
-						email: emailInput},
-				type: "POST",
-				success: function(res){
-					console.log(res.status);
-					if(res.status=="SUCCESS"){
-						$('#success_alert').show();
-						scrollToTop();
-					}else{
-						alert("AJAX error.");
-					}
-				},
-				error: function(){
-					console.log("connection timeout");				
+	function updateThrottle(cb){
+		// window.location.replace("/");
+		getTimeoutStatus(function(data){
+				if(data.status == "bad"){
+					updateWaitMessage(data.timeLeft);
+					$('#wait_alert').show();
+					scrollToTop();
+				}else{
+					$('#wait_alert').hide("fold");
+					cb();
 				}
-			});
+		});
+	}
 
-			updateLastRequested(crnInput);
-			updateOtherWatchers(crnInput);
-		}
+	function loginOk(next){
+		var emailContent = $('#email').val();
+		var passContent = $('#password').val();
+		var errorCount = 0;
 
-
-	}else if(!errorCount && smsEnabled){
-		$(".alert").hide();
-
-		var gatewayedInput = "";			
-		var serviceProvider = $("#serviceProvider").val();
-
-	  //SMS GATEWAY
-	  //http://www.obviously.com/tech_tips/SMS_Text_Email_Gateway.html
-
-		if(serviceProvider == "att"){
-			gatewayedInput = phoneInput + "@txt.att.net";
-		}else if(serviceProvider == "verizon"){
-			gatewayedInput = phoneInput + "@vtext.com";
-		}else if(serviceProvider == "sprint"){
-			gatewayedInput = phoneInput + "@messaging.sprintpcs.com";
-		}else if(serviceProvider == "tmobile"){
-			gatewayedInput = phoneInput + "@tmomail.net";
-		}else if(serviceProvider == "virginmobile"){
-			gatewayedInput = phoneInput + "@vmobl.com";
-		}else if(serviceProvider == "metropcs"){
-			gatewayedInput = phoneInput + "@mymetropcs.com";
-		}else if(serviceProvider == "alltel"){
-			gatewayedInput = phoneInput + "@message.alltel.com";
-		}else if(serviceProvider == "boost"){
-			gatewayedInput = phoneInput + "@myboostmobile.com";
-		}
-
-		var currentRequest = {
-			"crn" : crnInput,
-			"email" : emailInput,
-			"gatewayedInput" : gatewayedInput
-		};
-
-		if(checkDuplicateRequest(submittedRequest, currentRequest)){
-			$("#duplicate_alert").show();
+		if(checkEmpty(emailContent)){
+			$('#username_alert').show();
+			errorCount++;
 		}else{
-			$("#duplicate_alert").hide();
-			$("#success_alert").show();
-			$("#send_request").hide();
-			$("#makeAnother").show();
-			scrollToTop();
-			submittedRequest = currentRequest;
-
-			$.ajax({
-				url:"/sms_req_sub",
-				dataType: "json",
-				timeout: 30000,
-				data: {	crn: crnInput, 
-						term: term,
-						email: emailInput,
-						gatewayedNumber: gatewayedInput
-					},
-				type: "POST",
-				success: function(res){
-					console.log(res.status);
-					if(res.status=="SUCCESS"){
-						$('#success_alert').show();
-						scrollToTop();
-					}else{
-						alert("AJAX error.");
-					}
-				},
-				error: function(){
-					console.log("connection timeout");				
-				}
-			});
-
-			updateLastRequested(crnInput);
-			updateOtherWatchers(crnInput);
+			$('#username_alert').hide();
 		}
-	}else{
-		scrollToTop();
-	}
-}
 
-function getTimeoutStatus(callback){
-	$.ajax({
-		url:"/getTimeoutStatus",
-		dataType: "json",
-		type: "GET",
-		success: callback
-	})
-}
-
-//used to update DOM when sms or email requests are made
-function updateOtherWatchers(crn){
-	var numWatchers;
-
-	$.ajax({
-		url:"/getNumWatchers/"+crn,
-		dataType: "json",
-		type: "GET",
-		success: function(data){
-			$('#otherWatchers').html(data.numWatchers + " other people are watching this class.").show();
+		if(checkEmpty(passContent)){
+			$('#pass_alert').show();
+			errorCount++;
+		}else{
+			$('#pass_alert').hide();
 		}
-	});
-}
 
-function verifyCRN(crn, term, cb){
-	$.ajax({
-		url:"/verifyCRN/"+crn+"/"+term,
-		dataType: "json",
-		type: "GET",
-		success: function(data){
-			if(data.verification_status==1){
-				cb(true);
-			}else{
-				cb(false);
-			}
+		if(errorCount){
+			return false;
+		}else{
+			next();
 		}
-	});
-}
-
-//used for get stats tab
-function getStats(cb){
-	var crn = $('#stats_crn').val();
-	var term = $('#stats_term').val();
-
-	if(!isCRN(crn)){
-		$('#crn_alert').show();
-		scrollToTop();
-		return;
-	}else{
-		$('#crn_alert').hide();
-	}
-
-	var opts = {
-	  lines: 13, // The number of lines to draw
-	  length: 10, // The length of each line
-	  width: 2, // The line thickness
-	  radius: 8, // The radius of the inner circle
-	  corners: 1, // Corner roundness (0..1)
-	  rotate: 0, // The rotation offset
-	  direction: 1, // 1: clockwise, -1: counterclockwise
-	  color: '#000', // #rgb or #rrggbb or array of colors
-	  speed: 1.2, // Rounds per second
-	  trail: 42, // Afterglow percentage
-	  shadow: false, // Whether to render a shadow
-	  hwaccel: false, // Whether to use hardware acceleration
-	  className: 'spinner', // The CSS class to assign to the spinner
-	  zIndex: 2e9, // The z-index (defaults to 2000000000)
-	  top: '95%', // Top position relative to parent
-	  left: '80%' // Left position relative to parent
 	};
 
-	var target = document.getElementById('classStatsSpinner');
-	var spinner = new Spinner(opts).spin(target);
-
-	var remainingPieChart;
-	var takenPieChart;
-
-	$.ajax({
-		url:"/getStats/"+crn+"/"+term,
-		dataType: "json",
-		type: "GET",
-		success: function(data){
-			if(data && data.remaining == undefined){
-				alert("Your crn couldn't be found on BuzzPort.");
-				spinner.stop();
-				return;
-			}
-
-			spinner.stop();			
-
-			//dom manipulation to display returned data
-			$('#class_stats_div').html("<h5> Stats for CRN: " + crn + "</h5>");
-			$('#class_stats_div').append("<h5>" + data.numWatchers + " people are watching this class. </h5>");
-
-			var tableHTML = '<br/> <table class="table table-striped" style="width:500px"> <tr> <th></th> <th>Seat Stats</th>' + 
-				'<th>Waitlist Stats</th> </tr> <tr> <td>Remaining</td>' +
-				'<td>' + data.remaining + '/' + data.capacity + '</td>' +	 
-				'<td>' + data.waitlist_remaining + '/' + data.waitlist_capacity + '</td></tr><tr><td>Actual</td>' +
-				'<td>' + data.actual + '/' + data.capacity + '</td>' + 
-				'<td>' + data.waitlist_actual + '/' + data.waitlist_capacity + '</td></tr></table>';
-
-			$('#class_stats_div').append(tableHTML);
-
-			remainingPieChart = parseInt(data.remaining);
-			takenPieChart = parseInt(data.capacity) - remainingPieChart;
-
-			if(data.remaining != undefined){
-				updateAlias(remainingPieChart, takenPieChart);
-			}
-
-			// <table style="width:300px">
-			// 	<tr>
-			// 		<th>*</th>
-			// 		<th>Seat Stats</th>
-			// 		<th>Waitlist Stats</th>
-			// 	</tr>
-
-			// 	<tr>
-			// 		<td>Remaining</td>
-			// 		<td>data.remaining</td>
-			// 		<td>data.waitlist_remaining</td> 
-			// 	</tr>
-
-			// 	<tr>
-			// 		<td>Actual</td>				
-			// 		<td>data.actual</td>
-			// 		<td>data.waitlist_actual</td> 
-			// 	</tr>
-
-			// 	<tr>
-			// 		<td>Capacity</td>
-			// 		<td>data.capacity</td>
-			// 		<td>data.waitlist_capacity</td> 
-			// 	</tr>
-			// </table>
-
-
+	function processInputAndSend(){
+		if(!$('#send_request').hasClass('btn-success')){
+			$('#verify_alert').show();
+			scrollToTop();
+			return;
+		}else{
+			$('#verify_alert').hide();
 		}
-	});
 
-}
+		var errorCount = 0;
 
-function updateLastRequested(lastCrn){
-	$('#lastRequested').html("Last Requested CRN: " + lastCrn).show();
-}
+		var crnInput = $('#inputCRN').val();
+		var emailInput = $('#inputEmail').val();
+		var phoneInput = $('#inputPhoneNum').val();
+		var term = $("#selectTerm").val();
 
-function updateWaitMessage(time){
-	$('#wait_alert').html("Throttle ~ You need to wait the following number of seconds to do that: " + time);
-}
+		if(!isEmail(emailInput)){
+			$('#email_alert').show();
+			errorCount++;
+		}else{
+			$('#email_alert').hide();
+		}
+
+		if(!isCRN(crnInput)){
+			$('#crn_alert').show();
+			errorCount++;
+		}else{
+			$('#crn_alert').hide();
+		}
+
+		if(smsEnabled){
+			if(!isPhoneNumber(phoneInput)){
+				$('#phone_alert').show();
+				errorCount++; 
+			}else{
+				$('#phone_alert').hide();
+				phoneInput = formatPhoneNumber(phoneInput);
+			}
+		}
+
+		if(!errorCount && !smsEnabled){
+			$(".alert").hide();
+
+			var currentRequest = {
+				"crn" : crnInput,
+				"email" : emailInput,
+				"gatewayedInput" : null
+			};
+
+			if(checkDuplicateRequest(submittedRequest, currentRequest)){
+				$("#duplicate_alert").show();
+			}else{
+				$("#duplicate_alert").hide();
+				$("#success_alert").show();
+				$("#send_request").hide();
+				$("#makeAnother").show();
+				scrollToTop();
+				
+				submittedRequest = currentRequest;
+
+				$.ajax({
+					url:"/reg_req_sub",
+					dataType: "json",
+					timeout: 30000,
+					data: {	crn: crnInput, 
+							term: term,
+							email: emailInput},
+					type: "POST",
+					success: function(res){
+						console.log(res.status);
+						if(res.status=="SUCCESS"){
+							$('#success_alert').show();
+							scrollToTop();
+						}else{
+							alert("AJAX error.");
+						}
+					},
+					error: function(){
+						console.log("connection timeout");				
+					}
+				});
+
+				updateLastRequested(crnInput);
+				updateOtherWatchers(crnInput);
+			}
+
+
+		}else if(!errorCount && smsEnabled){
+			$(".alert").hide();
+
+			var gatewayedInput = "";			
+			var serviceProvider = $("#serviceProvider").val();
+
+		  //SMS GATEWAY
+		  //http://www.obviously.com/tech_tips/SMS_Text_Email_Gateway.html
+
+			if(serviceProvider == "att"){
+				gatewayedInput = phoneInput + "@txt.att.net";
+			}else if(serviceProvider == "verizon"){
+				gatewayedInput = phoneInput + "@vtext.com";
+			}else if(serviceProvider == "sprint"){
+				gatewayedInput = phoneInput + "@messaging.sprintpcs.com";
+			}else if(serviceProvider == "tmobile"){
+				gatewayedInput = phoneInput + "@tmomail.net";
+			}else if(serviceProvider == "virginmobile"){
+				gatewayedInput = phoneInput + "@vmobl.com";
+			}else if(serviceProvider == "metropcs"){
+				gatewayedInput = phoneInput + "@mymetropcs.com";
+			}else if(serviceProvider == "alltel"){
+				gatewayedInput = phoneInput + "@message.alltel.com";
+			}else if(serviceProvider == "boost"){
+				gatewayedInput = phoneInput + "@myboostmobile.com";
+			}
+
+			var currentRequest = {
+				"crn" : crnInput,
+				"email" : emailInput,
+				"gatewayedInput" : gatewayedInput
+			};
+
+			if(checkDuplicateRequest(submittedRequest, currentRequest)){
+				$("#duplicate_alert").show();
+			}else{
+				$("#duplicate_alert").hide();
+				$("#success_alert").show();
+				$("#send_request").hide();
+				$("#makeAnother").show();
+				scrollToTop();
+				submittedRequest = currentRequest;
+
+				$.ajax({
+					url:"/sms_req_sub",
+					dataType: "json",
+					timeout: 30000,
+					data: {	crn: crnInput, 
+							term: term,
+							email: emailInput,
+							gatewayedNumber: gatewayedInput
+						},
+					type: "POST",
+					success: function(res){
+						console.log(res.status);
+						if(res.status=="SUCCESS"){
+							$('#success_alert').show();
+							scrollToTop();
+						}else{
+							alert("AJAX error.");
+						}
+					},
+					error: function(){
+						console.log("connection timeout");				
+					}
+				});
+
+				updateLastRequested(crnInput);
+				updateOtherWatchers(crnInput);
+			}
+		}else{
+			scrollToTop();
+		}
+	}
+
+	function getTimeoutStatus(callback){
+		$.ajax({
+			url:"/getTimeoutStatus",
+			dataType: "json",
+			type: "GET",
+			success: callback
+		})
+	}
+
+	function verifyCRN(crn, term, cb){
+		$.ajax({
+			url:"/verifyCRN/"+crn+"/"+term,
+			dataType: "json",
+			type: "GET",
+			success: function(data){
+				if(data.verification_status==1){
+					cb(true);
+				}else{
+					cb(false);
+				}
+			}
+		});
+	}
+
+	//used for get stats tab
+	function getStats(cb){
+		var crn = $('#stats_crn').val();
+		var term = $('#stats_term').val();
+
+		if(!isCRN(crn)){
+			$('#crn_alert').show();
+			scrollToTop();
+			return;
+		}else{
+			$('#crn_alert').hide();
+		}
+
+		var opts = {
+		  lines: 13, // The number of lines to draw
+		  length: 10, // The length of each line
+		  width: 2, // The line thickness
+		  radius: 8, // The radius of the inner circle
+		  corners: 1, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#000', // #rgb or #rrggbb or array of colors
+		  speed: 1.2, // Rounds per second
+		  trail: 42, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: false, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: '95%', // Top position relative to parent
+		  left: '80%' // Left position relative to parent
+		};
+
+		var target = document.getElementById('classStatsSpinner');
+		var spinner = new Spinner(opts).spin(target);
+
+		var remainingPieChart;
+		var takenPieChart;
+
+		$.ajax({
+			url:"/getStats/"+crn+"/"+term,
+			dataType: "json",
+			type: "GET",
+			success: function(data){
+				if(data && data.remaining == undefined){
+					alert("Your crn couldn't be found on BuzzPort.");
+					spinner.stop();
+					return;
+				}
+
+				spinner.stop();			
+
+				//dom manipulation to display returned data
+				$('#class_stats_div').html("<h5> Stats for CRN: " + crn + "</h5>");
+				$('#class_stats_div').append("<h5>" + data.numWatchers + " people are watching this class. </h5>");
+
+				var tableHTML = '<br/> <table class="table table-striped" style="width:500px"> <tr> <th></th> <th>Seat Stats</th>' + 
+					'<th>Waitlist Stats</th> </tr> <tr> <td>Remaining</td>' +
+					'<td>' + data.remaining + '/' + data.capacity + '</td>' +	 
+					'<td>' + data.waitlist_remaining + '/' + data.waitlist_capacity + '</td></tr><tr><td>Actual</td>' +
+					'<td>' + data.actual + '/' + data.capacity + '</td>' + 
+					'<td>' + data.waitlist_actual + '/' + data.waitlist_capacity + '</td></tr></table>';
+
+				$('#class_stats_div').append(tableHTML);
+
+				remainingPieChart = parseInt(data.remaining);
+				takenPieChart = parseInt(data.capacity) - remainingPieChart;
+
+				if(data.remaining != undefined){
+					updateAlias(remainingPieChart, takenPieChart);
+				}
+
+				// <table style="width:300px">
+				// 	<tr>
+				// 		<th>*</th>
+				// 		<th>Seat Stats</th>
+				// 		<th>Waitlist Stats</th>
+				// 	</tr>
+
+				// 	<tr>
+				// 		<td>Remaining</td>
+				// 		<td>data.remaining</td>
+				// 		<td>data.waitlist_remaining</td> 
+				// 	</tr>
+
+				// 	<tr>
+				// 		<td>Actual</td>				
+				// 		<td>data.actual</td>
+				// 		<td>data.waitlist_actual</td> 
+				// 	</tr>
+
+				// 	<tr>
+				// 		<td>Capacity</td>
+				// 		<td>data.capacity</td>
+				// 		<td>data.waitlist_capacity</td> 
+				// 	</tr>
+				// </table>
+
+
+			}
+		});
+
+	}
+
+	function updateLastRequested(lastCrn){
+		$('#lastRequested').html("Last Requested CRN: " + lastCrn).show();
+	}
+
+	//used to update DOM when sms or email requests are made
+	function updateOtherWatchers(crn){
+		var numWatchers;
+
+		$.ajax({
+			url:"/getNumWatchers/"+crn,
+			dataType: "json",
+			type: "GET",
+			success: function(data){
+				$('#otherWatchers').html(data.numWatchers + " other people are watching this class.").show();
+			}
+		});
+	}
+
+	function updateWaitMessage(time){
+		$('#wait_alert').html("Throttle ~ You need to wait the following number of seconds to do that: " + time);
+	}
+});
 
 function checkEmpty(content){
 	return (content.length > 0 ? false : true);

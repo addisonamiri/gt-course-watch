@@ -1,0 +1,140 @@
+<div class = "container">
+	<div class = "row">
+
+		<!--                Remember, there's 12 possible grid boxes to be divided amongst your grid items. -->
+
+		<div class="col-md-7" style="margin-left:-15px;">
+			<div class="bs-callout bs-callout-info">
+				<h4>Automated Registration |
+					<img src="/free.gif" alt="Free" height="22px" width="35px" style="margin-bottom:5px;">
+					<!--  (Free for a Limited Time) -->
+				</h4>
+
+				<ul>
+					<li>
+						Verify your CRN &amp; BuzzPort on this page before making a request; the red button will turn green when you're good.
+					</li>									
+					<li>
+						When the system realizes a seat is free, it will log in to BuzzPort and register your class for you; additionally, you'll receive a registration success e-mail notification.
+					</li>
+					<li>
+						If multiple people request the same CRN, they are registered on a first come first served basis as seats open up.
+					</li>												
+					<li>
+						Your information is stored on a secure server, and is deleted once either your request expires or is fulfilled.
+					</li>
+				</ul>
+			</div>
+		</div>
+
+
+		<div class = "col-md-5">
+			<div class="bs-callout bs-callout-danger">
+				<h4>Requirements</h4>
+				<ul>
+					<li>
+						You must be signed in to this website to use the auto-registration feature.
+					</li>
+					<li>
+						You can cancel your request anytime under Account -> My Requests in the top bar.
+					</li>
+
+<!-- 				<li>
+							This feature will be free for a limited time.
+						</li> -->
+				</ul>					
+			</div>       
+		</div>
+
+	</div>
+</div>
+
+
+{{#if username}}
+{{else}}
+<h5>You need to login before you can use this feature!
+	<a href="/log_in">Log in</a> | <a href="/sign_up">Sign up</a>
+</h5>
+{{/if}}
+
+<div id="autoRegVerificationStatus">
+	<div id="autoRegBuzzCheck" style="display:none">
+		<i class="glyphicon glyphicon-ok" style="color:green;"></i> BuzzPort Verified!
+	</div>
+	<div id="autoRegCrnCheck" style="display:none">
+		<i class="glyphicon glyphicon-ok" style="color:green;"></i> CRN Verified!
+	</div>
+</div>
+
+<!-- <a href="#buzz_verify_modal" data-toggle="modal" class="btn btn-primary">Verify BuzzPort Credentials</a> -->
+
+<div class="form-group">
+	<input type="text" id="buzzport_id" class="form-control" placeholder="Buzzport Username">
+	<input type="password" id="buzzport_pass" class="form-control" placeholder="Buzzport Password">
+	<input type="button" id="buzz_verify_sub" class="btn btn-warning" value="Verify BuzzPort">
+</div>
+
+<div id="auto-reg-classinfo">
+	<input id="buzzport_crn" type="text" class="form-control" placeholder="CRN">
+
+	<select id="buzzport_term" class="form-control">
+		{{#if fallLabel}}
+		<option value="{{fall}}">{{fallLabel}}</option>
+		{{/if}}
+		{{#if springLabel}}
+		<option value="{{spring}}">{{springLabel}}</option>
+		{{/if}}
+		{{#if summerLabel}}
+		<option value="{{summer}}">{{summerLabel}}</option>
+		{{/if}}
+	</select>
+
+	<input id="autoVerifyCRN" type="button" class="btn btn-primary" value="Verify CRN">
+	<div id="autoRegSpinner"></div>
+</div>
+
+<br>
+
+<div id="autoreg_finalize">
+	<input id="auto-reg-email" type="text" class="form-control" placeholder="Email">
+	<input type="button" id="buzz_register" class="btn btn-danger" value="Request Auto-Register">
+</div>
+
+<!-- Modal and progress bar -->
+
+<!-- <div class="modal fade" id="buzz_verify_modal" role="dialog"> 
+	<div class="modal-dialog"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4> Verify Your BuzzPort Credentials </h4>
+			</div>
+			<div class="modal-body">
+
+			</div>
+			<div class="modal-footer">
+				<a class="btn btn-danger" data-dismiss="modal">Close</a>
+			</div>
+		</div>
+	</div>
+</div> -->
+
+<div class="modal fade loading-bar-modal" id="verify-buzz-progress" role="dialog"> 
+	<div class="modal-dialog"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4>Verifying BuzzPort Credentials</h4>
+			</div>
+			<div class="modal-body">
+
+				<div class="progress progress-striped active">
+				  <div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+				    <span class="sr-only">100% Complete</span>
+				  </div>
+				</div>
+
+				Servicing https://buzzport.gatech.edu/...
+			</div>
+			<div class="modal-footer"></div>
+		</div>
+	</div>
+</div>
