@@ -10,6 +10,7 @@
 		"socket.io" : "latest",
 		"cheerio" : "latest",
 		"forever" : "latest",
-		"bcrypt" : "latest"	
+		"bcrypt" : "latest",
+		"nodemailer-ses-transport": "latest"
 	}
 }

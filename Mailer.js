@@ -1,18 +1,20 @@
 var nodemailer = require('nodemailer');
+var ses = require('nodemailer-ses-transport');
 
 function Mailer(email, pass){
 // create reusable transport method (opens pool of SMTP connections)
 	this.emailID = email;
 	this.emailPass = pass;
-	
-	this.smtpTransport = nodemailer.createTransport("SMTP",{
-	    service: "Gmail",
-	    auth: {
-	        user: email,
-	        pass: pass
-	    }
-	});
 
+	if(service=='Gmail'){
+		this.smtpTransport = nodemailer.createTransport("SMTP",{
+		    service: "Gmail",
+		    auth: {
+		        user: email,
+		        pass: pass
+		    }
+		});
+	}
 }
 
 Mailer.prototype.sendGenericMail = function(email, subj, msg){

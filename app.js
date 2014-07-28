@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-var server = require('http').createServer(app).listen(process.env.PORT || 8080);
+var server = require('http').createServer(app).listen(process.env.HTTP_PORT || 8080);
 var io = require('socket.io').listen(server);
 var hbs = require('hbs');
 var fs = require('fs');
@@ -10,6 +10,9 @@ var MongoController = require('./MongoController.js');
 var Mailer = require('./Mailer.js');
 var Poller = require('./Poller.js');
 var PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
+
+//secury copy paste command
+//scp -i GTCW.pem /Users/vikram/amazon_ec2/gtcw_gmail_pass.txt ec2-user@54.204.32.244:/home/ec2-user
 
 if(process.env.BUILD_ENVIRONMENT == 'production'){
 	var https_opts = {
@@ -23,6 +26,10 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 	}
 
 	var secureServer = require('https').createServer(https_opts, app).listen(443);
+	var hostName = "https://www.gtcoursewatch.us";
+	var mailerEmail = "gtcoursewatch.mailer@gmail.com";
+	var mailerPass = fs.readFileSync("/home/ec2-user/gtcw_gmail_pass.txt").toString();
+	var myMailer = new Mailer(mailerEmail, mailerPass);
 }else{
 	var https_opts = {
 		key: fs.readFileSync("/Users/vikram/amazon_ec2/ssl_key.pem"),
@@ -35,18 +42,19 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 	}
 
 	var secureServer = require('https').createServer(https_opts, app).listen(8000);
+	var hostName = "http://localhost:8080";
+	var mailerEmail = "tofubeast1111@gmail.com";
+	var mailerPass = "Vikram888";
+	// var myMailer = new Mailer(mailerEmail, mailerPass, 'Gmail');
+	var myMailer = new Mailer(mailerEmail, mailerPass);
 }
 
 io.listen(secureServer);
 
 //*CONFIG
-var mailerEmail = "tofubeast1111@gmail.com";
-var mailerPass = "Vikram888";
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
-var hostName = "https://www.gtcoursewatch.us";
 var THROTTLE_DELAY_SECS = 8;
 var PHANTOM_EVENTLOPP_DELAY_MS = 2000;
-// var hostName = "http://localhost:8080";
 
 //*CONSTANTS
 var millisInSecond = 1000;
@@ -55,7 +63,6 @@ var millisInHour = millisInMinute*60;
 var millisInDay = millisInHour*24;
 
 //*INITIALIZE CUSTOM MODULES
-var myMailer = new Mailer(mailerEmail, mailerPass);
 var myMongoController = new MongoController(mongoConnectionUrl);
 var myDispatcher = new PhantomJobDispatcher( myMailer, myMongoController);
 myDispatcher.startDispatcher(PHANTOM_EVENTLOPP_DELAY_MS);
