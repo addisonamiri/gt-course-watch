@@ -25,7 +25,7 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 		]
 	}
 
-	var secureServer = require('https').createServer(https_opts, app).listen( process.env.HTTPS_PORT|| 8000);
+	var secureServer = require('https').createServer(https_opts, app).listen( process.env.HTTPS_PORT || 8000);
 	var hostName = "https://www.gtcoursewatch.us";
 	var mailerEmail = "gtcoursewatch.mailer@gmail.com";
 	var mailerPass = fs.readFileSync("/home/ec2-user/gtcw_gmail_pass.txt").toString();
@@ -74,24 +74,9 @@ var rejectRequests = false;
 
 initPollers();
 
-//register partials
-(function(){
-	var partials_path = "./views/partials";
-	var partial_files = fs.readdirSync(partials_path);
-
-	partial_files.forEach(function(partial){
-		var matches = /^([^.]+).hbs.html$/.exec(partial);
-		if (!matches) { return };
-		var name = matches[1];
-
-		var partial = fs.readFileSync(partials_path + "/" + partial, 'utf8');
-		hbs.registerPartial(name, partial);
-	});
-}());
-
-console.log('Spring Null? ' + (current_pollers['spring']==null).toString());
-console.log('Fall Null? ' + (current_pollers['fall']==null).toString());
-console.log('Summer Null? ' + (current_pollers['summer']==null).toString());
+console.log('Spring Null? ' + (current_pollers['spring'] == null).toString());
+console.log('Fall Null? ' + (current_pollers['fall'] == null).toString());
+console.log('Summer Null? ' + (current_pollers['summer'] == null).toString());
 
 //*Express Config
 app.use(express.cookieParser());
@@ -122,6 +107,21 @@ app.configure(function(){
 
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
+
+//register partials
+(function(){
+	var partials_path = "./views/partials";
+	var partial_files = fs.readdirSync(partials_path);
+
+	partial_files.forEach(function(partial){
+		var matches = /^([^.]+).hbs.html$/.exec(partial);
+		if (!matches) { return };
+		var name = matches[1];
+
+		var partial = fs.readFileSync(partials_path + "/" + partial, 'utf8');
+		hbs.registerPartial(name, partial);
+	});
+}());
 
 app.use(express.bodyParser());
 app.use(app.router);
