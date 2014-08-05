@@ -3,12 +3,8 @@ body {
 	margin-bottom: 80px;
 }
 
-input {
+input, select {
 	margin-top: 5px;
-}
-
-select{
-	margin-top: 5px;	
 }
 
 .alert {
