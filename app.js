@@ -11,6 +11,13 @@ var Mailer = require('./Mailer.js');
 var Poller = require('./Poller.js');
 var PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
 
+/*****
+username and email are synonymous through this application
+*****/
+
+//LESSON LEARNED: In a one to many relationship, store the value of the one object as a field in each of the
+// many objects... This way, querying is SO much easier.
+
 //secury copy paste command
 //scp -i GTCW.pem /Users/vikram/amazon_ec2/gtcw_gmail_pass.txt ec2-user@54.204.32.244:/home/ec2-user
 
@@ -30,6 +37,21 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 	var mailerEmail = "gtcoursewatch.mailer@gmail.com";
 	var mailerPass = fs.readFileSync("/home/ec2-user/gtcw_gmail_pass.txt").toString();
 	var myMailer = new Mailer(mailerEmail, mailerPass);
+
+	//register partials once
+	(function(){
+		var partials_path = "./views/partials";
+		var partial_files = fs.readdirSync(partials_path);
+
+		partial_files.forEach(function(partial){
+			var matches = /^([^.]+).hbs.html$/.exec(partial);
+			if (!matches) { return };
+			var name = matches[1];
+
+			var partial = fs.readFileSync(partials_path + "/" + partial, 'utf8');
+			hbs.registerPartial(name, partial);
+		});
+	}());
 }else{
 	var https_opts = {
 		key: fs.readFileSync("/Users/vikram/amazon_ec2/ssl_key.pem"),
@@ -47,6 +69,21 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 	var mailerPass = fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_gmail_pass.txt").toString();
 	// var myMailer = new Mailer(mailerEmail, mailerPass, 'Gmail');
 	var myMailer = new Mailer(mailerEmail, mailerPass);
+
+	//keep reloading partials
+	setInterval( function(){
+		var partials_path = "./views/partials";
+		var partial_files = fs.readdirSync(partials_path);
+
+		partial_files.forEach(function(partial){
+			var matches = /^([^.]+).hbs.html$/.exec(partial);
+			if (!matches) { return };
+			var name = matches[1];
+
+			var partial = fs.readFileSync(partials_path + "/" + partial, 'utf8');
+			hbs.registerPartial(name, partial);
+		});
+	}, 1000)
 }
 
 io.listen(secureServer);
@@ -85,7 +122,7 @@ app.use(express.session({secret: generateUUID(), store:sessionStore}));
 
 app.configure(function(){
 
-	app.use(express.compress());
+  app.use(express.compress());
 
 	//middleware + res.locals
   app.use(function(req, res, next){
@@ -108,28 +145,10 @@ app.configure(function(){
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 
-//register partials
-(function(){
-	var partials_path = "./views/partials";
-	var partial_files = fs.readdirSync(partials_path);
-
-	partial_files.forEach(function(partial){
-		var matches = /^([^.]+).hbs.html$/.exec(partial);
-		if (!matches) { return };
-		var name = matches[1];
-
-		var partial = fs.readFileSync(partials_path + "/" + partial, 'utf8');
-		hbs.registerPartial(name, partial);
-	});
-}());
-
 app.use(express.bodyParser());
 app.use(app.router);
 app.use(express.static('public'));
 
-/*****
-username and email are synonymous through this application
-*****/
 
 app.get('/', function(req, res) {
 	var springLabel, summerLabel, fallLabel;
@@ -520,9 +539,6 @@ app.post('/change_forgotten_password', function(req, res){
 		});
 	}
 });
-
-//LESSON LEARNED: In a one to many relationship, store the value of the one object as a field in each of the
-// many objects... This way, querying is SO much easier.
 
 //display a user's current requests
 app.get('/my_requests', checkAuth, function(req, res){
