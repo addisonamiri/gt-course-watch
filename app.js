@@ -38,20 +38,7 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 	var mailerPass = fs.readFileSync("/home/ec2-user/gtcw_gmail_pass.txt").toString();
 	var myMailer = new Mailer(mailerEmail, mailerPass);
 
-	//register partials once
-	(function(){
-		var partials_path = "./views/partials";
-		var partial_files = fs.readdirSync(partials_path);
-
-		partial_files.forEach(function(partial){
-			var matches = /^([^.]+).hbs.html$/.exec(partial);
-			if (!matches) { return };
-			var name = matches[1];
-
-			var partial = fs.readFileSync(partials_path + "/" + partial, 'utf8');
-			hbs.registerPartial(name, partial);
-		});
-	}());
+	registerPartials();
 }else{
 	var https_opts = {
 		key: fs.readFileSync("/Users/vikram/amazon_ec2/ssl_key.pem"),
@@ -67,31 +54,33 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 	var hostName = "http://localhost:8080";
 	var mailerEmail = "gtcoursewatch.mailer@gmail.com";
 	var mailerPass = fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_gmail_pass.txt").toString();
-	// var myMailer = new Mailer(mailerEmail, mailerPass, 'Gmail');
 	var myMailer = new Mailer(mailerEmail, mailerPass);
 
 	//keep reloading partials
-	setInterval( function(){
-		var partials_path = "./views/partials";
-		var partial_files = fs.readdirSync(partials_path);
-
-		partial_files.forEach(function(partial){
-			var matches = /^([^.]+).hbs.html$/.exec(partial);
-			if (!matches) { return };
-			var name = matches[1];
-
-			var partial = fs.readFileSync(partials_path + "/" + partial, 'utf8');
-			hbs.registerPartial(name, partial);
-		});
-	}, 1000)
+	setInterval(registerPartials, 1000);
 }
 
 io.listen(secureServer);
 
+//Ensure partial registration on startup
+(function(){
+	var partials_path = "./views/partials";
+	var partial_files = fs.readdirSync(partials_path);
+
+	partial_files.forEach(function(partial){
+		var matches = /^([^.]+).hbs.html$/.exec(partial);
+		if (!matches) { return };
+		var name = matches[1];
+
+		var partial = fs.readFileSync(partials_path + "/" + partial, 'utf8');
+		hbs.registerPartial(name, partial);
+	});
+})();
+
 //*CONFIG
 var mongoConnectionUrl = 'mongodb://localhost/gtcw';
 var THROTTLE_DELAY_SECS = 8;
-var PHANTOM_EVENTLOPP_DELAY_MS = 2000;
+var PHANTOM_EVENTLOOP_DELAY_MS = 2000;
 
 //*CONSTANTS
 var millisInSecond = 1000;
@@ -102,7 +91,7 @@ var millisInDay = millisInHour*24;
 //*INITIALIZE CUSTOM MODULES
 var myMongoController = new MongoController(mongoConnectionUrl);
 var myDispatcher = new PhantomJobDispatcher( myMailer, myMongoController);
-myDispatcher.startDispatcher(PHANTOM_EVENTLOPP_DELAY_MS);
+myDispatcher.startDispatcher(PHANTOM_EVENTLOOP_DELAY_MS);
 
 var springPoller, fallPoller, summerPoller; //pollers
 var current_pollers; //object that holds all current pollers
@@ -148,7 +137,6 @@ app.engine('html', hbs.__express);
 app.use(express.bodyParser());
 app.use(app.router);
 app.use(express.static('public'));
-
 
 app.get('/', function(req, res) {
 	var springLabel, summerLabel, fallLabel;
@@ -736,6 +724,21 @@ function initPollers(){
 	if(atLeastOnePoller) rejectRequests = false;
 
 	current_pollers = {spring:springPoller, summer:summerPoller, fall:fallPoller};
+}
+
+//register partials
+function registerPartials(){
+	var partials_path = "./views/partials";
+	var partial_files = fs.readdirSync(partials_path);
+
+	partial_files.forEach(function(partial){
+		var matches = /^([^.]+).hbs.html$/.exec(partial);
+		if (!matches) { return };
+		var name = matches[1];
+
+		var partial = fs.readFileSync(partials_path + "/" + partial, 'utf8');
+		hbs.registerPartial(name, partial);
+	});
 }
 
 //get all pollers for current school-terms.
