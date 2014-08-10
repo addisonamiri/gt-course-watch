@@ -40,7 +40,7 @@ PhantomJobDispatcher.prototype.dispatcherEventLoop = function(){
 		//have a registration job to get done, which takes priority over validation
 		var job = registrationJobsQueue.shift(); //job is just a request obj from mongoDB
 		
-		execRegistrationTask(job, function(res){
+		execRegistrationTask(job, function(res, job){
 			if(res.status == "SUCCESS"){
 				//check if phantom was able to successfuly register. 
 				//if so, send status update email and remove request from db.
@@ -50,7 +50,7 @@ PhantomJobDispatcher.prototype.dispatcherEventLoop = function(){
 				job.remove(); //remove from DB	
 			}else if(res.status.indexOf("ERROR") > -1){
 				//encountered an error so remove from DB
-				var subj = "Registration Error";
+				var subj = "Registration Error CRN: " + job.crn;
 				var msg = "Your automatated registration request encountered the following error: " + res.status +
 					"\n\nAs a result, your request has been removed from the system.";
 
@@ -91,26 +91,26 @@ function execRegistrationTask(job, cb){
 			clearTimeout(killJob);	
 			jobInProgress = false;	
 			numConcurrentJobs--;			
-			cb({status: "SUCCESS"});
+			cb({status: "SUCCESS"}, job);
 		}
 		else if(data.indexOf("FAILURE")>-1){
 			clearTimeout(killJob);
 			jobInProgress = false;						
 			numConcurrentJobs--;			
-			cb({status: "FAILURE"});
+			cb({status: "FAILURE"}, job);
 		}
 		else if(data.indexOf("INVALID_TERM_ERROR")>-1){
 			clearTimeout(killJob);
 			jobInProgress = false;
 			numConcurrentJobs--;							
-			cb({status: "INVALID TERM ERROR\nYou don't have a time ticket for the term you signed up for."});
+			cb({status: "INVALID TERM ERROR\nYou don't have a time ticket for the term you signed up for."}, job);
 		}		
 		else if(data.indexOf("REGISTRATION_ERROR")>-1){
 			clearTimeout(killJob);
 			jobInProgress = false;
 			numConcurrentJobs--;								
 			cb({status: "REGISTRATION ERROR\nThis means you can't register for the class for some reason\n"+
-				"For specifics, log into BuzzPort and try to add the class to see what the error is."});
+				"For specifics, log into BuzzPort and try to add the class to see what the error is."}, job);
 		}
 	});
 
@@ -119,7 +119,7 @@ function execRegistrationTask(job, cb){
 		child.kill('SIGKILL');
 		jobInProgress = false;
 		numConcurrentJobs--;		
-		cb({status: "MAX_TIME_REACHED"});
+		cb({status: "MAX_TIME_REACHED"}, job);
 	}, maxWaitPeriod);
 }
 

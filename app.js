@@ -175,7 +175,7 @@ app.post('/verifyBuzzport', function(req, res){
 	);
 });
 
-//submit and automated registration request.
+//submit an automated registration request.
 app.post('/autoRegReq', function(req, res){
 	var post = req.body;
 	post.term = post.term.replace(' ', '-');
