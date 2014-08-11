@@ -10,9 +10,11 @@ node app.js
 
 ### Server Deployment
 ```
-chmod +x ./start
+chmod +x start
 ./start
 ```
+
+Note: mongod must be running in both cases.
 
 ## Features
 ### Course Watch
