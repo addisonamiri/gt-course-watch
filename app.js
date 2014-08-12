@@ -146,7 +146,7 @@ app.get('/', function(req, res) {
 	if(summerTerm) summerLabel = createLabel(summerTerm);
 	if(fallTerm) fallLabel = createLabel(fallTerm);
 
-	res.render('index',{title:"Home", 
+	res.render('index',{title:"GT CourseWatch", 
 						spring: springTerm,
 						summer: summerTerm,
 						fall: fallTerm,
