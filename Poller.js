@@ -200,6 +200,7 @@ Poller.prototype.checkSeats = function(numSeats, existingRequest, smsRequest){
 				this.dispatcher.addRegisterTaskToQueue(existingRequest);
 				existingRequest.beingProcessed = "true";
 				existingRequest.save();
+				this.mongoController.createSuccessStat(0,0,1);
 			}
 
 		}else{
