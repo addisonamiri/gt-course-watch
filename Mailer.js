@@ -1,18 +1,30 @@
 var nodemailer = require('nodemailer');
 
-function Mailer(email, pass){
-// create reusable transport method (opens pool of SMTP connections)
-	this.emailID = email;
-	this.emailPass = pass;
 
-	this.smtpTransport = nodemailer.createTransport("SMTP",{
-	    service: "gmail",
-	    auth: {
-	        user: email,
-	        pass: pass
-	    }
-	});
-	
+//for gmail, opts={service:'gmail', pass:'pass'}
+//for ses, opts={service:'ses', id:'id', sekret: 'secret'}
+function Mailer(email, opts){
+	this.emailID = email;
+	// create reusable transport method (opens pool of SMTP connections)
+	switch(opts.service) {
+		case "gmail":
+			this.smtpTransport = nodemailer.createTransport("SMTP",{
+			    service: "gmail",
+			    auth: {
+			        user: email,
+			        pass: opts.pass
+			    }
+			});	
+			break;
+		case "ses":
+			this.smtpTransport = nodemailer.createTransport("SES", {
+			    AWSAccessKeyID: opts.id,
+			    AWSSecretKey: opts.sekret
+			});
+			break;
+		default:
+			break
+	}
 }
 
 Mailer.prototype.sendGenericMail = function(email, subj, msg){
@@ -177,7 +189,7 @@ Mailer.prototype.contactMailJob = function(email, name, msg){
 	// setup e-mail data with unicode symbols
 	var mailOptions = {
 //	    from: "GT Course Watch Mailer ✔ <tofubeast1111@gmail.com>", // sender address
-	    from: "CONTACT MESSAGE <tofubeast1111@gmail.com>", // sender address
+	    from: "CONTACT MESSAGE <" + this.emailID + ">", // sender address
 	    to: this.emailID, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
 	    subject: "CONTACT MESSAGE FROM " + name, // Subject line
 	    text: bodyText, // plaintext body

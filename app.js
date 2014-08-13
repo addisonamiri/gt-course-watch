@@ -19,7 +19,8 @@ username and email are synonymous through this application
 // many objects... This way, querying is SO much easier.
 
 //secury copy paste command
-//scp -i GTCW.pem /Users/vikram/amazon_ec2/gtcw_gmail_pass.txt ec2-user@54.204.32.244:/home/ec2-user
+// scp -i GTCW.pem /Users/vikram/amazon_ec2/gtcw_gmail_pass.txt ec2-user@54.204.32.244:/home/ec2-user
+
 
 if(process.env.BUILD_ENVIRONMENT == 'production'){
 	var https_opts = {
@@ -34,9 +35,21 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 
 	var secureServer = require('https').createServer(https_opts, app).listen( process.env.HTTPS_PORT || 8000);
 	var hostName = "https://www.gtcoursewatch.us";
-	var mailerEmail = "gtcoursewatch.mailer@gmail.com";
-	var mailerPass = fs.readFileSync("/home/ec2-user/gtcw_gmail_pass.txt").toString();
-	var myMailer = new Mailer(mailerEmail, mailerPass);
+	var email_service = 'ses';
+
+	if(email_service == 'gmail'){
+		var mailerEmail = "gtcoursewatch.mailer@gmail.com";
+		var mailerPass = fs.readFileSync("/home/ec2-user/gtcw_gmail_pass.txt").toString();
+		var myMailer = new Mailer(mailerEmail, { 	service:'gmail', 
+													pass:mailerPass });
+	}else if(email_service == 'ses'){
+		var mailerEmail = "admin@gtcoursewatch.us";
+		var ses_creds = JSON.parse( fs.readFileSync('/home/ec2-user/ses_config.json') );
+
+		var myMailer = new Mailer(mailerEmail, {service: 'ses', 
+												id: ses_creds.accessKeyID,
+												sekret: ses_creds.accessKeySecret});
+	}
 
 	registerPartials();
 }else{
