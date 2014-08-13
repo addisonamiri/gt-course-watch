@@ -1,6 +1,5 @@
 var nodemailer = require('nodemailer');
 
-
 //for gmail, opts={service:'gmail', pass:'pass'}
 //for ses, opts={service:'ses', id:'id', sekret: 'secret'}
 function Mailer(email, opts){
@@ -23,7 +22,7 @@ function Mailer(email, opts){
 			});
 			break;
 		default:
-			break
+			break;
 	}
 }
 
@@ -33,19 +32,17 @@ Mailer.prototype.sendGenericMail = function(email, subj, msg){
 	    from: "GT Course Watch Mailer ✔ <"+ this.emailID +">", // sender address
 	    to: email, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
 	    subject: subj, // Subject line
-	    text: msg, // plaintext body
+	    text: msg // plaintext body
 	    // html: "<b>Hello world ✔</b>" // html body
 	}
 
 	// send mail with defined transport object
 	this.smtpTransport.sendMail(mailOptions, function(error, response){
-	    if(error){
-	        console.log(error);
-	    }
+	    if(error) console.log(error);
 	});		
 }
 
-Mailer.prototype.sendEmailVerification = function(email, link){
+Mailer.prototype.sendEmailVerification = function(email, link) {
 	var htmlBody = "<h1>Click the Link to Complete Verification </h1> <br> " +
 	    	'<a href="' + link + '"> Verification Link </a>';
 
@@ -57,11 +54,9 @@ Mailer.prototype.sendEmailVerification = function(email, link){
 	}
 
 	// send mail with defined transport object
-	this.smtpTransport.sendMail(mailOptions, function(error, response){
-	    if(error){
-	        console.log(error);
-	    }
-	});		
+	this.smtpTransport.sendMail(mailOptions, function(error, response) {
+	    if(error) console.log(error);
+	});
 }
 
 Mailer.prototype.sendPassChangeVerification = function(email, link){
@@ -77,13 +72,9 @@ Mailer.prototype.sendPassChangeVerification = function(email, link){
 
 	// send mail with defined transport object
 	this.smtpTransport.sendMail(mailOptions, function(error, response){
-	    if(error){
-	        console.log(error);
-	    }
+	    if(error) console.log(error);
 	});		
 }
-
-
 
 Mailer.prototype.sendNotificationMail = function(existingRequest, smsRequest){
 
@@ -99,13 +90,7 @@ Mailer.prototype.sendNotificationMail = function(existingRequest, smsRequest){
 
 	// send mail with defined transport object
 	this.smtpTransport.sendMail(mailOptions, function(error, response){
-	    if(error){
-	        console.log(error);
-	    }
-	    else{
-	    	// console.log('email sent');
-	        // console.log("Message sent: " + response.message);
-	    }
+	    if(error) console.log(error);
 
 	    // if you don't want to use this transport object anymore, uncomment following line
 	    //smtpTransport.close(); // shut down the connection pool, no more messages
@@ -123,13 +108,8 @@ Mailer.prototype.sendNotificationMail = function(existingRequest, smsRequest){
 		}
 
 		this.smtpTransport.sendMail(smsMailOptions, function(error, response){
-		    if(error){
-		        console.log(error);
-		    }else{
-		    	// console.log("texted");
-		    }
+		    if(error) console.log(error);
 		});
-
 
 	}
 
@@ -148,9 +128,7 @@ Mailer.prototype.sendAutoRegSuccessMail = function(existingRequest){
 
 	// send mail with defined transport object
 	this.smtpTransport.sendMail(mailOptions, function(error, response){
-	    if(error){
-	        console.log(error);
-	    }
+	    if(error) console.log(error);
 	});	
 }
 
@@ -174,35 +152,28 @@ Mailer.prototype.sendConfirmationMail = function sendConfirmationMail(requestEma
 
 	// send mail with defined transport object
 	this.smtpTransport.sendMail(mailOptions, function(error, response){
-	    if(error){
-	        console.log(error);
-	    }
+	    if(error) console.log(error);
 	});
 }
 
 Mailer.prototype.contactMailJob = function(email, name, msg){
-
-	    var bodyText="Name: " + name + 
-	    "\nEmail: " + email + 
-	    "\n\nMessage: " + msg;
+    var bodyText="Name: " + name + 
+    "\nEmail: " + email + 
+    "\n\nMessage: " + msg;
 
 	// setup e-mail data with unicode symbols
 	var mailOptions = {
 //	    from: "GT Course Watch Mailer ✔ <tofubeast1111@gmail.com>", // sender address
 	    from: "CONTACT MESSAGE <" + this.emailID + ">", // sender address
-	    to: this.emailID, // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
+	    to: 'gtcoursewatch.mailer@gmail.com', // list of receivers: "bar@blurdybloop.com, baz@blurdybloop.com"
 	    subject: "CONTACT MESSAGE FROM " + name, // Subject line
 	    text: bodyText, // plaintext body
 	}
 
 	// send mail with defined transport object
 	this.smtpTransport.sendMail(mailOptions, function(error, response){
-	    if(error){
-	        console.log(error);
-	    }
+	    if(error) console.log(error);
 	});
-
-
 }
 
 module.exports = Mailer;
