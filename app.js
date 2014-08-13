@@ -22,7 +22,7 @@ username and email are synonymous through this application
 // scp -i GTCW.pem /Users/vikram/amazon_ec2/gtcw_gmail_pass.txt ec2-user@54.204.32.244:/home/ec2-user
 
 
-if(process.env.BUILD_ENVIRONMENT == 'production'){
+if(process.env.BUILD_ENVIRONMENT == 'production') {
 	var https_opts = {
 		key: fs.readFileSync("/home/ec2-user/ssl_key.pem"),
 		cert: fs.readFileSync("/home/ec2-user/certs/www_gtcoursewatch_us.crt"),
@@ -37,12 +37,12 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 	var hostName = "https://www.gtcoursewatch.us";
 	var email_service = 'ses';
 
-	if(email_service == 'gmail'){
+	if(email_service == 'gmail') {
 		var mailerEmail = "gtcoursewatch.mailer@gmail.com";
 		var mailerPass = fs.readFileSync("/home/ec2-user/gtcw_gmail_pass.txt").toString();
-		var myMailer = new Mailer(mailerEmail, { 	service:'gmail', 
-													pass:mailerPass });
-	}else if(email_service == 'ses'){
+		var myMailer = new Mailer(mailerEmail, {service:'gmail', 
+												pass:mailerPass });
+	} else if(email_service == 'ses') {
 		var mailerEmail = "admin@gtcoursewatch.us";
 		var ses_creds = JSON.parse( fs.readFileSync('/home/ec2-user/ses_config.json') );
 
@@ -52,7 +52,7 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 	}
 
 	registerPartials();
-}else{
+}else {
 	var https_opts = {
 		key: fs.readFileSync("/Users/vikram/amazon_ec2/ssl_key.pem"),
 		cert: fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_ssl_certs/www_gtcoursewatch_us.crt"),
@@ -76,7 +76,7 @@ if(process.env.BUILD_ENVIRONMENT == 'production'){
 io.listen(secureServer);
 
 //Ensure partial registration on startup
-(function(){
+(function() {
 	var partials_path = "./views/partials";
 	var partial_files = fs.readdirSync(partials_path);
 
