@@ -57,7 +57,6 @@
 </h5>
 {{/if}}
 
-
 <div id="autoRegVerificationStatus">
 	<div id="autoRegBuzzCheck" style="display:none">
 		<i class="glyphicon glyphicon-ok" style="color:green;"></i> BuzzPort Verified!
@@ -67,31 +66,35 @@
 	</div>
 </div>
 
-<!-- <a href="#buzz_verify_modal" data-toggle="modal" class="btn btn-primary">Verify BuzzPort Credentials</a> -->
+<div class="row">
+	<div class="col-md-6">
+		<div class="form-group">
+			<input type="text" id="buzzport_id" class="form-control" placeholder="Buzzport Username">
+			<input type="password" id="buzzport_pass" class="form-control" placeholder="Buzzport Password">
+			<input type="button" id="buzz_verify_sub" class="btn btn-warning" value="Verify BuzzPort">
+		</div>
+	</div>
 
-<div class="form-group">
-	<input type="text" id="buzzport_id" class="form-control" placeholder="Buzzport Username">
-	<input type="password" id="buzzport_pass" class="form-control" placeholder="Buzzport Password">
-	<input type="button" id="buzz_verify_sub" class="btn btn-warning" value="Verify BuzzPort">
-</div>
+	<div class="col-md-6">
+		<div id="auto-reg-classinfo">
+			<input id="buzzport_crn" type="text" class="form-control" placeholder="CRN">
 
-<div id="auto-reg-classinfo">
-	<input id="buzzport_crn" type="text" class="form-control" placeholder="CRN">
+			<select id="buzzport_term" class="form-control">
+				{{#if fallLabel}}
+				<option value="{{fall}}">{{fallLabel}}</option>
+				{{/if}}
+				{{#if springLabel}}
+				<option value="{{spring}}">{{springLabel}}</option>
+				{{/if}}
+				{{#if summerLabel}}
+				<option value="{{summer}}">{{summerLabel}}</option>
+				{{/if}}
+			</select>
 
-	<select id="buzzport_term" class="form-control">
-		{{#if fallLabel}}
-		<option value="{{fall}}">{{fallLabel}}</option>
-		{{/if}}
-		{{#if springLabel}}
-		<option value="{{spring}}">{{springLabel}}</option>
-		{{/if}}
-		{{#if summerLabel}}
-		<option value="{{summer}}">{{summerLabel}}</option>
-		{{/if}}
-	</select>
-
-	<input id="autoVerifyCRN" type="button" class="btn btn-primary" value="Verify CRN">
-	<div id="autoRegSpinner"></div>
+			<input id="autoVerifyCRN" type="button" class="btn btn-primary" value="Verify CRN">
+			<div id="autoRegSpinner"></div>
+		</div>
+	</div>
 </div>
 
 <br>
