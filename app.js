@@ -3,7 +3,7 @@ var express = require('express'),
     server = require('http').createServer(app).listen(process.env.HTTP_PORT || 8080),
     io = require('socket.io').listen(server),
     hbs = require('hbs'),
-    fs = require('fs');
+    fs = require('fs'),
     ObjectId = require('mongoose').Types.ObjectId,
 
     MongoController = require('./MongoController.js'),
