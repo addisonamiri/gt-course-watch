@@ -158,14 +158,15 @@ app.get('/', function(req, res) {
   if(summerTerm) summerLabel = createLabel(summerTerm);
   if(fallTerm) fallLabel = createLabel(fallTerm);
 
-  res.render('index',{title:"GT CourseWatch", 
-            spring: springTerm,
-            summer: summerTerm,
-            fall: fallTerm,
-            springLabel: springLabel,
-            summerLabel: summerLabel,
-            fallLabel: fallLabel
-          });
+  res.render('index', {
+    title:"GT CourseWatch", 
+    spring: springTerm,
+    summer: summerTerm,
+    fall: fallTerm,
+    springLabel: springLabel,
+    summerLabel: summerLabel,
+    fallLabel: fallLabel
+  });
 });
 
 app.get('/about', function(req, res) {
