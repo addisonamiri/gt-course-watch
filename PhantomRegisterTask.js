@@ -29,7 +29,7 @@ page.onLoadFinished = function() {
   // console.log("load finished");
 };
 
-// page.onAlert = function(msg){
+// page.onAlert = function(msg) {
 //   console.log("Alert! - " + msg);
 // }
 
@@ -91,12 +91,12 @@ page.onResourceError = function(resourceError) {
 var steps = [
   function enterLogin(cb) {
     //Load Login Page
-    page.open("https://buzzport.gatech.edu/cp/home/displaylogin", function(){
-      var status = page.evaluate(function(){
-        if(document.title == "BuzzPort Login"){
+    page.open("https://buzzport.gatech.edu/cp/home/displaylogin", function() {
+      var status = page.evaluate(function() {
+        if(document.title == "BuzzPort Login") {
           document.getElementById('login_btn').click();
           return "success";
-        }else{
+        } else{
           //couldn't reach login entrance
           return "failure";
         }
@@ -109,12 +109,12 @@ var steps = [
     //Enter Credentials and login to buzzport
     
     var status = page.evaluate(function(username, password) {
-      if(document.title=="GT | GT Login"){
+      if(document.title=="GT | GT Login") {
         document.getElementById("username").value = username;
         document.getElementById("password").value = password;
         document.getElementsByClassName("btn-submit")[0].click();
         return "success";      
-      }else{
+      } else{
         //haven't loaded GT login page yet, so 
         return "failure";
       }
@@ -127,17 +127,17 @@ var steps = [
     // Buzzport page.
     // page.getPage("https://oscar.gatech.edu/pls/bprod/bwskfreg.P_AltPin");
     var status = page.evaluate(function() {
-      if(document.title=="BuzzPort"){
+      if(document.title=="BuzzPort") {
         //confirm login, forward to OSCAR
         console.log("Inside Buzzport");
         // var btn=document.createElement("BUTTON");
-        // btn.onclick = function(){window.location = "https://oscar.gatech.edu/pls/bprod/bwskfreg.P_AltPin";}
+        // btn.onclick = function() {window.location = "https://oscar.gatech.edu/pls/bprod/bwskfreg.P_AltPin";}
         // btn.click();
         var links = document.links;
 
-        for(var i in links){
+        for(var i in links) {
           // console.log(links[i].textContent);
-          if(links[i].textContent == "Registration - OSCAR "){
+          if(links[i].textContent == "Registration - OSCAR ") {
             var link = links[i];
             var event = document.createEvent('MouseEvents');
             event.initMouseEvent( 'click', true, true, window, 1, 0, 0 );
@@ -153,8 +153,8 @@ var steps = [
 
     cb(status);
   },
-  function enterStudentServices(cb){
-    page.open("https://oscar.gatech.edu/pls/bprod/bwskfreg.P_AltPin", function(){
+  function enterStudentServices(cb) {
+    page.open("https://oscar.gatech.edu/pls/bprod/bwskfreg.P_AltPin", function() {
       // console.log("Student Svcs status: " + status);
 
       // if ( status !== 'success' ) {
@@ -168,9 +168,9 @@ var steps = [
       //     phantom.exit( 0 );
       // }
 
-      var status = page.evaluate(function(term){
+      var status = page.evaluate(function(term) {
 
-        if(document.title == "Select Term"){
+        if(document.title == "Select Term") {
           console.log("on select term page");
 
           var submitBtn = document.querySelector('input[value=Submit][type=submit]');
@@ -180,8 +180,8 @@ var steps = [
           termText = term.replace('-', ' ');
           console.log("term text:"+termText);
 
-          for(var i in selectorOpts){
-            if(selectorOpts[i].text == termText){
+          for(var i in selectorOpts) {
+            if(selectorOpts[i].text == termText) {
               selector.value = selectorOpts[i].value;
               submitBtn.click();
               console.log("button click");
@@ -199,14 +199,14 @@ var steps = [
     });
 
   },
-  function enterRegistration(cb){
+  function enterRegistration(cb) {
     var status = page.evaluate(function(crnInput) {
-      if(document.title=="Add/Drop Classes:"){
+      if(document.title=="Add/Drop Classes:") {
         //confirm login, forward to OSCAR
         console.log("Inside Registration Page");
         // console.log("Crn Input:" + crnInput);
 
-        if(document.querySelector('span.infotext').innerHTML.indexOf("You have no Registration Time") > -1){
+        if(document.querySelector('span.infotext').innerHTML.indexOf("You have no Registration Time") > -1) {
           console.log("Don't have a time ticket for your term.");
           return "INVALID_TERM_ERROR";
         }
@@ -224,13 +224,13 @@ var steps = [
 
     cb(status);
   },
-  function confirmRegistration(cb){
+  function confirmRegistration(cb) {
     // page.render("buzzporter.jpeg", {format: 'jpeg', quality:'100'});
     console.log("Verifying Registration...");
 
     var status = page.evaluate(function(crnInput) {
 
-      if(document.querySelector('.errortext') != null){
+      if(document.querySelector('.errortext') != null) {
           console.log("Detected : Buzzport registration error.");
           //could maybe return something else to signal we detected an error
           return "REGISTRATION_ERROR";
@@ -238,8 +238,8 @@ var steps = [
 
       var crnsOnPage = document.getElementsByName('CRN_IN');
 
-      for(var i in crnsOnPage){
-        if(crnsOnPage[i].value == crnInput){
+      for(var i in crnsOnPage) {
+        if(crnsOnPage[i].value == crnInput) {
           console.log("Registration Verified and Complete");
           return "success";
         } 
@@ -256,17 +256,17 @@ setInterval(function() {
 
   if (!loadInProgress && typeof steps[stepIndex] == "function") {
 
-    steps[stepIndex](function(status){
-      if(status=="success"){
+    steps[stepIndex](function(status) {
+      if(status=="success") {
         stepIndex++;
         retrys = 0;
-      }else if(status == "REGISTRATION_ERROR" || status=="INVALID_TERM_ERROR"){
+      } else if(status == "REGISTRATION_ERROR" || status=="INVALID_TERM_ERROR") {
         console.log(status);
         phantom.exit();
       }
       else{
         retrys = retrys + 1;
-        if(retrys > maxRetrys){
+        if(retrys > maxRetrys) {
           //task failure condition
           console.log("FAILURE");
           phantom.exit();
