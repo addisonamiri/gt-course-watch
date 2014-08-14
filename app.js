@@ -25,7 +25,7 @@ username and email are synonymous through this application
 var mongoConnectionUrl = 'mongodb://localhost/gtcw',
     THROTTLE_DELAY_SECS = 8,
     PHANTOM_EVENTLOOP_DELAY_MS = 2000,
-    prod_email_service = 'ses';
+    PROD_EMAIL_SERVICE = 'ses';
 
 //*CONSTANTS
 var millisInSecond = 1000,
@@ -47,18 +47,20 @@ if(process.env.BUILD_ENVIRONMENT == 'production') {
   var secureServer = require('https').createServer(https_opts, app).listen( process.env.HTTPS_PORT || 8000);
   var hostName = "https://www.gtcoursewatch.us";
 
-  if(prod_email_service == 'gmail') {
+  if(PROD_EMAIL_SERVICE == 'gmail') {
     var mailerEmail = "gtcoursewatch.mailer@gmail.com";
     var mailerPass = fs.readFileSync("/home/ec2-user/gtcw_gmail_pass.txt").toString();
-    var myMailer = new Mailer(mailerEmail, {service:'gmail', 
-                        pass:mailerPass });
-  } else if(prod_email_service == 'ses') {
+    var myMailer = new Mailer(mailerEmail, 
+      { service: 'gmail', 
+        pass: mailerPass });
+  } else if(PROD_EMAIL_SERVICE == 'ses') {
     var mailerEmail = "admin@gtcoursewatch.us";
     var ses_creds = JSON.parse( fs.readFileSync('/home/ec2-user/ses_config.json') );
 
-    var myMailer = new Mailer(mailerEmail, {service: 'ses', 
-                        id: ses_creds.accessKeyID,
-                        sekret: ses_creds.accessKeySecret});
+    var myMailer = new Mailer(mailerEmail, 
+      { service: 'ses', 
+        id: ses_creds.accessKeyID,
+        sekret: ses_creds.accessKeySecret });
   }
 
   registerPartials();
@@ -77,7 +79,9 @@ if(process.env.BUILD_ENVIRONMENT == 'production') {
   var hostName = "http://localhost:8080";
   var mailerEmail = "gtcoursewatch.mailer@gmail.com";
   var mailerPass = fs.readFileSync("/Users/vikram/amazon_ec2/gtcw_gmail_pass.txt").toString();
-  var myMailer = new Mailer(mailerEmail, mailerPass);
+  var myMailer = new Mailer(mailerEmail, 
+    { service: 'gmail', 
+      pass: mailerPass });
 
   //keep reloading partials
   setInterval(registerPartials, 1000);
@@ -159,7 +163,7 @@ app.get('/', function(req, res) {
   if(fallTerm) fallLabel = createLabel(fallTerm);
 
   res.render('index', {
-    title:"GT CourseWatch", 
+    title: 'GT CourseWatch', 
     spring: springTerm,
     summer: summerTerm,
     fall: fallTerm,
@@ -802,17 +806,17 @@ function checkAuth(req, res, next) {
 
 //periodically access unused sessions so that they are expired by Express.
 function sessionCleanup() {
-    sessionStore.all(function(err, sessions) {
-        for (var i = 0; i < sessions.length; i++) {
-            sessionStore.get(sessions[i], function() {} );
-        }
-    });
+  sessionStore.all(function(err, sessions) {
+    for (var i = 0; i < sessions.length; i++) {
+      sessionStore.get(sessions[i], function() {} );
+    }
+  });
 }
 
 function generateUUID() {
   return   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-      return v.toString(16);
+    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+    return v.toString(16);
   });
 }
 
