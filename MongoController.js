@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
-  Schema = mongoose.Schema,
-  bcrypt = require('bcrypt');
+    Schema = mongoose.Schema,
+    bcrypt = require('bcrypt');
 
 //
 // MONGO SETUP
@@ -11,8 +11,8 @@ function MongoController(url) {
 
   mongoose.connect(connectionURL);
 
-  this.myDB = mongoose.connection;
-  this.myDB.on('error', console.error.bind(console, 'connection error'));
+  this._myDB = mongoose.connection;
+  this._myDB.on('error', console.error.bind(console, 'connection error'));
 
   //investigate why closure with _this wont work..
   this.requestSchema = mongoose.Schema({
@@ -66,7 +66,7 @@ function MongoController(url) {
   this.successStat = mongoose.model('successStat', this.successStatSchema);
   this.user = mongoose.model('user', this.userSchema);
 
-  this.myDB.once('open', function() {
+  this._myDB.once('open', function() {
     console.log('db successfully opened');
   });
 }

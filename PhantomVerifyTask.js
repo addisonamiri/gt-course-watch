@@ -84,9 +84,7 @@ var steps = [
 ];
 
 setInterval(function() {
-
   if (!loadInProgress && typeof steps[stepIndex] == "function") {
-
     steps[stepIndex](function(status) {
       if(status=="success") {
         stepIndex++;

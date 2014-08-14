@@ -1,5 +1,5 @@
-var https = require('https');
-var cheerio = require('cheerio');
+var https = require('https'),
+    cheerio = require('cheerio');
 
 function Poller(mongoController, mailer, basePath, term, dispatcher) {
   this.mongoController = mongoController;

@@ -692,7 +692,7 @@ function initPollers() {
     if(month == 0) year = pathComponents[1] = d.getFullYear();
     else year = pathComponents[1] = d.getFullYear()+1;
 
-    springTerm = 'spring'+ year.toString();
+    springTerm = 'spring' + year.toString();
     pathComponents[2] = '02';
     var springBasePath = pathComponents.join('');
     console.log(springBasePath);

@@ -1,14 +1,14 @@
 var exec = require('child_process').exec;
 
 var verifyJobsQueue = [], //each index holds an obj {request, callbackFunc}
-  registrationJobsQueue = [], //each index just holds a requuest obj from db
-  jobInProgress = false,
-  numConcurrentJobs = 0,
-  maxConcurrentJobs = 8,
-  eventLoopInterval;
+    registrationJobsQueue = [], //each index just holds a requust obj from db
+    jobInProgress = false,
+    numConcurrentJobs = 0,
+    maxConcurrentJobs = 8,
+    eventLoopInterval;
 
 function PhantomJobDispatcher(mailer, mongoController, throttle) {
-     this.throttle = typeof throttle !== 'undefined' ? throttle : false;
+  this.throttle = typeof throttle !== 'undefined' ? throttle : false;
   this.mailer = mailer;
   this.mongoController = mongoController;
 }
