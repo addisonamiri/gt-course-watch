@@ -88,7 +88,7 @@ io.listen(secureServer);
 //Ensure partial registration on startup
 (function() {
   var partials_path = "./views/partials";
-  var partial_files = fs.readdirSync(partials_path);
+      partial_files = fs.readdirSync(partials_path);
 
   partial_files.forEach(function(partial) {
     var matches = /^([^.]+).hbs.html$/.exec(partial);
@@ -291,8 +291,8 @@ app.get('/getNumWatchers/:crn', function(req, res) {
 app.get('/getStats/:crn/:term', function(req, res) {
   myMongoController.Request.find({crn:req.params.crn}, function(err, requests) {
     myMongoController.smsRequest.find({crn:req.params.crn}, function(err, smsRequests) {
-      var pollers = getActivePollers();
-      var termPoller;
+      var pollers = getActivePollers(),
+          termPoller;
 
       pollers.forEach(function(poller) {
         if(poller.term == req.params.term) termPoller = poller;
@@ -314,8 +314,8 @@ app.get('/getStats/:crn/:term', function(req, res) {
 
 //verify a CRN on request forms
 app.get('/verifyCRN/:crn/:term', function(req, res) {
-  var pollers = getActivePollers();
-  var termPoller;
+  var pollers = getActivePollers(),
+      termPoller;
 
   pollers.forEach(function(poller) {
     if(poller.term==req.params.term) termPoller = poller;
@@ -383,7 +383,7 @@ app.post('/create_account', function(req, res) {
 //endpoint used to confirm validation of an email account
 app.get('/verifyEmail', function(req, res) {
   var email = req.query.email,
-    uuid = req.query.uuid;
+      uuid = req.query.uuid;
 
   myMongoController.userAccessor(email, function(user_arr) {
     var user = user_arr[0];
@@ -449,8 +449,8 @@ app.get('/my_account', checkAuth, function(req, res) {
 //endpoint to change a password from account settings.
 app.post('/change_password', checkAuth, function(req, res) {
   var post = req.body,
-    password = post.password,
-    password_conf = post.password_conf;
+      password = post.password,
+      password_conf = post.password_conf;
 
   if(password != password_conf) {
     req.session.danger_flash = "Passwords did not match!";
@@ -491,7 +491,7 @@ app.post('/request_pass_change', function(req, res) {
 //render change password form ONLY if the email and UUID from the URL match a user in the DB
 app.get('/verify_pass_change', function(req, res) {
   var email = req.query.email,
-    uuid = req.query.uuid;
+      uuid = req.query.uuid;
 
   myMongoController.userAccessor(email, function(user_arr) {
     var user = user_arr[0];
@@ -513,9 +513,9 @@ app.get('/verify_pass_change', function(req, res) {
 // POST request to our endpoint with email and password params to change
 app.post('/change_forgotten_password', function(req, res) {
   var post = req.body,
-    password = post.password,
-    password_conf = post.password_conf,
-    email = post.email;
+      password = post.password,
+      password_conf = post.password_conf,
+      email = post.email;
 
   if(password != password_conf) {
     req.session.danger_flash = "Passwords did not match!";
@@ -545,9 +545,9 @@ app.post('/change_forgotten_password', function(req, res) {
 app.get('/my_requests', checkAuth, function(req, res) {
   myMongoController.userAccessor(req.session.username, function(user_arr) {
     var user = user_arr[0],
-      reg_reqs,
-      sms_reqs,
-      auto_reqs;
+        reg_reqs,
+        sms_reqs,
+        auto_reqs;
 
     find_reqs(user.reg_reqs, myMongoController.Request, function(result) {
       reg_reqs = result;
@@ -588,10 +588,10 @@ app.get('/my_requests', checkAuth, function(req, res) {
     }
 
     function find_reqs(collection, model, next) {
-      var result = [];
-      var collection = collection;
-      var model = model;
-      var requests_remaining = collection.length;
+      var result = [],
+          collection = collection,
+          model = model,
+          requests_remaining = collection.length;
 
       if( requests_remaining > 0) {
         collection.forEach(function(id) {
@@ -617,8 +617,8 @@ app.get('/my_requests', checkAuth, function(req, res) {
 //endpoint that handles request cancellations
 app.get('/cancel_req/:type/:id', checkAuth, function(req, res) {
   var id = req.params.id,
-    type = req.params.type,
-    username = req.session.username;
+      type = req.params.type,
+      username = req.session.username;
 
   switch(type) {
     case "EMAIL":
@@ -677,72 +677,94 @@ function socketHandler(socket) {
 
 //figure out what terms are open presently and initalize pollers for them.
 function initPollers() {
-  var d =  new Date();
   var pathComponents= ['/pls/bprod/bwckschd.p_disp_detail_sched?term_in=','4digityear','2digitmonth','&crn_in='];
-  var month = d.getMonth();
-  var year; //can't initalize due to spring edge cases
-  var atLeastOnePoller = false;
 
-  console.log('init pollers, for date:' + d );
+  initSpringPoller(pathComponents);
+  initSummerPoller(pathComponents);
+  initFallPoller(pathComponents);
 
-  if(month>=9 || month<=0) {
-    //spring registration
-    fallTerm = summerTerm = null;
+  current_pollers = { spring: springPoller, 
+                      summer:summerPoller, 
+                      fall:fallPoller };
 
-    if(month == 0) year = pathComponents[1] = d.getFullYear();
-    else year = pathComponents[1] = d.getFullYear()+1;
+  //hibernation months, accept or process no requests,
+  //no labels for term selection either
+  if( !getNumPollers() ) {
+    rejectRequests = true;
+  }else{
+    rejectRequests = false;
+  }
+}
 
+//spring registration poller
+function initSpringPoller(pathComponents) {
+  var d = new Date();
+      month = d.getMonth(),
+      year = (month == 0 ? d.getFullYear() : d.getFullYear() + 1), 
+      pathComponents[1] = year;
+
+  if( isSpring(month) ) {
     springTerm = 'spring' + year.toString();
     pathComponents[2] = '02';
     var springBasePath = pathComponents.join('');
-    console.log(springBasePath);
     springPoller = new Poller(myMongoController, myMailer, springBasePath, springTerm, myDispatcher);
-
-    summerPoller = fallPoller = summerTerm = fallTerm = null;
-    atLeastOnePoller = true;
-  } else if(month>=2) {
-    //summer and fall
-    year = pathComponents[1] = d.getFullYear();
-
-    //summer check
-    if(month <= 5) {
-      summerTerm = 'summer' + year.toString();
-      pathComponents[2] = '05';
-      var summerBasePath = pathComponents.join('');
-      summerPoller = new Poller(myMongoController, myMailer, summerBasePath, summerTerm, myDispatcher);
-      atLeastOnePoller = true;
-    } else{
-      summerTerm = summerPoller = null;
-    }
-
-    //fall check
-    if(month <=8) {
-      fallTerm = 'fall' + year.toString();
-      pathComponents[2] = '08';
-      var fallBasePath = pathComponents.join('');
-      fallPoller = new Poller(myMongoController, myMailer, fallBasePath, fallTerm, myDispatcher);
-      atLeastOnePoller = true;
-    } else{
-      fallTerm = fallPoller = null;
-    }
-
+  }else {
     springPoller = springTerm = null;
-  } else if(!atLeastOnePoller) {
-    //hibernation months, accept or process no requests, no labels for term selection either
-    rejectRequests = true;
-    springPoller = fallPoller = summerPoller = springTerm =
-    summerTerm = fallTerm = null;
   }
+}
 
-  if(atLeastOnePoller) rejectRequests = false;
+function initSummerPoller(pathComponents) {
+  var d = new Date();
+      month = d.getMonth(),
+      year = d.getFullYear(),
+      pathComponents[1] = year;
 
-  current_pollers = {spring:springPoller, summer:summerPoller, fall:fallPoller};
+  if ( isSummer(month) ) {
+    summerTerm = 'summer' + year.toString();
+    pathComponents[2] = '05';
+    var summerBasePath = pathComponents.join('');
+    summerPoller = new Poller(myMongoController, myMailer, summerBasePath, summerTerm, myDispatcher);
+  }else {
+    summerTerm = summerPoller = null;    
+  }
+}
+
+function initFallPoller(pathComponents) {
+  var d = new Date();
+      month = d.getMonth(),
+      year = d.getFullYear(),
+      pathComponents[1] = year;
+
+  if ( isFall(month) ) {
+    fallTerm = 'fall' + year.toString();
+    pathComponents[2] = '08';
+    var fallBasePath = pathComponents.join('');
+    fallPoller = new Poller(myMongoController, myMailer, fallBasePath, fallTerm, myDispatcher);
+  }else {
+    fallTerm = fallPoller = null;
+  }
+}
+
+function isSpring(month) {
+  return month >= 9 || month <= 0;
+}
+
+function isFall(month) {
+  return month >= 2 && month <= 8;
+}
+
+function isSummer(month) {
+  return month >= 2 && month <= 5;
+}
+
+function getNumPollers() {
+  return getActivePollers().length;
 }
 
 //register partials
 function registerPartials() {
-  var partials_path = "./views/partials";
-  var partial_files = fs.readdirSync(partials_path);
+  var partials_path = "./views/partials",
+      partial_files = fs.readdirSync(partials_path);
 
   partial_files.forEach(function(partial) {
     var matches = /^([^.]+).hbs.html$/.exec(partial);
@@ -806,10 +828,11 @@ function generateEmailPassChangeURL(email, uuid) {
 
 //Semi-alias for create createLabel method, although different implementation..
 function format_watch_req(term) {
-  var year_idx = term.indexOf(2);
-  var season = term.slice(0,year_idx);
-  var year = term.slice(year_idx);
-  var capitalizedSeason = season.charAt(0).toUpperCase() + season.slice(1);
+  var year_idx = term.indexOf(2),
+      season = term.slice(0,year_idx),
+      year = term.slice(year_idx),
+
+  capitalizedSeason = season.charAt(0).toUpperCase() + season.slice(1);
   return capitalizedSeason + " " + year;
 }
 
@@ -819,9 +842,10 @@ function format_auto_req(term) {
 
 //create labels for front-end term selectors
 function createLabel(term) {
-  var length = term.length;
-  var year = term.slice(length-4,length);
-  var season = term.slice(0,length-4);
+  var length = term.length,
+      year = term.slice(length-4,length),
+      season = term.slice(0,length-4);
+  
   season = capitalizeFirstLetter(season);
   return season + " " + year;
 }
@@ -837,7 +861,7 @@ function isEmail(email) {
 
 //*SCHEDULED JOBS
 
-//re-init pollers every day in the event of new term
+//Daily Tasks
 setInterval(function() {
   initPollers();
   myMongoController.cleanExpiredReqs();
