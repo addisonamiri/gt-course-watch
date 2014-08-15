@@ -74,14 +74,11 @@ Poller.prototype.pollAllSeats = function () {
   var _this = this;
 
   //need to adjust term for auto reg reqs
-  var indexOf2 = _this.term.indexOf('2');
-  var adjustedTerm = _this.term.slice(0, indexOf2) + "-" + _this.term.slice(indexOf2);
+  var indexOf2 = this.term.indexOf('2');
+  var adjustedTerm = this.term.slice(0, indexOf2) + "-" + this.term.slice(indexOf2);
   adjustedTerm = adjustedTerm.charAt(0).toUpperCase() + adjustedTerm.slice(1);
 
-  //a hash of "crn" => [requests...]
-  var aggregatedReqs = {};
-
-  aggregateInOrder(function() {      
+  aggregateInOrder(function(aggregatedReqs) {      
     for (var crn in aggregatedReqs) {
       _this.getSeatStats(crn, function(crn, result) {
         if(result.hasOwnProperty("remaining") && result["remaining"] > 0) {
@@ -103,6 +100,9 @@ Poller.prototype.pollAllSeats = function () {
 
 
   function aggregateInOrder(cb) {
+    //a hash of "crn" => [requests...]
+    var aggregatedReqs = {};
+
     //auto regs must be handled before unpaid reqs for aggregation to work!  
     //aggregate paid automated reqs first to give them priority
     _this.mongoController.autoRegReq.find({term:adjustedTerm}, function(err, requestPool) {
@@ -117,7 +117,7 @@ Poller.prototype.pollAllSeats = function () {
           if(err) console.log(err);
           aggregateRequests(aggregatedReqs, requestPool);
 
-          cb();
+          cb(aggregatedReqs);
         });
       });
     });
