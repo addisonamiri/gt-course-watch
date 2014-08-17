@@ -371,6 +371,10 @@ app.post('/create_account', function(req, res) {
         req.session.danger_flash = "That e-mail address has already been taken"
         res.redirect('back');
       } else{
+        if(user_arr.length > 0 && !user_arr[0].activated){
+          user_arr[0].remove();
+        }
+
         var uuid=generateUUID(),
           emailLink = generateEmailVerificationURL(email, uuid);
 
