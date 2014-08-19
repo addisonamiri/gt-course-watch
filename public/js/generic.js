@@ -653,6 +653,7 @@ $(document).ready(function() {
         if(data && data.remaining == undefined) {
           alert("Your crn couldn't be found on BuzzPort.");
           // spinner.stop();
+          NProgress.done();
           return;
         }
         NProgress.done();
