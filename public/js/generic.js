@@ -151,7 +151,8 @@ $(document).ready(function() {
     }
 
     var target = document.getElementById('autoRegSpinner');
-    var spinner = new Spinner(opts).spin(target);
+    // var spinner = new Spinner(opts).spin(target);
+    NProgress.start();
 
     verifyCRN(iCRN, iTerm, function(result) {
       if(result) {
@@ -166,7 +167,8 @@ $(document).ready(function() {
       } else{
         alert("Your crn couldn't be verified.")
       }
-      spinner.stop();
+      NProgress.done();
+      // spinner.stop();
     });
 
   });
@@ -203,7 +205,11 @@ $(document).ready(function() {
     }
 
     var target = document.getElementById('watchSpinner');
-    var spinner = new Spinner(opts).spin(target);
+    // var spinner = new Spinner(opts).spin(target);
+    NProgress.start();
+    // setInterval(function(){
+    //   NProgress.inc(0.2);
+    // }, 50)
 
     verifyCRN(iCRN, iTerm, function(result) {
       if(result) {
@@ -215,7 +221,8 @@ $(document).ready(function() {
       } else{
         alert("Your crn couldn't be verified.")
       }
-      spinner.stop();
+      // spinner.stop();
+      NProgress.done();
     });
 
   });
@@ -632,7 +639,8 @@ $(document).ready(function() {
     };
 
     var target = document.getElementById('classStatsSpinner');
-    var spinner = new Spinner(opts).spin(target);
+    // var spinner = new Spinner(opts).spin(target);
+    NProgress.start();
 
     var remainingPieChart;
     var takenPieChart;
@@ -644,11 +652,11 @@ $(document).ready(function() {
       success: function(data) {
         if(data && data.remaining == undefined) {
           alert("Your crn couldn't be found on BuzzPort.");
-          spinner.stop();
+          // spinner.stop();
           return;
         }
-
-        spinner.stop();      
+        NProgress.done();
+        // spinner.stop();      
 
         //dom manipulation to display returned data
         $('#class_stats_div').html("<h5> Stats for CRN: " + crn + "</h5>");
