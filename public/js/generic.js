@@ -18,7 +18,7 @@ var submittedRequest = {
   "gatewayedInput" : null
 };
 
-NProgress.configure({parent: '#root_layout_container'});
+NProgress.configure({parent: '#nprogress_pos_container'});
 
 //live chat code.
 window.onload = function() {
