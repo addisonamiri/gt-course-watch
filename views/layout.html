@@ -56,7 +56,7 @@
       }(document, 'script', 'facebook-jssdk'));
     </script>
 
-    <div id="navContainer">
+    <div id="fixed-top-container">
       <div class="navbar navbar-default navbar-fixed-top">
         <div class="container">
 
@@ -109,104 +109,99 @@
 
       <div id="nprogress_pos_container" style="position: fixed;height: 2px;width: 100%;margin-top: -5px;"></div>
     </div>
+     
+    <div class="container">
+      <div id = "contact_alert" class="alert alert-danger">
+        <button type="button" class="close" data-hide="alert">&times;</button>
+        You didn't fully fill out the contact form.
+      </div>
 
-<!--     <div id="testContainer" style="margin: -8px 0px 0px 0px;">
-      <div id="top_padding_container" style="margin-top: 10px">
- -->        
-        <div class="container">
-          <div id = "contact_alert" class="alert alert-danger">
-            <button type="button" class="close" data-hide="alert">&times;</button>
-            You didn't fully fill out the contact form.
-          </div>
+      <div id = "email_alert" class="alert alert-danger">
+        <button type="button" class="close" data-hide="alert">&times;</button>
+        Invalid Email
+      </div>
+      <!-- <link href="/css/generic.css" rel="stylesheet"> -->
 
-          <div id = "email_alert" class="alert alert-danger">
-            <button type="button" class="close" data-hide="alert">&times;</button>
-            Invalid Email
-          </div>
-          <!-- <link href="/css/generic.css" rel="stylesheet"> -->
+      <div id = "buzzport_alert" class="alert alert-danger">
+        <button type="button" class="close" data-hide="alert">&times;</button>
+        Invalid BuzzPort Credentials
+      </div>
 
-          <div id = "buzzport_alert" class="alert alert-danger">
-            <button type="button" class="close" data-hide="alert">&times;</button>
-            Invalid BuzzPort Credentials
-          </div>
+      <div id = "crn_alert" class="alert alert-danger">
+        <button type="button" class="close" data-hide="alert">&times;</button>
+        Invalid CRN
+      </div>
 
-          <div id = "crn_alert" class="alert alert-danger">
-            <button type="button" class="close" data-hide="alert">&times;</button>
-            Invalid CRN
-          </div>
+      <div id = "phone_alert" class="alert alert-danger">
+        <button type="button" class="close" data-hide="alert">&times;</button>
+        Invalid Phone Number
+      </div>  
 
-          <div id = "phone_alert" class="alert alert-danger">
-            <button type="button" class="close" data-hide="alert">&times;</button>
-            Invalid Phone Number
-          </div>  
+      <div id = "duplicate_alert" class="alert alert-danger">
+        <button type="button" class="close" data-hide="alert">&times;</button>
+        Duplicate request, please do not flood the database
+      </div>  
 
-          <div id = "duplicate_alert" class="alert alert-danger">
-            <button type="button" class="close" data-hide="alert">&times;</button>
-            Duplicate request, please do not flood the database
-          </div>  
+      <div id = "verify_alert" class="alert alert-danger">
+        <button type="button" class="close" data-hide="alert">&times;</button>
+        Verify the required fields before proceeding
+      </div>  
 
-          <div id = "verify_alert" class="alert alert-danger">
-            <button type="button" class="close" data-hide="alert">&times;</button>
-            Verify the required fields before proceeding
-          </div>  
+      <div id = "success_alert" class="alert alert-success">
+        <button type="button" class="close" data-hide="alert">&times;</button>
+        Request submitted to server! You'll be emailed when a spot is open
+      </div>
 
-          <div id = "success_alert" class="alert alert-success">
-            <button type="button" class="close" data-hide="alert">&times;</button>
-            Request submitted to server! You'll be emailed when a spot is open
-          </div>
+      <div id = "wait_alert" class="alert alert-warning">
+        <button type="button" class="close" data-hide="alert">&times;</button>     
+        You need to wait the following number of second to do that: 
+      </div>
 
-          <div id = "wait_alert" class="alert alert-warning">
-            <button type="button" class="close" data-hide="alert">&times;</button>     
-            You need to wait the following number of second to do that: 
-          </div>
+      <div id = "username_alert" class="alert alert-danger">
+        <button type="button" class="close" data-hide="alert">&times;</button>  
+        Email can't be blank
+      </div>
 
-          <div id = "username_alert" class="alert alert-danger">
-            <button type="button" class="close" data-hide="alert">&times;</button>  
-            Email can't be blank
-          </div>
+      <div id = "pass_alert" class="alert alert-danger">
+        <button type="button" class="close" data-hide="alert">&times;</button>
+        Password can't be blank
+      </div>
 
-          <div id = "pass_alert" class="alert alert-danger">
-            <button type="button" class="close" data-hide="alert">&times;</button>
-            Password can't be blank
-          </div>
+      <div id = "invalid_alert" class="alert alert-danger">
+        <button type="button" class="close" data-hide="alert">&times;</button>
+        Invalid password/email combination
+      </div>
 
-          <div id = "invalid_alert" class="alert alert-danger">
-            <button type="button" class="close" data-hide="alert">&times;</button>
-            Invalid password/email combination
-          </div>
+      <div id = "link_sent_alert" class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Link request sent successfully.
+      </div>
 
-          <div id = "link_sent_alert" class="alert alert-success">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            Link request sent successfully.
-          </div>
+      {{#if success_flash}}
+        <div id = "success_flash_alert" class="alert alert-success flash_alert">
+          <button type="button" class="close" data-hide="alert">&times;</button>
+          {{success_flash}}
+        </div>
+      {{/if}}
 
-          {{#if success_flash}}
-            <div id = "success_flash_alert" class="alert alert-success flash_alert">
-              <button type="button" class="close" data-hide="alert">&times;</button>
-              {{success_flash}}
-            </div>
-          {{/if}}
+      {{#if danger_flash}}
+        <div id = "danger_flash_alert" class="alert alert-danger flash_alert">
+          <button type="button" class="close" data-hide="alert">&times;</button>
+          {{danger_flash}}
+        </div>
+      {{/if}}
 
-          {{#if danger_flash}}
-            <div id = "danger_flash_alert" class="alert alert-danger flash_alert">
-              <button type="button" class="close" data-hide="alert">&times;</button>
-              {{danger_flash}}
-            </div>
-          {{/if}}
+      {{#if warning_flash}}
+        <div id = "warning_flash_alert" class="alert alert-warning flash_alert">
+          <button type="button" class="close" data-hide="alert">&times;</button>
+          {{warning_flash}}
+        </div>
+      {{/if}}      
 
-          {{#if warning_flash}}
-            <div id = "warning_flash_alert" class="alert alert-warning flash_alert">
-              <button type="button" class="close" data-hide="alert">&times;</button>
-              {{warning_flash}}
-            </div>
-          {{/if}}      
+    	{{{body}}}
 
-        	{{{body}}}
+    </div> <!-- /container -->
 
-        </div> <!-- /container -->
-
-<!--       </div>
-    </div> -->
 
 
 <!--     <div class = "navbar navbar-inverse navbar-fixed-bottom">
