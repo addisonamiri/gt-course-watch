@@ -56,10 +56,11 @@
       }(document, 'script', 'facebook-jssdk'));
     </script>
 
-    <div class="navbar navbar-default navbar-fixed-top">
+    <div id="navContainer">
+      <div class="navbar navbar-default navbar-fixed-top">
         <div class="container">
 
-          <a  href='/'class="navbar-brand">
+          <a  href="/" class="navbar-brand">
             CourseWatch
           </a>
 
@@ -104,10 +105,14 @@
             </ul>
           </div><!--/.nav-collapse -->
         </div>
+      </div>
+
+      <div id="nprogress_pos_container" style="position: fixed;height: 2px;width: 100%;margin-top: -8px;"></div>
     </div>
 
-    <div id="nprogress_pos_container" style="margin: -8px 0px 0px 0px;">
+<!--     <div id="testContainer" style="margin: -8px 0px 0px 0px;">
       <div id="top_padding_container" style="margin-top: 10px">
+ -->        
         <div class="container">
           <div id = "contact_alert" class="alert alert-danger">
             <button type="button" class="close" data-hide="alert">&times;</button>
@@ -199,8 +204,10 @@
         	{{{body}}}
 
         </div> <!-- /container -->
-      </div>
-    </div>
+        
+<!--       </div>
+    </div> -->
+
 
 <!--     <div class = "navbar navbar-inverse navbar-fixed-bottom">
             <div class = "container">
