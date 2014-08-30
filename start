@@ -1,10 +1,14 @@
 export HTTP_PORT=8080
 export HTTPS_PORT=8000
+export HTTPS_ENABLED=true
 export BUILD_ENVIRONMENT=production
 
 # port remapping solution involving changing the routing table
 sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to $HTTP_PORT
-sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to $HTTPS_PORT
+
+if [ $HTTPS_ENABLED == 'true' ]; then
+  sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to $HTTPS_PORT
+fi
 
 sudo mkdir -p /data
 sudo chown $(whoami) /data # $() forks the script, runs the contents, and returns the output

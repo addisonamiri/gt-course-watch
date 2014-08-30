@@ -25,7 +25,8 @@ username and email are synonymous through this application
 var mongoConnectionUrl = 'mongodb://localhost/gtcw',
     THROTTLE_DELAY_SECS = 8,
     PHANTOM_EVENTLOOP_DELAY_MS = 2000,
-    PROD_EMAIL_SERVICE = 'ses';
+    PROD_EMAIL_SERVICE = 'ses',
+    HTTPS_ENABLED = (process.env.HTTPS_ENABLED == "true" ? true : false);
 
 //*CONSTANTS
 var millisInSecond = 1000,
@@ -34,18 +35,22 @@ var millisInSecond = 1000,
     millisInDay = millisInHour*24;
 
 if(process.env.BUILD_ENVIRONMENT == 'production') {
-  var https_opts = {
-    key: fs.readFileSync("/home/ec2-user/ssl_key.pem"),
-    cert: fs.readFileSync("/home/ec2-user/certs/www_gtcoursewatch_us.crt"),
-    ca: [
-      fs.readFileSync("/home/ec2-user/certs/AddTrustExternalCARoot.crt"),
-      fs.readFileSync("/home/ec2-user/certs/COMODORSAAddTrustCA.crt"),
-      fs.readFileSync("/home/ec2-user/certs/COMODORSADomainValidationSecureServerCA.crt")
-    ]
-  }
+  if(HTTPS_ENABLED){
+    var https_opts = {
+      key: fs.readFileSync("/home/ec2-user/ssl_key.pem"),
+      cert: fs.readFileSync("/home/ec2-user/certs/www_gtcoursewatch_us.crt"),
+      ca: [
+        fs.readFileSync("/home/ec2-user/certs/AddTrustExternalCARoot.crt"),
+        fs.readFileSync("/home/ec2-user/certs/COMODORSAAddTrustCA.crt"),
+        fs.readFileSync("/home/ec2-user/certs/COMODORSADomainValidationSecureServerCA.crt")
+      ]
+    }
 
-  var secureServer = require('https').createServer(https_opts, app).listen( process.env.HTTPS_PORT || 8000);
-  var hostName = "https://www.gtcoursewatch.us";
+    var secureServer = require('https').createServer(https_opts, app).listen( process.env.HTTPS_PORT || 8000);
+    var hostName = "https://www.gtcoursewatch.us";
+  }else {
+    var hostName = "http://www.gtcoursewatch.us";    
+  }
 
   if(PROD_EMAIL_SERVICE == 'gmail') {
     var mailerEmail = "gtcoursewatch.mailer@gmail.com";
@@ -87,7 +92,7 @@ if(process.env.BUILD_ENVIRONMENT == 'production') {
   setInterval(registerPartials, 1000);
 }
 
-io.listen(secureServer);
+if(HTTPS_ENABLED) io.listen(secureServer);
 
 //Ensure partial registration on startup
 (function() {
