@@ -1,21 +1,31 @@
 <div class = "container">
     <div class = "jumbotron">
         <h1>About</h1>
-        <p>I'm a student at Georgia Tech, and this is a hobby-project of mine. You can check out my personal website <a href="http://www.vikramsomu.com">here</a></p>
+        <p>Hi! My name is Vikram, and I'm a student at Georgia Tech. You can check out my personal website @ <a href="http://www.vikramsomu.com">vikramsomu.com</a> to learn more about me and my projects. Scroll <a href="#bottom" id="technical_overview">down</a> for a technical overview.</p>
 
-        <p>This project exposed me to the flexibility and efficiency of JavaScript. <br>Although I started out confused by the quirks and oddities of the language, it's now my favorite. <br><br> Here are some of the main technologies leveraged: </p>
+
+        <p>This website has been a hobby-project of mine, and it exposed me to the flexibility and efficiency of JavaScript. Although I started out confused by the quirks and oddities of the language, it's now one of my favorites. <br><br> Here are some of the main technologies leveraged: </p>
 
         <p>
             <ul>
             	<li>Node.js</li>
+                <li>Express</li>
             	<li>MongoDB</li>
+                <li>Handlebars.js</li>
+                <li>Bootstrap</li>
+                <li>Amazon Web Services</li>
             	<li>PhantomJS</li>
+                <li>jQuery</li>
             	<li>d3.js</li>
             	<li>socket.io</li>
+                <li>Google Analytics</li>
+                <li>Facebook SDK</li>
+                <li>AddThis</li>
+                <li>NProgress</li>
             </ul>
         </p>
 
-        <p>Feedback is welcome through the contact button up top.<br> Scroll down for a technical overview of this project.</p>
+        <p>Feedback is welcome through the contact button up top.</p>
     </div>
 </div>
 
@@ -47,3 +57,10 @@
 
      </div>
 </div>
+
+<script>
+    $("a[href='#bottom']").click(function() {
+      $("html, body").animate({ scrollTop: $(document).height() }, "slow");
+      return false;
+    })
+</script>
