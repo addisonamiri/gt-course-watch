@@ -714,8 +714,8 @@ function initPollers() {
   initFallPoller(pathComponents);
 
   current_pollers = { spring: springPoller, 
-                      summer:summerPoller, 
-                      fall:fallPoller };
+                      summer: summerPoller, 
+                      fall: fallPoller };
 
   //hibernation months, accept or process no requests,
   //no labels for term selection either
