@@ -185,6 +185,7 @@ app.get('/about', function(req, res) {
 //verify buzzport for automated registration
 app.post('/verifyBuzzport', function(req, res) {
   var post = req.body;
+  strip_whitespace_from_obj(post);
 
   myDispatcher.addVerifyTaskToQueue(
     {  
@@ -201,6 +202,7 @@ app.post('/verifyBuzzport', function(req, res) {
 app.post('/autoRegReq', function(req, res) {
   var post = req.body;
   post.term = post.term.replace(' ', '-');
+  strip_whitespace_from_obj(post);
 
   var user = req.session.username;
 
@@ -225,6 +227,7 @@ app.post('/autoRegReq', function(req, res) {
 //submit a regular, email only request
 app.post('/reg_req_sub', function(req, res) {
   var post = req.body;
+  strip_whitespace_from_obj(post);
 
   myMongoController.createRequest(post.crn, post.email, post.term, function(doc) {
     var user = req.session.username;
@@ -246,6 +249,7 @@ app.post('/reg_req_sub', function(req, res) {
 //submit a email + sms reuqest
 app.post('/sms_req_sub', function(req, res) {
   var post = req.body;
+  strip_whitespace_from_obj(post);
 
   myMongoController.createSMSRequest(post.crn, post.email, post.gatewayedNumber, post.term, function(doc) {
     var user = req.session.username;
@@ -286,6 +290,8 @@ app.get('/getTimeoutStatus', function(req, res) {
 
 //get the number of other people in our database watching a particular CRN when a user makse a request
 app.get('/getNumWatchers/:crn', function(req, res) {
+  strip_whitespace_from_obj(req.params);
+
   myMongoController.Request.find({crn:req.params.crn}, function(err, requests) {
     myMongoController.smsRequest.find({crn:req.params.crn}, function(err, smsRequests) {
       //since stat is for 'other watcher' we don't include the request just made by the user, hence the -1
@@ -298,6 +304,8 @@ app.get('/getNumWatchers/:crn', function(req, res) {
 
 //Send OSCAR scraped stats for capacity, remaining, etc. AND number of people in our database watching a seat.
 app.get('/getStats/:crn/:term', function(req, res) {
+  strip_whitespace_from_obj(req.params);
+
   myMongoController.Request.find({crn:req.params.crn}, function(err, requests) {
     myMongoController.smsRequest.find({crn:req.params.crn}, function(err, smsRequests) {
       var pollers = getActivePollers(),
@@ -325,6 +333,8 @@ app.get('/getStats/:crn/:term', function(req, res) {
 app.get('/verifyCRN/:crn/:term', function(req, res) {
   var pollers = getActivePollers(),
       termPoller;
+
+  strip_whitespace_from_obj(req.params);
 
   pollers.forEach(function(poller) {
     if(poller.term==req.params.term) termPoller = poller;
@@ -354,6 +364,7 @@ app.get('/sign_up', function(req, res) {
 app.post('/create_account', function(req, res) {
   // myMongoController.createUser("jo@jo.com", "password", "uuid");
   var post = req.body;
+  strip_whitespace_from_obj(post);
 
   var email = post.email,
     password = post.password,
@@ -465,6 +476,8 @@ app.post('/change_password', checkAuth, function(req, res) {
       password = post.password,
       password_conf = post.password_conf;
 
+  strip_whitespace_from_obj(post);
+
   if(password != password_conf) {
     req.session.danger_flash = "Passwords did not match!";
     res.redirect('back');
@@ -529,6 +542,8 @@ app.post('/change_forgotten_password', function(req, res) {
       password = post.password,
       password_conf = post.password_conf,
       email = post.email;
+
+  strip_whitespace_from_obj(post);
 
   if(password != password_conf) {
     req.session.danger_flash = "Passwords did not match!";
@@ -629,6 +644,8 @@ app.get('/my_requests', checkAuth, function(req, res) {
 
 //endpoint that handles request cancellations
 app.get('/cancel_req/:type/:id', checkAuth, function(req, res) {
+  strip_whitespace_from_obj(req.params);
+
   var id = req.params.id,
       type = req.params.type,
       username = req.session.username;
@@ -864,12 +881,24 @@ function createLabel(term) {
 }
 
 function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function isEmail(email) {
   var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   return regex.test(email);
+}
+
+function strip_whitespace(input) {
+  return input.replace(/\s+/g, "");
+}
+
+function strip_whitespace_from_obj(input_obj) {
+  for (var key in input_obj) {
+    if (input_obj.hasOwnProperty(key)) {
+      input_obj[key] = strip_whitespace(input_obj[key]);
+    }
+  }
 }
 
 //*SCHEDULED JOBS
