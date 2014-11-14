@@ -23,6 +23,19 @@ input, select {
 	font-weight: normal;
 }
 
+.modal-dialog-center { /* Edited classname 10/03/2014 */
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+@media (max-width: 767px) {
+  .modal-dialog-center { /* Edited classname 10/03/2014 */
+    width: 100%;
+  }
+}
+
 .alert {
   display: none;
 }
