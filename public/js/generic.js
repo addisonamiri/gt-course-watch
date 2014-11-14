@@ -77,7 +77,11 @@ $(function() {
 
 $(document).ready(function() {  
 
-  $("#donate-modal").modal({'show':true})
+  $("#donate-modal").modal({'show': true})
+
+  $(".donation-box").click(function() {
+    $("#donate-modal").modal('toggle');
+  });
 
   $("#loginForm").submit(function(e) {
     e.preventDefault();
