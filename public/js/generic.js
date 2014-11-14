@@ -77,6 +77,8 @@ $(function() {
 
 $(document).ready(function() {  
 
+  $("#donate_modal").modal({'show':true})
+
   $("#loginForm").submit(function(e) {
     e.preventDefault();
     var form = $(this);

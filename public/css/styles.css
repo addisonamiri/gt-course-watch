@@ -7,7 +7,14 @@ input, select {
 	margin-top: 5px;
 }
 
-.donation-box {
+/*#donate_modal {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}*/
+
+.donation_box {
 	margin-bottom:-20px;
 	padding: 10px;
 	margin: 0px;
