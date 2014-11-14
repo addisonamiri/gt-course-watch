@@ -7,6 +7,22 @@ input, select {
 	margin-top: 5px;
 }
 
+.donation-box {
+	margin-bottom:-20px;
+	padding: 10px;
+	margin: 0px;
+	background: #ff0030;
+	color: #fff;
+	font-size: 1.5em;
+	font-weight: bold;
+	line-height: 1em;
+	border: 2px dashed #fff;
+	border-radius: 10px;
+	box-shadow: 0 0 0 4px #ff0030, 2px 1px 6px 4px rgba(10, 10, 0, 0.5);
+	text-shadow: -1px -1px #aa3030;
+	font-weight: normal;
+}
+
 .alert {
   display: none;
 }
