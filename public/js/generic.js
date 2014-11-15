@@ -85,6 +85,10 @@ $(document).ready(function() {
     $("#donate-modal").modal('toggle');
   });
 
+  $("#donation-box-button").click(function(e) {
+    e.stopPropagation();
+  });
+
   $("#loginForm").submit(function(e) {
     e.preventDefault();
     var form = $(this);
