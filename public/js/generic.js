@@ -77,7 +77,9 @@ $(function() {
 
 $(document).ready(function() {  
 
-  $("#donate-modal").modal({'show': true})
+  setTimeout(1500, function() {
+    $("#donate-modal").modal({'show': true});
+  });
 
   $(".donation-box").click(function() {
     $("#donate-modal").modal('toggle');
