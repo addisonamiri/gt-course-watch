@@ -122,7 +122,8 @@ MongoController.prototype.addToArchive = function(type, email, term, crn, gate_n
       email: email,
       term: term,
       crn: crn,
-      gatewayedNumber: gate_number
+      gatewayedNumber: gate_number,
+      timestamp: new Date()
     });
 
     infostat.save(function(err, doc) {
@@ -250,16 +251,33 @@ MongoController.prototype.createSuccessStat = function (regular, sms, auto) {
 
 //delete reqs from last yr.
 MongoController.prototype.cleanExpiredReqs = function() {
-  var d = new Date();
-  var yr = (d.getFullYear() - 1).toString();
+  var d = new Date(),
+    month = d.getMonth(),
+    date_of_month = d.getDate(),
+    yr = d.getFullYear().toString();
+ 
 
-  var regex = new RegExp(".*" + yr + ".*");
+  if(month >= 1 && month <= 8) {
+    //clean spring for the year on February/1
+    this.removeTerm('spring' + yr);
+  }
 
-  this.autoRegReq.find( { term: regex }, helper );
-  this.Request.find( { term: regex }, helper );
-  this.smsRequest.find( { term: regex }, helper );
+  if(month >= 6 || month <= 1) {
+    //clean up summer for the year on July/1
+    this.removeTerm('summer' + yr);
+  } 
 
-  function helper(err, foundReqs) {
+  if(month >= 9 && month <= 1) {
+    //clean up fall for the year on October/1
+    this.removeTerm('fall' + yr);
+  }
+
+  function removeTerm(removal_term) {
+    this.Request.find( { term: removal_term }, remover_helper );
+    this.smsRequest.find( { term: removal_term }, remover_helper );    
+  }
+
+  function remover_helper(err, foundReqs) {
     if(err) console.log(err);
 
     foundReqs.forEach(function(e) {
