@@ -923,6 +923,8 @@ function strip_whitespace_from_obj(input_obj) {
 
 //*SCHEDULED JOBS
 
+myMongoController.cleanExpiredReqs();
+
 //Daily Tasks
 setInterval(function() {
   initPollers();

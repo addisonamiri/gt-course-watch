@@ -254,35 +254,36 @@ MongoController.prototype.cleanExpiredReqs = function() {
   var d = new Date(),
     month = d.getMonth(),
     date_of_month = d.getDate(),
-    yr = d.getFullYear();
+    yr = d.getFullYear(),
+    _this = this;
  
 
   if(month >= 1 && month <= 8) {
     //clean spring for the year on February/1
-    this.removeTerm('spring' + yr);
+    removeTerm('spring' + yr);
   }
 
   if(month >= 6 || month <= 1) {
     //clean up summer for the year on July/1
     if(month <= 1) {
-      this.removeTerm('summer' + (yr-1));
+      removeTerm('summer' + (yr-1));
     } else {
-      this.removeTerm('summer' + yr);
+      removeTerm('summer' + yr);
     }
   } 
 
   if(month >= 9 || month <= 1) {
     //clean up fall for the year on October/1
     if(month <= 1) {
-      this.removeTerm('fall' + (yr-1));
+      removeTerm('fall' + (yr-1));
     } else {
-      this.removeTerm('fall' + yr);
+      removeTerm('fall' + yr);
     }
   }
 
   function removeTerm(removal_term) {
-    this.Request.find( { term: removal_term }, remover_helper );
-    this.smsRequest.find( { term: removal_term }, remover_helper );    
+    _this.Request.find( { term: removal_term }, remover_helper );
+    _this.smsRequest.find( { term: removal_term }, remover_helper );    
   }
 
   function remover_helper(err, foundReqs) {
