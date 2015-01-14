@@ -254,7 +254,7 @@ MongoController.prototype.cleanExpiredReqs = function() {
   var d = new Date(),
     month = d.getMonth(),
     date_of_month = d.getDate(),
-    yr = d.getFullYear().toString();
+    yr = d.getFullYear();
  
 
   if(month >= 1 && month <= 8) {
@@ -264,12 +264,20 @@ MongoController.prototype.cleanExpiredReqs = function() {
 
   if(month >= 6 || month <= 1) {
     //clean up summer for the year on July/1
-    this.removeTerm('summer' + yr);
+    if(month <= 1) {
+      this.removeTerm('summer' + (yr-1));
+    } else {
+      this.removeTerm('summer' + yr);
+    }
   } 
 
   if(month >= 9 || month <= 1) {
     //clean up fall for the year on October/1
-    this.removeTerm('fall' + yr);
+    if(month <= 1) {
+      this.removeTerm('fall' + (yr-1));
+    } else {
+      this.removeTerm('fall' + yr);
+    }
   }
 
   function removeTerm(removal_term) {
