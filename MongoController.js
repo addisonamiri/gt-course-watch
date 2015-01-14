@@ -107,7 +107,7 @@ MongoController.prototype.getFullfillmentStats = function(func) {
         ret = {
           fulfilled: f,
           total: c,
-          rate: (Math.round((f/c) * 100).toFixed(2)
+          rate: (Math.round((f/c) * 100)).toFixed(2)
         };
       }
 
