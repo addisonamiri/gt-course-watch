@@ -88,6 +88,34 @@ MongoController.prototype.userAccessor = function (email, f) {
   });
 }
 
+
+MongoController.prototype.getFullfillmentStats = function(func) {
+  _this = this;
+
+  _this.successStat.find(function(err1, successes){
+    _this.confirmationStat.find(function(err2, confirmations){
+      if(err1 || err2) {
+        ret = {
+          fulfilled: 0,
+          total: 0,
+          rate: 0
+        };
+      }else{
+        var f = successes.length,
+            c = confirmations.length;
+
+        ret = {
+          fulfilled: f,
+          total: c,
+          rate: (f/c) * 100
+        };
+      }
+
+      func(ret);
+    });
+  });
+};
+
 MongoController.prototype.addToArchive = function(type, email, term, crn, gate_number) {
     var infostat = new this.req_archive({
       type: type,

@@ -76,6 +76,19 @@ $(function() {
 });
 
 $(document).ready(function() {  
+  $.ajax({
+    url:"/getFulfillmentStats",
+    dataType: "json",
+    type: "GET",
+    success: function(data) {
+      fulfillment_stat_components = [
+        'Request Fulfillment Rate: ',
+        data.rate + '% ',
+        '(' + data.fulfilled + '/' + data.total + ')'
+      ];
+      $('#fulfillment_stats').html(fulfillment_stat_components.join(''));
+    }
+  });
 
   setTimeout(function() {
     $("#donate-modal").modal({'show': true});
@@ -941,3 +954,6 @@ function change(data) {
 };
 
 });
+
+
+

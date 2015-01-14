@@ -118,6 +118,15 @@ var springPoller, fallPoller, summerPoller; //pollers
 var current_pollers; //object that holds all current pollers
 var springTerm, fallTerm, summerTerm; //string ids of current terms, also used to tell which terms to poll
 var rejectRequests = false;
+var fulfillment_stats = {
+          fulfilled: 0,
+          total: 0,
+          rate: 0
+        };
+
+myMongoController.getFullfillmentStats(function(stats) {
+  fulfillment_stats = stats;
+});
 
 initPollers();
 
@@ -290,6 +299,12 @@ app.get('/getTimeoutStatus', function(req, res) {
       res.json({status:"good"})
     }
   }
+});
+
+app.get('/getFulfillmentStats', function(req, res) {
+  console.log('hit');
+  console.log(fulfillment_stats);
+  res.json(fulfillment_stats);
 });
 
 //get the number of other people in our database watching a particular CRN when a user makse a request
@@ -690,6 +705,7 @@ app.get('/cancel_req/:type/:id', checkAuth, function(req, res) {
 });
 
 
+
 //*WEBSOCKET HANDLING
 
 // io.disable('heartbeats');
@@ -923,3 +939,10 @@ setInterval(function() {
     }
   }
 }, 2*millisInMinute); //*millisInMinute
+
+
+setInterval(function() {
+  myMongoController.getFullfillmentStats(function(stats) {
+    fulfillment_stats = stats;
+  });
+}, 30*millisInMinute);

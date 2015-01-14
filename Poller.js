@@ -165,21 +165,20 @@ Poller.prototype.scrapeSeats = function (existingRequest, smsRequest) {
       body.push(chunk);
     });
 
-
     res.on('end', function() {
 
       var joinedBody = body.join('');
       var $ = cheerio.load(joinedBody);
 
-        //traversing method
-        $('.dddefault').each(function(i) {
-          if(i==3) {
-            var remainingSeats = parseInt($(this).text().trim());
-            //perserve this reference by calling on _this
+      //traversing method
+      $('.dddefault').each(function(i) {
+        if(i==3) {
+          var remainingSeats = parseInt($(this).text().trim());
+          //perserve this reference by calling on _this
 
-            _this.checkSeats(remainingSeats, existingRequest, smsRequest);
-          }
-        });
+          _this.checkSeats(remainingSeats, existingRequest, smsRequest);
+        }
+      });
     });
   });
 
