@@ -64,7 +64,8 @@ function MongoController(url) {
     email: String,
     term: String,
     crn: String,
-    gatewayedNumber: String
+    gatewayedNumber: String,
+    timestamp: Date
   });
 
   this.Request = mongoose.model('Request', this.requestSchema);
