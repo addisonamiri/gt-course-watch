@@ -267,7 +267,7 @@ MongoController.prototype.cleanExpiredReqs = function() {
     this.removeTerm('summer' + yr);
   } 
 
-  if(month >= 9 && month <= 1) {
+  if(month >= 9 || month <= 1) {
     //clean up fall for the year on October/1
     this.removeTerm('fall' + yr);
   }
