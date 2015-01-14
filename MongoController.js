@@ -57,7 +57,15 @@ function MongoController(url) {
     reg_reqs: [],
     sms_reqs: [],
     auto_reqs: []
-  })
+  });
+
+  this.reqArchiveSchema = mongoose.Schema({
+    type: String, // REG, SMS
+    email: String,
+    term: String,
+    crn: String,
+    gatewayedNumber: String
+  });
 
   this.Request = mongoose.model('Request', this.requestSchema);
   this.smsRequest = mongoose.model('smsRequest', this.smsRequestSchema);
@@ -65,6 +73,7 @@ function MongoController(url) {
   this.confirmationStat = mongoose.model('confirmationStat', this.confirmationStatSchema);
   this.successStat = mongoose.model('successStat', this.successStatSchema);
   this.user = mongoose.model('user', this.userSchema);
+  this.req_archive = mongoose.model('req_archive', this.reqArchiveSchema)
 
   this._myDB.once('open', function() {
     console.log('db successfully opened');
@@ -79,22 +88,36 @@ MongoController.prototype.userAccessor = function (email, f) {
   });
 }
 
+MongoController.prototype.addToArchive = function(type, email, term, crn, gate_number) {
+    var infostat = new this.req_archive({
+      type: type,
+      email: email,
+      term: term,
+      crn: crn,
+      gatewayedNumber: gate_number
+    });
+
+    infostat.save(function(err, doc) {
+      if(err) console.log('save error: ' + err);
+    });
+}
+
 MongoController.prototype.createUser = function (email, password, uuid) {
   var _this = this;
 
   bcrypt.genSalt(10, function(err, salt) {
       bcrypt.hash(password, salt, function(err, hash) {
           // Store hash in your password DB.
-      var newUser = new _this.user({
-        email: email,
-        password_hash: hash,
-        uuid: uuid,
-        activated: false
-      });
+        var newUser = new _this.user({
+          email: email,
+          password_hash: hash,
+          uuid: uuid,
+          activated: false
+        });
 
-      newUser.save(function(err, doc) {
-        if(err) console.log('save error: ' + err);
-      });
+        newUser.save(function(err, doc) {
+          if(err) console.log('save error: ' + err);
+        });
       });
   });
 }

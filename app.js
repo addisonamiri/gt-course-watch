@@ -241,6 +241,8 @@ app.post('/reg_req_sub', function(req, res) {
 
     myMailer.sendConfirmationMail(post.email, post.crn, false, false);
     myMongoController.createConfirmationStat(1,0,0);
+    myMongoController.addToArchive('REG', post.email, post.term, 
+      post.crn, null);
 
     res.json({status: "SUCCESS"});
   });
@@ -263,6 +265,8 @@ app.post('/sms_req_sub', function(req, res) {
 
     myMailer.sendConfirmationMail(post.email, post.crn, true, false);
     myMongoController.createConfirmationStat(0,1,0);
+    myMongoController.addToArchive('SMS', post.email, 
+      post.term, post.crn, post.gatewayedNumber);
 
     res.json({status: "SUCCESS"});
   });
