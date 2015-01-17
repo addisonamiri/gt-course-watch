@@ -13,3 +13,5 @@ tar -cvzf backup.tar.gz gtcw_backup/
 http://stackoverflow.com/questions/6558080/scp-secure-copy-to-ec2-instance-without-password 
 scp -i GTCW.pem backup.tar.gz ec2-user@54.174.170.202:/
 
+# Move folder content up one level
+http://unix.stackexchange.com/questions/19344/move-folder-content-up-one-level 
