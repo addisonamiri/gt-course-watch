@@ -16,8 +16,11 @@ sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
 sudo /sbin/mkswap /var/swap.1
 sudo /sbin/swapon /var/swap.1
 
-sudo mkdir -p /data
-sudo chown $(whoami) /data # $() forks the script, runs the contents, and returns the output
+sudo mkdir -p /data/db
+
+# old change permissions command:
+# sudo chown $(whoami) /data/db # $() forks the script, runs the contents, and returns the output
+sudo chown `id -u` /data/db # $() forks the script, runs the contents, and returns the output
 sudo cp mongod.conf /etc/mongod.conf
 sudo mongod --config /etc/mongod.conf
 
@@ -27,3 +30,4 @@ start \
 -ao out.log \
 -ae err.log \
 app.js
+

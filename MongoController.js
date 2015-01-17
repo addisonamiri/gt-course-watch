@@ -260,12 +260,12 @@ MongoController.prototype.cleanExpiredReqs = function() {
  
 
   if(month >= 1 && month <= 8) {
-    //clean spring for the year on February/1
+    //clean spring for the year on February/1 - September/31
     removeTerm('spring' + yr);
   }
 
   if(month >= 6 || month <= 1) {
-    //clean up summer for the year on July/1
+    //clean up summer for the year on July/1 - February/31
     if(month <= 1) {
       removeTerm('summer' + (yr-1));
     } else {
@@ -274,7 +274,7 @@ MongoController.prototype.cleanExpiredReqs = function() {
   } 
 
   if(month >= 9 || month <= 1) {
-    //clean up fall for the year on October/1
+    //clean up fall for the year on October/1 - February/31
     if(month <= 1) {
       removeTerm('fall' + (yr-1));
     } else {

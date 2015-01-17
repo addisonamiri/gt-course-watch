@@ -302,8 +302,6 @@ app.get('/getTimeoutStatus', function(req, res) {
 });
 
 app.get('/getFulfillmentStats', function(req, res) {
-  console.log('hit');
-  console.log(fulfillment_stats);
   res.json(fulfillment_stats);
 });
 

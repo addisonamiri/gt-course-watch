@@ -1,0 +1,15 @@
+http://stackoverflow.com/questions/11255630/how-to-export-all-collection-in-mongodb
+
+# To backup the database 'gtcw' into a folder called gtcw_backup
+mongodump -d gtcw -o gtcw_backup
+
+# And to "restore/import" that, i used (from gtcw_backup/):
+mongorestore <our database name>
+
+# To zip up a file
+tar -cvzf backup.tar.gz gtcw_backup/
+
+# SCP with key file
+http://stackoverflow.com/questions/6558080/scp-secure-copy-to-ec2-instance-without-password 
+scp -i GTCW.pem backup.tar.gz ec2-user@54.174.170.202:/
+
