@@ -49,7 +49,7 @@ if(process.env.BUILD_ENVIRONMENT == 'production') {
     var secureServer = require('https').createServer(https_opts, app).listen( process.env.HTTPS_PORT || 8000);
     var hostName = "https://www.gtcoursewatch.us";
   }else {
-    var hostName = "http://www.gtcoursewatch.us";    
+    var hostName = "http://www.gtcoursewatch.us";
   }
 
   if(PROD_EMAIL_SERVICE == 'gmail') {
