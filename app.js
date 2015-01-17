@@ -62,9 +62,9 @@ if(process.env.BUILD_ENVIRONMENT == 'production') {
     var mailerEmail = "admin@gtcoursewatch.us";
 
     if(process.env.HOST_PROVIDER.toLowerCase() == 'digitalocean') {
-      var ses_creds = JSON.parse( fs.readFileSync('/home/ec2-user/ses_config.json') );
-    }else if(process.env.HOST_PROVIDER.toLowerCase() == 'amazon') {
       var ses_creds = JSON.parse( fs.readFileSync('/root/ses_config.json') );
+    }else if(process.env.HOST_PROVIDER.toLowerCase() == 'amazon') {
+      var ses_creds = JSON.parse( fs.readFileSync('/home/ec2-user/ses_config.json') );
     }
 
     var myMailer = new Mailer(mailerEmail, 
