@@ -17,6 +17,8 @@ sudo /sbin/mkswap /var/swap.1
 sudo /sbin/swapon /var/swap.1
 
 sudo mkdir -p /data/db
+sudo mkdir -p /log
+sudo touch /log/mongod.log
 
 # old change permissions command:
 # sudo chown $(whoami) /data/db # $() forks the script, runs the contents, and returns the output
