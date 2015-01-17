@@ -3,6 +3,7 @@ export HTTPS_PORT=8000
 #Don't forget to turn off HTTPS url redirect in NameCheap
 export HTTPS_ENABLED=false
 export BUILD_ENVIRONMENT=production
+export HOST_PROVIDER=digitalocean
 
 # port remapping solution involving changing the routing table
 sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to $HTTP_PORT
