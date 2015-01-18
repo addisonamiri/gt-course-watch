@@ -1,7 +1,6 @@
 export HTTP_PORT=8080
 export HTTPS_PORT=8000
-#Don't forget to turn off HTTPS url redirect in NameCheap
-export HTTPS_ENABLED=false
+export HTTPS_ENABLED=false #Don't forget to turn off HTTPS url redirect in NameCheap
 export BUILD_ENVIRONMENT=production
 export HOST_PROVIDER=digitalocean #either digitalocean or amazon
 
