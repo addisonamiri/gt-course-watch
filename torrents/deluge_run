@@ -8,4 +8,3 @@ deluged
 deluge-web --fork
 
 iptables -A INPUT -p tcp -m tcp --dport 8112 -j ACCEPT
-iptables -A INPUT -p tcp --match multiport --dports 6881:6891 -j ACCEPT
