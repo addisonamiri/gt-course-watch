@@ -1,0 +1,4 @@
+sudo useradd --system --home /var/lib/deluge deluge
+sudo yum install deluge-common && sudo yum install deluge-web && sudo yum install deluge-images && sudo yum install deluge-daemon
+
+
