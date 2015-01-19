@@ -4,4 +4,5 @@ sudo rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro && sudo rpm -
 
 sudo yum install deluge-common && sudo yum install deluge-web && sudo yum install deluge-images && sudo yum install deluge-daemon
 
-
+deluged
+deluge-web --fork
