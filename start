@@ -24,7 +24,7 @@ sudo touch /log/mongod.log
 # sudo chown $(whoami) /data/db # $() forks the script, runs the contents, and returns the output
 sudo chown `id -u` /data/db # $() forks the script, runs the contents, and returns the output
 sudo cp mongod.conf /etc/mongod.conf
-sudo mongod --config /etc/mongod.conf
+sudo mongod --config /etc/mongod.conf --smallfiles
 
 ./node_modules/forever/bin/forever \
 start \
