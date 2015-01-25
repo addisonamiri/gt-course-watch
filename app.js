@@ -11,7 +11,7 @@ var express = require('express'),
     Poller = require('./Poller.js'),
     PhantomJobDispatcher = require('./PhantomJobDispatcher.js'),
     TermManager = require('./TermManager.js'),
-    CourseConnector = require('./CourseConnector.js');    
+    CatalogConnector = require('./CatalogConnector.js');    
 
 /*****
 username and email are synonymous through this application
@@ -24,7 +24,7 @@ username and email are synonymous through this application
 // scp -i GTCW.pem /Users/vikram/amazon_ec2/gtcw_gmail_pass.txt ec2-user@54.204.32.244:/home/ec2-user
 
 //*CONFIG
-var mongoConnectionUrl = 'mongodb://localhost/gtcw',
+var mongo_url = 'mongodb://localhost/gtcw',
     THROTTLE_DELAY_SECS = 8,
     PHANTOM_EVENTLOOP_DELAY_MS = 2000,
     PROD_EMAIL_SERVICE = 'ses',
@@ -117,9 +117,10 @@ if(HTTPS_ENABLED) io.listen(secureServer);
 })();
 
 //*INITIALIZE CUSTOM MODULES
-var myMongoController = new MongoController(mongoConnectionUrl);
-var myTermManager = new TermManager(mongoConnectionUrl, 1*millisInHour);
-var myCourseConnector = new CourseConnector(mongoConnectionUrl, myTermManager);
+var myMongoController = new MongoController(mongo_url);
+var myTermManager = new TermManager(mongo_url, 5*millisInMinute);
+var myCatalogConnector = 
+  new CatalogConnector(mongo_url, myTermManager, 5*millisInMinute);
 var myDispatcher = new PhantomJobDispatcher( myMailer, myMongoController);
 myDispatcher.startDispatcher(PHANTOM_EVENTLOOP_DELAY_MS);
 
@@ -958,9 +959,9 @@ setInterval(function() {
 
 // myTermManager.poll_new_terms();
 // myTermManager.get_unprobed_terms();
-myCourseConnector.start_unprobed_term_poller(1000);
 
-
+//Uncomment to re-run the crn scan on the term
+myTermManager.set_probed('201502', false);
 
 
 

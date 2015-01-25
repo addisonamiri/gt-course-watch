@@ -9,9 +9,18 @@ function TermManager(connection_url, delay) {
 	var db = monk(connection_url);
 	this.historical_terms = db.get('historical_terms');
 	this.start_season_poller(delay);
-	// console.log(this.historical_terms);
-	// console.log(db.get('requests'));
 }
+
+TermManager.prototype.set_probed = function(term_code, val) {
+	this.historical_terms.update(
+		{code:term_code},
+		{ $set: 
+			{
+				probed: val
+			}
+		}
+	);
+};
 
 TermManager.prototype.is_new_term = function(term_obj, cb) {
 	this.historical_terms.findOne(term_obj)

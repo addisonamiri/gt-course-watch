@@ -1,27 +1,47 @@
 'use strict'
+/***
+@author Vikram Somu
+
+PIPELINED COURSE CONNECTOR
+A piplined system to connect my MongoDB database
+to oscar.gatech's course catalog in order to sync 
+our systems.
+
+This class could be refactored out into two seperate classes:
+One queue processing class and another HTML parsing class.
+
+Method that needs most refactoring: 
+CatalogConnector.prototype.parse_catalog_entry
+*/
+
 
 var https = require('https'),
     cheerio = require('cheerio'),
     monk = require('monk'),
     poller_interval = null;
 
-function CourseConnector(connection_url, term_mgr) {
+function CatalogConnector(connection_url, term_mgr, unprobedt_delay) {
 	var db = monk(connection_url);
 	this.term_mgr = term_mgr;
 	this.course_info = db.get('course_info');
 	this.term_courses = db.get('term_courses');
-	this.dispatch_delay_ms = 25;
+	this.dispatch_delay_ms = 50;
+	this.start_crn = 10000;
+	this.end_crn = 99999;
 	this.active_probe_q = [];
 	this.check_active = false;
+	this.start_unprobed_term_poller(unprobedt_delay);
 };
 
 
-CourseConnector.prototype.check_probe_q = function() {
+CatalogConnector.prototype.check_probe_q = function() {
 	var _this = this;
 
 	if(this.active_probe_q.length > 0) {
 		var crn_test_fcall = this.active_probe_q.shift();
 		_this.check_active = true;
+		// TRACKING show the current CRN being tested
+		// console.log(crn_test_fcall[0]);
 		_this.crn_path_valid(crn_test_fcall);
 		setTimeout(function() {
 			_this.check_probe_q();
@@ -32,37 +52,35 @@ CourseConnector.prototype.check_probe_q = function() {
 
 }
 
-CourseConnector.prototype.alert_q = function() {
+CatalogConnector.prototype.alert_q = function() {
 	if (!this.check_active) {
 		this.check_probe_q();	
 	}
 };
 
-CourseConnector.prototype.start_unprobed_term_poller = function(delay) {
-	_this = this;
+CatalogConnector.prototype.start_unprobed_term_poller = function(delay) {
+	var _this = this;
 
 	poller_interval = setInterval(function() {
 		_this.poll_unprobed_terms(function(unprobed) {
-			if(unprobed) {
 				unprobed.forEach(function(e) {
 					_this.probe_term_for_crns(e.code);
 				});
-			}
 		});
 	}, delay);
 };
 
-CourseConnector.prototype.stop_unprobed_term_poller = function() {
+CatalogConnector.prototype.stop_unprobed_term_poller = function() {
 	if(poller_interval) {
 		clearInterval(poller_interval);
 	}
 };
 
-CourseConnector.prototype.poll_unprobed_terms = function(cb) {
+CatalogConnector.prototype.poll_unprobed_terms = function(cb) {
 	this.term_mgr.get_unprobed_terms(cb);
 };
 
-CourseConnector.prototype.probe_term_for_crns = function(term_code) {
+CatalogConnector.prototype.probe_term_for_crns = function(term_code) {
   var pathComponents= [
   	'/pls/bprod/bwckschd.p_disp_detail_sched?term_in=',
   	'4digityear',
@@ -71,8 +89,8 @@ CourseConnector.prototype.probe_term_for_crns = function(term_code) {
   	'crn_val'
   ],
   	term_period = this.term_mgr.decompose_term_code(term_code),
-  	start_crn = 20000,
-  	stop_crn = 29999,
+  	start_crn = this.start_crn,
+  	stop_crn = this.end_crn,
   	// stop_crn = 99999,
   	_this = this;
 
@@ -92,10 +110,11 @@ CourseConnector.prototype.probe_term_for_crns = function(term_code) {
 		this.alert_q();
 	};
 
+	_this.term_mgr.set_probed(term_code, true);
 };
 
 //Probe PHASE 1
-CourseConnector.prototype.crn_path_valid = function(crn, term, path, cb) {
+CatalogConnector.prototype.crn_path_valid = function(crn, term, path, cb) {
   var _this = this;
 
   if(arguments.length == 1) {
@@ -104,7 +123,6 @@ CourseConnector.prototype.crn_path_valid = function(crn, term, path, cb) {
   		path = arguments[0][2],
   		cb = arguments[0][3]
   }
-
 
   this.term_courses.find({term_code: term, crn: crn})
 	.on('success', function (docs) {
@@ -131,10 +149,11 @@ CourseConnector.prototype.crn_path_valid = function(crn, term, path, cb) {
 
 //Probe PHASE 2
 "'Detailed Class Information' page"
-CourseConnector.prototype.parse_class_info = function($, term, path) {
+CatalogConnector.prototype.parse_class_info = function($, term, path) {
 	var _this = this;
 
-	console.log(path);
+	//TRACKING show paths that belong to VALID CRNS
+	// console.log(path);
 
 	$('a').each(function() {
 		if(_this.link_to_text(this) == 'View Catalog Entry') {
@@ -144,8 +163,10 @@ CourseConnector.prototype.parse_class_info = function($, term, path) {
 };
 
 "'Detailed Class Information' page"
-CourseConnector.prototype.parse_catalog_entry = function(term, path) {
+CatalogConnector.prototype.parse_catalog_entry = function(term, path) {
 	var _this = this;
+
+
 
 	this.gt_https_req(path, function($){
 		var class_title_e = $('.nttitle a'),
@@ -156,7 +177,6 @@ CourseConnector.prototype.parse_catalog_entry = function(term, path) {
 		}else{
 			var course_info_comps = null;		
 		}
-
 
 		if(class_title_txt) {
 			var title_comps = class_title_txt.split('-'),
@@ -221,34 +241,41 @@ CourseConnector.prototype.parse_catalog_entry = function(term, path) {
 				}
 			});
 
-		}
 
-		if(course_info_comps) {
-			//Find the Schedule listings page path to probe.
-			var sched_listing_href = course_info_comps.filter(function(e) {
-				return e.match(/href/);
-			});
 
-			if(sched_listing_href.length) {
-				var sched_txt = sched_listing_href[0].trim(),
-						start_link_idx = sched_txt.indexOf('"'),
-						end_link_idx = sched_txt.indexOf('"', start_link_idx + 1);
-				
-				if(start_link_idx != -1 && end_link_idx != -1) {
-					var sched_path = sched_txt.slice(start_link_idx+1, end_link_idx),
-							sched_path = sched_path.replace(/&amp;/g, '&');
 
-					_this.parse_schedule_listing(term, sched_path);
+			if(course_info_comps) {
+				//Find the Schedule listings page path to probe.
+				var sched_listing_href = course_info_comps.filter(function(e) {
+					return e.match(/href/);
+				});
+
+				if(sched_listing_href.length) {
+					var sched_txt = sched_listing_href[0].trim(),
+							start_link_idx = sched_txt.indexOf('"'),
+							end_link_idx = sched_txt.indexOf('"', start_link_idx + 1);
+					
+					if(start_link_idx != -1 && end_link_idx != -1) {
+						var sched_path = sched_txt.slice(start_link_idx+1, end_link_idx),
+								sched_path = sched_path.replace(/&amp;/g, '&');
+
+						_this.term_courses.find(course_info_obj)
+						.on('success', function(docs) {
+							if(!docs.length) {
+								_this.parse_schedule_listing(term, sched_path);
+							}
+						});
+					}
 				}
-			}
 
+			}
 		}
 
 	});
 };
 
 "'Detailed Class Information' page"
-CourseConnector.prototype.parse_schedule_listing = function(term, path) {
+CatalogConnector.prototype.parse_schedule_listing = function(term, path) {
 	var _this = this;
 	// console.log(path);
 
@@ -266,58 +293,50 @@ CourseConnector.prototype.parse_schedule_listing = function(term, path) {
 					if(sect_obj) {
 						var next_row = $(row).next(),
 								data_cell = $(next_row).children('td')['0'],
-								meeting_rows = $(data_cell).find('tr').slice(1);
+								meeting_rows = $(data_cell).find('tr').slice(1),
+								upper_table = $(next_row).html().split('<br>');
 
-								sect_obj.meetings = []
+						parse_meeting_table(meeting_rows, sect_obj, $, function(sect_obj) {
+							parse_upper_table(upper_table, sect_obj, function(sect_obj) {
+								_this.term_courses.insert(sect_obj);
+							});
+						});
+					};
 
-								//Parse the meeting time tables
-								meeting_rows.each(function(meeting_idx, meeting_row) {
-									sect_obj.meetings.push({});
-									$(meeting_row).find('td').each(function(cell_idx,data_cell) {
-										var cur_meeting = sect_obj.meetings[meeting_idx],
-												cell_contents = $(data_cell).text();
-
-										if(cell_idx == 1) {
-											var time_comps = cell_contents.split('-');
-											if (time_comps.length == 2) {
-												cur_meeting.start_time = time_comps[0].trim();
-												cur_meeting.end_time = time_comps[1].trim();												
-											}else {
-												cur_meeting.start_time = time_comps[0].trim();
-												cur_meeting.end_time = time_comps[0].trim();																							
-											}
-										}else if(cell_idx == 2) {
-											cur_meeting.days = cell_contents.trim();
-										}else if(cell_idx == 3) {
-											cur_meeting.location = cell_contents.trim();											
-										}else if(cell_idx == 4) {
-											var date_comps = cell_contents.split('-');
-											cur_meeting.start_date = date_comps[0].trim();
-											cur_meeting.end_date = date_comps[1].trim();
-										}else if(cell_idx == 5) {
-											cur_meeting.type = cell_contents.trim();
-										}else if(cell_idx == 6) {
-											cur_meeting.instructor = cell_contents.trim();
-										}
-
-									});
-								});
-
-								var upper_table = $(next_row).html().split('<br>');
-								parse_upper_table(upper_table, sect_obj, function(sect_obj) {
-									_this.term_courses.insert(sect_obj);
-								});
-					}
 				});
-			}
-
+			};
 
 		});
 	});
 
-	function parse_meeting_table(meeting_rows, sect_obj, cb) {
+	function eval_sect_title(title_comps, cb) {
+		if(title_comps.length > 3) {
+			var check_obj = {
+				term: term,
+				crn: title_comps[1].trim()
+			};
+
+			_this.term_courses.find(check_obj)
+			.on('success', function(docs) {
+				if(!docs.length) { //The section isn't in the system, so add it
+					var sect_obj = check_obj;
+
+					sect_obj.title = title_comps[0].trim();
+
+					var tmp = title_comps[2].trim().split(' ');
+					sect_obj.subj = tmp[0];
+					sect_obj.num = tmp[1];
+					sect_obj.sect_id = title_comps[3].trim();
+
+					cb(sect_obj);
+				}
+				cb(null);
+			});
+		};
+	};
+
+	function parse_meeting_table(meeting_rows, sect_obj, $, cb) {
 		sect_obj.meetings = [];
-		console.log('entr meeting table');
 
 		//Parse the meeting time tables
 		meeting_rows.each(function(meeting_idx, meeting_row) {
@@ -351,6 +370,8 @@ CourseConnector.prototype.parse_schedule_listing = function(term, path) {
 
 			});
 		});
+
+		cb(sect_obj);
 	};
 
 	//Parse the shit above the meeting time tables
@@ -395,44 +416,18 @@ CourseConnector.prototype.parse_schedule_listing = function(term, path) {
 		cb(sect_obj)
 	};
 
-	function eval_sect_title(title_comps, cb) {
-		if(title_comps.length) {
-			var check_obj = {
-				term: term,
-				crn: title_comps[1].trim()
-			};
-
-			_this.term_courses.find(check_obj)
-			.on('success', function(docs) {
-				if(!docs.length) { //The section isn't in the system, so add it
-					var sect_obj = check_obj;
-
-					sect_obj.title = title_comps[0].trim();
-
-					var tmp = title_comps[2].trim().split(' ');
-					sect_obj.subj = tmp[0];
-					sect_obj.num = tmp[1];
-					sect_obj.sect_id = title_comps[3].trim();
-
-					cb(sect_obj);
-				}
-				cb(null);
-			});
-		};
-	};
-
 
 };
 
-CourseConnector.prototype.save_course_info = function(first_argument) {
+CatalogConnector.prototype.save_course_info = function(first_argument) {
 	// body...
 };
 
-CourseConnector.prototype.save_term_course = function(first_argument) {
+CatalogConnector.prototype.save_term_course = function(first_argument) {
 	// body...
 };
 
-CourseConnector.prototype.link_to_text = function(link_e) {
+CatalogConnector.prototype.link_to_text = function(link_e) {
 	if(link_e && link_e.children && link_e.children.length > 0) {
 		if(link_e.children[0] && link_e.children[0].data) {
 			return link_e.children[0].data.trim();
@@ -442,7 +437,7 @@ CourseConnector.prototype.link_to_text = function(link_e) {
 	return ""
 };
 
-CourseConnector.prototype.gt_https_req = function(path, cb) {
+CatalogConnector.prototype.gt_https_req = function(path, cb) {
   var options = {
     hostname: 'oscar.gatech.edu',
     port: 443,
@@ -472,4 +467,4 @@ CourseConnector.prototype.gt_https_req = function(path, cb) {
   });
 };
 
-module.exports = CourseConnector;
+module.exports = CatalogConnector;
