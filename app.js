@@ -118,9 +118,9 @@ if(HTTPS_ENABLED) io.listen(secureServer);
 
 //*INITIALIZE CUSTOM MODULES
 var myMongoController = new MongoController(mongo_url);
-var myTermManager = new TermManager(mongo_url, 5*millisInMinute);
+var myTermManager = new TermManager(mongo_url, 1*millisInMinute);
 var myCatalogConnector = 
-  new CatalogConnector(mongo_url, myTermManager, 5*millisInMinute);
+  new CatalogConnector(mongo_url, myTermManager, 1*millisInMinute);
 var myDispatcher = new PhantomJobDispatcher( myMailer, myMongoController);
 myDispatcher.startDispatcher(PHANTOM_EVENTLOOP_DELAY_MS);
 
@@ -955,13 +955,10 @@ setInterval(function() {
   myMongoController.getFulfillmentStats(function(stats) {
     fulfillment_stats = stats;
   });
-}, 30*millisInMinute);
-
-// myTermManager.poll_new_terms();
-// myTermManager.get_unprobed_terms();
+}, 5*millisInMinute);
 
 //Uncomment to re-run the crn scan on the term
-myTermManager.set_probed('201502', false);
+// myTermManager.set_probed('201502', false);
 
 
 

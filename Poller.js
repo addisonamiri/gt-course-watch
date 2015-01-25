@@ -38,26 +38,24 @@ Poller.prototype.getSeatStats = function (crn, cb) {
       var $ = cheerio.load(joinedBody);
       var result = {};
 
-      // console.log(joinedBody);
+      //traversing method
+      $('.dddefault').each(function(i) {
+        if(i==3) {
+          result["remaining"] = parseInt($(this).text().trim());
+        } else if(i==2) {
+          result["actual"] = parseInt($(this).text().trim());
+        } else if(i==1) {
+          result["capacity"] = parseInt($(this).text().trim());            
+        } else if(i==4) {
+          result["waitlist_capacity"] = parseInt($(this).text().trim());            
+        } else if(i==5) {
+          result["waitlist_actual"] = parseInt($(this).text().trim());                        
+        } else if(i==6) {
+          result["waitlist_remaining"] = parseInt($(this).text().trim());                        
+        }
+      });
 
-        //traversing method
-        $('.dddefault').each(function(i) {
-          if(i==3) {
-            result["remaining"] = parseInt($(this).text().trim());
-          } else if(i==2) {
-            result["actual"] = parseInt($(this).text().trim());
-          } else if(i==1) {
-            result["capacity"] = parseInt($(this).text().trim());            
-          } else if(i==4) {
-            result["waitlist_capacity"] = parseInt($(this).text().trim());            
-          } else if(i==5) {
-            result["waitlist_actual"] = parseInt($(this).text().trim());                        
-          } else if(i==6) {
-            result["waitlist_remaining"] = parseInt($(this).text().trim());                        
-          }
-        });
-
-        cb(crn, result);
+      cb(crn, result);
     });
 
   });

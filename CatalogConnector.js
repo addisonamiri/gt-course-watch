@@ -25,8 +25,8 @@ function CatalogConnector(connection_url, term_mgr, unprobedt_delay) {
 	this.term_mgr = term_mgr;
 	this.course_info = db.get('course_info');
 	this.term_courses = db.get('term_courses');
-	this.dispatch_delay_ms = 50;
-	this.start_crn = 10000;
+	this.dispatch_delay_ms = 100;
+	this.start_crn = 20000;
 	this.end_crn = 99999;
 	this.active_probe_q = [];
 	this.check_active = false;
@@ -464,6 +464,7 @@ CatalogConnector.prototype.gt_https_req = function(path, cb) {
   req.on('error', function(e) {
      console.log("Error: " + e.message); 
      console.log( e.stack );
+     req.end();
   });
 };
 
