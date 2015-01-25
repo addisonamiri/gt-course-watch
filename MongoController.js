@@ -7,12 +7,14 @@ var mongoose = require('mongoose'),
 //
 
 function MongoController(url) {
-  var connectionURL = url;
+  var connectionURL = url,
+      _this = this;
 
   mongoose.connect(connectionURL);
 
   this._myDB = mongoose.connection;
   this._myDB.on('error', console.error.bind(console, 'connection error'));
+  this.db_open = false;
 
   //investigate why closure with _this wont work..
   this.requestSchema = mongoose.Schema({
@@ -78,6 +80,7 @@ function MongoController(url) {
 
   this._myDB.once('open', function() {
     console.log('db successfully opened');
+    _this.db_open = true;
   });
 }
 
@@ -90,8 +93,10 @@ MongoController.prototype.userAccessor = function (email, f) {
 }
 
 
-MongoController.prototype.getFullfillmentStats = function(func) {
+MongoController.prototype.getFulfillmentStats = function(func) {
   _this = this;
+
+  if(!_this.db_open) return;
 
   _this.successStat.find(function(err1, successes){
     _this.confirmationStat.find(function(err2, confirmations){

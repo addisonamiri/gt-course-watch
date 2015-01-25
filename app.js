@@ -9,7 +9,9 @@ var express = require('express'),
     MongoController = require('./MongoController.js'),
     Mailer = require('./Mailer.js'),
     Poller = require('./Poller.js'),
-    PhantomJobDispatcher = require('./PhantomJobDispatcher.js');
+    PhantomJobDispatcher = require('./PhantomJobDispatcher.js'),
+    TermManager = require('./TermManager.js'),
+    CourseConnector = require('./CourseConnector.js');    
 
 /*****
 username and email are synonymous through this application
@@ -116,6 +118,8 @@ if(HTTPS_ENABLED) io.listen(secureServer);
 
 //*INITIALIZE CUSTOM MODULES
 var myMongoController = new MongoController(mongoConnectionUrl);
+var myTermManager = new TermManager(mongoConnectionUrl, 1*millisInHour);
+var myCourseConnector = new CourseConnector(mongoConnectionUrl, myTermManager);
 var myDispatcher = new PhantomJobDispatcher( myMailer, myMongoController);
 myDispatcher.startDispatcher(PHANTOM_EVENTLOOP_DELAY_MS);
 
@@ -129,7 +133,7 @@ var fulfillment_stats = {
           rate: 0
         };
 
-myMongoController.getFullfillmentStats(function(stats) {
+myMongoController.getFulfillmentStats(function(stats) {
   fulfillment_stats = stats;
 });
 
@@ -947,7 +951,20 @@ setInterval(function() {
 
 
 setInterval(function() {
-  myMongoController.getFullfillmentStats(function(stats) {
+  myMongoController.getFulfillmentStats(function(stats) {
     fulfillment_stats = stats;
   });
 }, 30*millisInMinute);
+
+// myTermManager.poll_new_terms();
+// myTermManager.get_unprobed_terms();
+myCourseConnector.start_unprobed_term_poller(1000);
+
+
+
+
+
+
+
+
+
