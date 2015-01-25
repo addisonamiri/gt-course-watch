@@ -107,7 +107,9 @@ TermManager.prototype.poll_new_terms = function() {
 
 TermManager.prototype.start_season_poller = function(delay) {
 	var _this = this;
-	poller_interval = setInterval(_this.poll_new_terms, delay);
+	poller_interval = setInterval(function() {
+		_this.poll_new_terms();
+	}, delay);
 };
 
 TermManager.prototype.stop_season_poller = function() {
