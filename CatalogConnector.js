@@ -100,6 +100,10 @@ CatalogConnector.prototype.probe_term_for_crns = function(term_code) {
 		pathComponents[4] = i;
 		var path_to_probe = pathComponents.join('');
 
+		/* For whatever reason, transition_cb only properly retains it's
+		value when the dequeuer pops it off the queue if I declare it this way. 
+		Declaring it with function transition_cb() notation gives me an 
+		undefined error */
 		var transition_cb = function(is_valid, $, term_code, path) {			
 			if(is_valid) {
 				_this.check_catalog_entry($, term_code, path);
@@ -124,6 +128,8 @@ CatalogConnector.prototype.crn_path_valid = function(crn, term, path, cb) {
   		cb = arguments[0][3]
   }
 
+  // Only transition to .check_catalog_entry if CRN, TERMCODE combination
+  // Are not found in the term_courses collection.
   this.term_courses.find({term_code: term, crn: crn})
 	.on('success', function (docs) {
   	if(docs.length == 0) {
@@ -147,7 +153,7 @@ CatalogConnector.prototype.crn_path_valid = function(crn, term, path, cb) {
 };
 
 
-//Probe PHASE 2
+//Probe PHASE 2. Check to see if it has a catalog entry.
 "'Detailed Class Information' page"
 CatalogConnector.prototype.check_catalog_entry = function($, term, path) {
 	var _this = this;
@@ -163,6 +169,7 @@ CatalogConnector.prototype.check_catalog_entry = function($, term, path) {
 };
 
 "'Detailed Class Information' page"
+// Probe the catalog entry and scrape out information.
 CatalogConnector.prototype.parse_catalog_entry = function(term, path) {
 	var _this = this;
 
@@ -276,6 +283,8 @@ CatalogConnector.prototype.parse_catalog_entry = function(term, path) {
 					var sched_path = sched_txt.slice(start_link_idx+1, end_link_idx),
 							sched_path = sched_path.replace(/&amp;/g, '&');
 
+					//Only parse schedue listing if no matching class subj +
+					// class num exist in the term_courses db
 					_this.term_courses.find(check_obj)
 					.on('success', function(docs) {
 						if(!docs.length) {
@@ -291,6 +300,7 @@ CatalogConnector.prototype.parse_catalog_entry = function(term, path) {
 };
 
 "'Detailed Class Information' page"
+//Probe and parse the schedule listing page
 CatalogConnector.prototype.parse_schedule_listing = function(term, path) {
 	var _this = this;
 	// console.log(path);
