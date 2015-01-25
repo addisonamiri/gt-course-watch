@@ -102,9 +102,9 @@ CatalogConnector.prototype.probe_term_for_crns = function(term_code) {
 
 		var transition_cb = function(is_valid, $, term_code, path) {			
 			if(is_valid) {
-				_this.parse_class_info($, term_code, path);
+				_this.check_catalog_entry($, term_code, path);
 			}
-		}
+		};
 
 		this.active_probe_q.push([i, term_code, path_to_probe, transition_cb]);
 		this.alert_q();
@@ -149,7 +149,7 @@ CatalogConnector.prototype.crn_path_valid = function(crn, term, path, cb) {
 
 //Probe PHASE 2
 "'Detailed Class Information' page"
-CatalogConnector.prototype.parse_class_info = function($, term, path) {
+CatalogConnector.prototype.check_catalog_entry = function($, term, path) {
 	var _this = this;
 
 	//TRACKING show paths that belong to VALID CRNS
@@ -166,9 +166,7 @@ CatalogConnector.prototype.parse_class_info = function($, term, path) {
 CatalogConnector.prototype.parse_catalog_entry = function(term, path) {
 	var _this = this;
 
-
-
-	this.gt_https_req(path, function($){
+	this.gt_https_req(path, function($) {
 		var class_title_e = $('.nttitle a'),
 				class_title_txt = _this.link_to_text(class_title_e['0']);
 
@@ -186,92 +184,110 @@ CatalogConnector.prototype.parse_catalog_entry = function(term, path) {
 					course_num = tmp[1],
 					course_title = title_comps[1].trim();
 
-			var course_info_obj = {
-				subj: subj,
-				num: course_num,
-				title: course_title
-			}
-
-			_this.course_info.find(course_info_obj)
-			.on('success', function(docs) {
-				//If the course isn't present in the catalog, parse and add it.
-				if(docs.length == 0) {
-
-					var step_idx = 0;
-					var translate_step = {
-						0 : 'desc',
-						1 : 'credit_hrs',
-						2 : 'lect_hrs',
-					};
-
-					for(var i in course_info_comps) {
-						var test = course_info_comps[i].trim();
-
-						if(test.length != 0 && step_idx < 3) {
-							var translation = translate_step[step_idx];
-
-							if(translation != 'noop') {
-								course_info_obj[translation] = test;
-							}
-							step_idx++;
-						}
-					}
-
-					course_info_obj.credit_hrs = course_info_obj.credit_hrs.split(' ')[0];
-					course_info_obj.lect_hrs = course_info_obj.lect_hrs.split(' ')[0];
-
-					var grade_basis = course_info_comps.filter(function(e) {
-						return e.match(/span/);
-					});
-
-					if(grade_basis.length) {
-						grade_basis = grade_basis[0].split('>').pop();
-						course_info_obj.grade_basis = grade_basis.trim();
-					}
-
-					var dept = course_info_comps.filter(function(e) {
-						return e.match(/Depart|Dept/i);
-					});
-
-					if(dept.length) {
-						course_info_obj.dept = dept[0].trim();
-					}
-
-					_this.course_info.insert(course_info_obj);
-				}
-			});
-
-
-
-
-			if(course_info_comps) {
-				//Find the Schedule listings page path to probe.
-				var sched_listing_href = course_info_comps.filter(function(e) {
-					return e.match(/href/);
-				});
-
-				if(sched_listing_href.length) {
-					var sched_txt = sched_listing_href[0].trim(),
-							start_link_idx = sched_txt.indexOf('"'),
-							end_link_idx = sched_txt.indexOf('"', start_link_idx + 1);
-					
-					if(start_link_idx != -1 && end_link_idx != -1) {
-						var sched_path = sched_txt.slice(start_link_idx+1, end_link_idx),
-								sched_path = sched_path.replace(/&amp;/g, '&');
-
-						_this.term_courses.find(course_info_obj)
-						.on('success', function(docs) {
-							if(!docs.length) {
-								_this.parse_schedule_listing(term, sched_path);
-							}
-						});
-					}
-				}
-
-			}
+			parse_html(course_info_comps, subj, course_num, course_title);
+			check_sched_path(course_info_comps, subj, course_num);
 		}
 
 	});
+
+	// PARSE HTML SECTION
+	function parse_html(course_info_comps, subj, course_num, course_title) {
+		var course_info_obj = {
+			subj: subj,
+			num: course_num,
+			title: course_title
+		};
+
+		_this.course_info.find(course_info_obj)
+		.on('success', function(docs) {
+			//If the course isn't present in the catalog, parse and add it.
+			if(docs.length == 0) {
+				parse_sequentially();
+				parse_filtering();
+			}
+
+		});
+
+		function parse_filtering() {
+			var grade_basis = course_info_comps.filter(function(e) {
+				return e.match(/span/);
+			});
+
+			if(grade_basis.length) {
+				grade_basis = grade_basis[0].split('>').pop();
+				course_info_obj.grade_basis = grade_basis.trim();
+			}
+
+			var dept = course_info_comps.filter(function(e) {
+				return e.match(/Depart|Dept/i);
+			});
+
+			if(dept.length) {
+				course_info_obj.dept = dept[0].trim();
+			}
+
+			_this.course_info.insert(course_info_obj);
+		}
+
+		function parse_sequentially() {
+			var step_idx = 0;
+			var translate_step = {
+				0 : 'desc',
+				1 : 'credit_hrs',
+				2 : 'lect_hrs',
+			};
+
+			for(var i in course_info_comps) {
+				var test = course_info_comps[i].trim();
+
+				if(test.length != 0 && step_idx < 3) {
+					var translation = translate_step[step_idx];
+					course_info_obj[translation] = test;
+					step_idx++;
+				}
+			}
+
+			course_info_obj.credit_hrs = course_info_obj.credit_hrs.split(' ')[0];
+			course_info_obj.lect_hrs = course_info_obj.lect_hrs.split(' ')[0];
+		}
+
+	};
+
+	// CHECK SCHED PATH SECTION
+
+	function check_sched_path(course_info_comps, subj, course_num) {
+		var check_obj = {
+			subj: subj,
+			num: course_num
+		};
+
+		if(course_info_comps) {
+			//Find the Schedule listings page path to probe.
+			var sched_listing_href = course_info_comps.filter(function(e) {
+				return e.match(/href/);
+			});
+
+			if(sched_listing_href.length) {
+				var sched_txt = sched_listing_href[0].trim(),
+						start_link_idx = sched_txt.indexOf('"'),
+						end_link_idx = sched_txt.indexOf('"', start_link_idx + 1);
+				
+				if(start_link_idx != -1 && end_link_idx != -1) {
+					var sched_path = sched_txt.slice(start_link_idx+1, end_link_idx),
+							sched_path = sched_path.replace(/&amp;/g, '&');
+
+					_this.term_courses.find(check_obj)
+					.on('success', function(docs) {
+						if(!docs.length) {
+							_this.parse_schedule_listing(term, sched_path);
+						}
+					});
+				}
+			}
+		}
+
+	};
+
 };
 
 "'Detailed Class Information' page"
@@ -416,7 +432,6 @@ CatalogConnector.prototype.parse_schedule_listing = function(term, path) {
 		cb(sect_obj)
 	};
 
-
 };
 
 CatalogConnector.prototype.save_course_info = function(first_argument) {
@@ -456,7 +471,7 @@ CatalogConnector.prototype.gt_https_req = function(path, cb) {
     })
     .on('end', function() {
     	var $ = cheerio.load(body.join(''));
-    	cb($)
+    	cb($);
     });
   });
 
