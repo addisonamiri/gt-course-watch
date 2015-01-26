@@ -9,9 +9,6 @@ our systems.
 
 This class could be refactored out into two seperate classes:
 One queue processing class and another HTML parsing class.
-
-Method that needs most refactoring: 
-CatalogConnector.prototype.parse_catalog_entry
 */
 
 
@@ -215,27 +212,6 @@ CatalogConnector.prototype.parse_catalog_entry = function(term, path) {
 
 		});
 
-		function parse_filtering() {
-			var grade_basis = course_info_comps.filter(function(e) {
-				return e.match(/span/);
-			});
-
-			if(grade_basis.length) {
-				grade_basis = grade_basis[0].split('>').pop();
-				course_info_obj.grade_basis = grade_basis.trim();
-			}
-
-			var dept = course_info_comps.filter(function(e) {
-				return e.match(/Depart|Dept/i);
-			});
-
-			if(dept.length) {
-				course_info_obj.dept = dept[0].trim();
-			}
-
-			_this.course_info.insert(course_info_obj);
-		}
-
 		function parse_sequentially() {
 			var step_idx = 0;
 			var translate_step = {
@@ -256,6 +232,27 @@ CatalogConnector.prototype.parse_catalog_entry = function(term, path) {
 
 			course_info_obj.credit_hrs = course_info_obj.credit_hrs.split(' ')[0];
 			course_info_obj.lect_hrs = course_info_obj.lect_hrs.split(' ')[0];
+		}
+
+		function parse_filtering() {
+			var grade_basis = course_info_comps.filter(function(e) {
+				return e.match(/span/);
+			});
+
+			if(grade_basis.length) {
+				grade_basis = grade_basis[0].split('>').pop();
+				course_info_obj.grade_basis = grade_basis.trim();
+			}
+
+			var dept = course_info_comps.filter(function(e) {
+				return e.match(/Depart|Dept/i);
+			});
+
+			if(dept.length) {
+				course_info_obj.dept = dept[0].trim();
+			}
+
+			_this.save_course_info(course_info_obj);
 		}
 
 	};
@@ -324,7 +321,7 @@ CatalogConnector.prototype.parse_schedule_listing = function(term, path) {
 
 						parse_meeting_table(meeting_rows, sect_obj, $, function(sect_obj) {
 							parse_upper_table(upper_table, sect_obj, function(sect_obj) {
-								_this.term_courses.insert(sect_obj);
+								_this.save_term_course(sect_obj);
 							});
 						});
 					};
@@ -444,12 +441,12 @@ CatalogConnector.prototype.parse_schedule_listing = function(term, path) {
 
 };
 
-CatalogConnector.prototype.save_course_info = function(first_argument) {
-	// body...
+CatalogConnector.prototype.save_course_info = function(course_info_obj) {
+	this.course_info.insert(course_info_obj);
 };
 
-CatalogConnector.prototype.save_term_course = function(first_argument) {
-	// body...
+CatalogConnector.prototype.save_term_course = function(sect_obj) {
+	this.term_courses.insert(sect_obj);
 };
 
 CatalogConnector.prototype.link_to_text = function(link_e) {
