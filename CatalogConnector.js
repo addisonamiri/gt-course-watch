@@ -25,17 +25,16 @@ function CatalogConnector(connection_url, term_mgr, unprobedt_delay) {
 	this.dispatch_delay_ms = 100;
 	this.start_crn = 20000;
 	this.end_crn = 99999;
-	this.active_probe_q = [];
+	this.probe_fcall_q = [];
 	this.check_active = false;
 	this.start_unprobed_term_poller(unprobedt_delay);
 };
 
-
 CatalogConnector.prototype.check_probe_q = function() {
 	var _this = this;
 
-	if(this.active_probe_q.length > 0) {
-		var crn_test_fcall = this.active_probe_q.shift();
+	if(this.probe_fcall_q.length > 0) {
+		var crn_test_fcall = this.probe_fcall_q.shift();
 		_this.check_active = true;
 		// TRACKING show the current CRN being tested
 		// console.log(crn_test_fcall[0]);
@@ -74,7 +73,10 @@ CatalogConnector.prototype.stop_unprobed_term_poller = function() {
 };
 
 CatalogConnector.prototype.poll_unprobed_terms = function(cb) {
-	this.term_mgr.get_unprobed_terms(cb);
+	// Process one term at a time, wait till the q is empty to proceed.
+	if(!this.probe_fcall_q.length) {
+		this.term_mgr.get_unprobed_terms(cb);
+	}
 };
 
 CatalogConnector.prototype.probe_term_for_crns = function(term_code) {
@@ -107,7 +109,7 @@ CatalogConnector.prototype.probe_term_for_crns = function(term_code) {
 			}
 		};
 
-		this.active_probe_q.push([i, term_code, path_to_probe, transition_cb]);
+		this.probe_fcall_q.push([i, term_code, path_to_probe, transition_cb]);
 		this.alert_q();
 	};
 
