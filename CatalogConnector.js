@@ -59,8 +59,12 @@ CatalogConnector.prototype.start_unprobed_term_poller = function(delay) {
 
 	poller_interval = setInterval(function() {
 		_this.poll_unprobed_terms(function(unprobed) {
-				unprobed.forEach(function(e) {
-					_this.probe_term_for_crns(e.code);
+				unprobed.forEach(function(e, i) {
+					//Limit 1 term at a time for probing
+					//Process only the first found term.
+					if(i == 0) {
+						_this.probe_term_for_crns(e.code);
+					}
 				});
 		});
 	}, delay);
