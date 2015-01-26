@@ -1,6 +1,7 @@
 'use strict'
 /***
 @author Vikram Somu
+@date 1/25/2015
 
 PIPELINED COURSE CONNECTOR
 A piplined system to connect my MongoDB database
@@ -10,7 +11,6 @@ our systems.
 This class could be refactored out into two seperate classes:
 One queue processing class and another HTML parsing class.
 */
-
 
 var https = require('https'),
     cheerio = require('cheerio'),
