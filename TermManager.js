@@ -1,4 +1,15 @@
 'use strict'
+/***
+@author Vikram Somu
+@date 1/25/2015
+
+TERM MANAGER
+A class to manage probing / downloading terms.
+Polls OSCAR for new terms. If so, we add the term to memory
+and mark its 'probed' flag to false. The term will 
+be marked true for 'probed' after the CatalogConnector
+processes the term.
+*/
 
 var https = require('https'),
     cheerio = require('cheerio'),
