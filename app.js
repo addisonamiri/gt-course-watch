@@ -29,7 +29,7 @@ var mongo_url = 'mongodb://localhost/gtcw',
     PHANTOM_EVENTLOOP_DELAY_MS = 2000,
     PROD_EMAIL_SERVICE = 'ses',
     HTTPS_ENABLED = (process.env.HTTPS_ENABLED == "true" ? true : false),
-    TERM_PRODUCER DELAY, //TermManager
+    TERM_PRODUCER_DELAY, //TermManager
     TERM_CONSUMER_DELAY; //CatalogConnector
 
 //*CONSTANTS
