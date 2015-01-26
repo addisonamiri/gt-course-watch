@@ -135,19 +135,15 @@ CatalogConnector.prototype.crn_path_valid = function(crn, term, path, cb) {
   // Are not found in the term_courses collection.
   this.term_courses.find({term_code: term, crn: crn})
 	.on('success', function (docs) {
-  	if(docs.length == 0) {
-  		_this.gt_https_req(path, function($){
-		  	var err_txt = $('.errortext');
-	      if(!err_txt.length) {
-	      	cb(true, $, term, path);
-	      } else {
-	      	cb(false, null, term, path);
-	      }
-  		});
+	  	if(docs.length == 0) {
+	  		_this.gt_https_req(path, function($){
+			  	var err_txt = $('.errortext');
+		      if(!err_txt.length) {
+		      	cb(true, $, term, path);
+		      }
+	  		});
 
-  	} else {
-  		cb(false, null, term, path);
-  	}
+	  	}
 	})
 	.on('error', function(err){
 		console.log(err);
