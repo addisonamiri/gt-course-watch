@@ -28,7 +28,9 @@ var mongo_url = 'mongodb://localhost/gtcw',
     THROTTLE_DELAY_SECS = 8,
     PHANTOM_EVENTLOOP_DELAY_MS = 2000,
     PROD_EMAIL_SERVICE = 'ses',
-    HTTPS_ENABLED = (process.env.HTTPS_ENABLED == "true" ? true : false);
+    HTTPS_ENABLED = (process.env.HTTPS_ENABLED == "true" ? true : false),
+    TERM_PRODUCER DELAY, //TermManager
+    TERM_CONSUMER_DELAY; //CatalogConnector
 
 //*CONSTANTS
 var millisInSecond = 1000,
@@ -75,6 +77,9 @@ if(process.env.BUILD_ENVIRONMENT == 'production') {
         sekret: ses_creds.accessKeySecret });
   }
 
+  TERM_PRODUCER_DELAY = 2*millisInMinute;
+  TERM_CONSUMER_DELAY = 1*millisInMinute;
+
   registerPartials();
 } else {
   var https_opts = {
@@ -94,6 +99,9 @@ if(process.env.BUILD_ENVIRONMENT == 'production') {
   var myMailer = new Mailer(mailerEmail, 
     { service: 'gmail', 
       pass: mailerPass });
+
+  TERM_PRODUCER_DELAY = .1*millisInMinute;
+  TERM_CONSUMER_DELAY = .1*millisInMinute;
 
   //keep reloading partials
   setInterval(registerPartials, 1000);
@@ -116,11 +124,12 @@ if(HTTPS_ENABLED) io.listen(secureServer);
   });
 })();
 
+
 //*INITIALIZE CUSTOM MODULES
 var myMongoController = new MongoController(mongo_url);
-var myTermManager = new TermManager(mongo_url, .1*millisInMinute);
+var myTermManager = new TermManager(mongo_url, TERM_PRODUCER_DELAY);
 var myCatalogConnector = 
-  new CatalogConnector(mongo_url, myTermManager, .1*millisInMinute);
+  new CatalogConnector(mongo_url, myTermManager, TERM_CONSUMER_DELAY);
 var myDispatcher = new PhantomJobDispatcher( myMailer, myMongoController);
 myDispatcher.startDispatcher(PHANTOM_EVENTLOOP_DELAY_MS);
 
@@ -950,7 +959,7 @@ setInterval(function() {
   }
 }, 2*millisInMinute); //*millisInMinute
 
-
+//refresh fulfillment stats
 setInterval(function() {
   myMongoController.getFulfillmentStats(function(stats) {
     fulfillment_stats = stats;
