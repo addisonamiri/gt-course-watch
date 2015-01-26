@@ -137,13 +137,12 @@ CatalogConnector.prototype.crn_path_valid = function(crn, term, path, cb) {
 	.on('success', function (docs) {
 	  	if(docs.length == 0) {
 	  		_this.gt_https_req(path, function($){
-			  	var err_txt = $('.errortext');
-		      if(!err_txt.length) {
+		      if($('.errortext').length) {
 		      	cb(true, $, term, path);
 		      }
 	  		});
-
 	  	}
+
 	})
 	.on('error', function(err){
 		console.log(err);
@@ -174,21 +173,20 @@ CatalogConnector.prototype.parse_catalog_entry = function(term, path) {
 
 	this.gt_https_req(path, function($) {
 		var class_title_e = $('.nttitle a'),
-				class_title_txt = _this.link_to_text(class_title_e['0']);
+			class_title_txt = _this.link_to_text(class_title_e['0']),
+			course_info_comps = null;
 
 		if($('.ntdefault').html()) {
-			var course_info_comps = $('.ntdefault').html().split('<br>');			
-		}else{
-			var course_info_comps = null;		
+			course_info_comps = $('.ntdefault').html().split('<br>');			
 		}
 
 		if(class_title_txt) {
 			var title_comps = class_title_txt.split('-'),
-					tmp = title_comps[0].trim(),
-					tmp = tmp.split(' '),
-					subj = tmp[0],
-					course_num = tmp[1],
-					course_title = title_comps[1].trim();
+				tmp = title_comps[0].trim(),
+				tmp = tmp.split(' '),
+				subj = tmp[0],
+				course_num = tmp[1],
+				course_title = title_comps[1].trim();
 
 			parse_html(course_info_comps, subj, course_num, course_title);
 			check_sched_path(course_info_comps, subj, course_num);
