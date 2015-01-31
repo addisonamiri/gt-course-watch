@@ -11,7 +11,7 @@ var express = require('express'),
     Poller = require('./Poller.js'),
     PhantomJobDispatcher = require('./PhantomJobDispatcher.js'),
     TermManager = require('./TermManager.js'),
-    CatalogConnector = require('./CatalogConnector.js');    
+    CatalogConnector = require('./CatalogConnector.js');
 
 /*****
 username and email are synonymous through this application

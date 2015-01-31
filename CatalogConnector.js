@@ -1,4 +1,5 @@
 'use strict'
+
 /***
 @author Vikram Somu
 @date 1/25/2015
@@ -15,6 +16,7 @@ One queue processing class and another HTML parsing class.
 var https = require('https'),
     cheerio = require('cheerio'),
     monk = require('monk'),
+    FCallQueueProcessor = require('./FCallQueueProcessor.js'),
     poller_interval = null;
 
 function CatalogConnector(connection_url, term_mgr, unprobedt_delay) {
@@ -22,36 +24,10 @@ function CatalogConnector(connection_url, term_mgr, unprobedt_delay) {
 	this.term_mgr = term_mgr;
 	this.course_info = db.get('course_info');
 	this.term_courses = db.get('term_courses');
-	this.dispatch_delay_ms = 100;
 	this.start_crn = 20000;
 	this.end_crn = 99999;
-	this.probe_fcall_q = [];
-	this.check_active = false;
 	this.start_unprobed_term_poller(unprobedt_delay);
-};
-
-CatalogConnector.prototype.check_probe_q = function() {
-	var _this = this;
-
-	if(this.probe_fcall_q.length > 0) {
-		var crn_test_fcall = this.probe_fcall_q.shift();
-		_this.check_active = true;
-		// TRACKING show the current CRN being tested
-		// console.log(crn_test_fcall[0]);
-		_this.crn_path_valid(crn_test_fcall);
-		setTimeout(function() {
-			_this.check_probe_q();
-		}, _this.dispatch_delay_ms);
-	} else {
-		_this.check_active = false;
-	}
-
-}
-
-CatalogConnector.prototype.alert_q = function() {
-	if (!this.check_active) {
-		this.check_probe_q();	
-	}
+	this.qprocessor = new FCallQueueProcessor(this.crn_path_valid, this);
 };
 
 CatalogConnector.prototype.start_unprobed_term_poller = function(delay) {
@@ -78,7 +54,7 @@ CatalogConnector.prototype.stop_unprobed_term_poller = function() {
 
 CatalogConnector.prototype.poll_unprobed_terms = function(cb) {
 	// Process one term at a time, wait till the q is empty to proceed.
-	if(!this.probe_fcall_q.length) {
+	if(!this.qprocessor.fcall_q.length) {
 		this.term_mgr.get_unprobed_terms(cb);
 	}
 };
@@ -113,8 +89,8 @@ CatalogConnector.prototype.probe_term_for_crns = function(term_code) {
 			}
 		};
 
-		this.probe_fcall_q.push([i, term_code, path_to_probe, transition_cb]);
-		this.alert_q();
+		this.qprocessor.fcall_q.push([i, term_code, path_to_probe, transition_cb]);
+		this.qprocessor.alert_q_to_poll();
 	};
 
 	_this.term_mgr.set_probed(term_code, true);
@@ -124,6 +100,7 @@ CatalogConnector.prototype.probe_term_for_crns = function(term_code) {
 CatalogConnector.prototype.crn_path_valid = function(crn, term, path, cb) {
   var _this = this;
 
+  //Doesn't even use this when called by FCallQueueProcessor
   if(arguments.length == 1) {
   	var crn = arguments[0][0],
   		term = arguments[0][1],
@@ -156,8 +133,8 @@ CatalogConnector.prototype.crn_path_valid = function(crn, term, path, cb) {
 CatalogConnector.prototype.check_catalog_entry = function($, term, path) {
 	var _this = this;
 
-	//TRACKING show paths that belong to VALID CRNS
-	// console.log(path);
+	// TRACKING show paths that belong to VALID CRNS
+	console.log(path);
 
 	$('a').each(function() {
 		if(_this.link_to_text(this) == 'View Catalog Entry') {
