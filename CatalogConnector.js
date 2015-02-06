@@ -24,7 +24,7 @@ function CatalogConnector(connection_url, term_mgr, unprobedt_delay) {
 	this.term_mgr = term_mgr;
 	this.course_info = db.get('course_info');
 	this.term_courses = db.get('term_courses');
-	this.start_crn = 20000;
+	this.start_crn = 10000;
 	this.end_crn = 99999;
 	this.start_unprobed_term_poller(unprobedt_delay);
 	this.qprocessor = new FCallQueueProcessor(this.crn_path_valid, this);
@@ -35,13 +35,13 @@ CatalogConnector.prototype.start_unprobed_term_poller = function(delay) {
 
 	poller_interval = setInterval(function() {
 		_this.poll_unprobed_terms(function(unprobed) {
-				unprobed.forEach(function(e, i) {
-					//Limit 1 term at a time for probing
-					//Process only the first found term.
-					if(i == 0) {
-						_this.probe_term_for_crns(e.code);
-					}
-				});
+			unprobed.forEach(function(e, i) {
+				//Limit 1 term at a time for probing
+				//Process only the first found term.
+				if(i == 0) {
+					_this.probe_term_for_crns(e.code);
+				}
+			});
 		});
 	}, delay);
 };
@@ -54,19 +54,19 @@ CatalogConnector.prototype.stop_unprobed_term_poller = function() {
 
 CatalogConnector.prototype.poll_unprobed_terms = function(cb) {
 	// Process one term at a time, wait till the q is empty to proceed.
-	if(!this.qprocessor.fcall_q.length) {
+	if(this.qprocessor.empty()) {
 		this.term_mgr.get_unprobed_terms(cb);
 	}
 };
 
 CatalogConnector.prototype.probe_term_for_crns = function(term_code) {
-  var pathComponents= [
-  	'/pls/bprod/bwckschd.p_disp_detail_sched?term_in=',
-  	'4digityear',
-  	'2digitmonth',
-  	'&crn_in=',
-  	'crn_val'
-  ],
+	var pathComponents= [
+		'/pls/bprod/bwckschd.p_disp_detail_sched?term_in=',
+		'4digityear',
+		'2digitmonth',
+		'&crn_in=',
+		'crn_val'
+	],
   	term_period = this.term_mgr.decompose_term_code(term_code),
   	start_crn = this.start_crn,
   	stop_crn = this.end_crn,

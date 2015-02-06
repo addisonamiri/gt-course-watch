@@ -33,4 +33,8 @@ FCallQueueProcessor.prototype.alert_q_to_poll = function() {
 	}
 };
 
+FCallQueueProcessor.prototype.empty = function() {
+	return !this.fcall_q.length;
+}
+
 module.exports = FCallQueueProcessor;
