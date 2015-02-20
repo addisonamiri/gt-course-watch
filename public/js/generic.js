@@ -76,6 +76,15 @@ $(function() {
 });
 
 $(document).ready(function() {  
+  //***BOOTSTRAP SELECT
+  $('#selectTerm').selectpicker();
+  $('#stats_term').selectpicker();
+  $('#serviceProvider').selectpicker();
+  $('.check-mark').hide();
+
+  ///////////////////
+
+  //***GET FULFILLMENT STATS
   $.ajax({
     url:"/getFulfillmentStats",
     dataType: "json",
@@ -89,7 +98,9 @@ $(document).ready(function() {
       $('#fulfillment_stats').html(fulfillment_stat_components.join(''));
     }
   });
+  ///////////////////
 
+  //***Donation Modal
   setTimeout(function() {
     $("#donate-modal").modal({'show': true});
   }, 1500);
@@ -101,6 +112,7 @@ $(document).ready(function() {
   $("#donation-box-button").click(function(e) {
     e.stopPropagation();
   });
+  ///////////////////
 
   $("#loginForm").submit(function(e) {
     e.preventDefault();

@@ -75,7 +75,7 @@
 		<!-- <label for="inputCRN">CRN </label> -->			
 		<input type="text" class="form-control" id="inputCRN" placeholder="CRN">
 
-		<select id="selectTerm" class="form-control">
+		<select id="selectTerm" class="form-control selectpicker">
 			{{#if fallLabel}}
 			<option value="{{fall}}">{{fallLabel}}</option>
 			{{/if}}
@@ -110,7 +110,7 @@
 
 	<div id="sms_stuff" style="display: none;">
 		<label for="serviceProvider">Choose Your Service Provider:</label>
-		<select id="serviceProvider" class="form-control">
+		<select id="serviceProvider" class="form-control selectpicker">
 			<option value="att">AT&T</option>
 			<option value="verizon">Verizon</option>
 			<option value="sprint">Sprint</option>
