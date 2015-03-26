@@ -705,7 +705,7 @@ $(document).ready(function() {
         var tableHTML = '<br/> <table class="table table-striped" style="width:500px"> <tr> <th></th> <th>Seat Stats</th>' + 
           '<th>Waitlist Stats</th> </tr> <tr> <td>Remaining</td>' +
           '<td>' + data.remaining + '/' + data.capacity + '</td>' +   
-          '<td>' + data.waitlist_remaining + '/' + data.waitlist_capacity + '</td></tr><tr><td>Actual</td>' +
+          '<td>' + data.waitlist_remaining + '/' + data.waitlist_capacity + '</td></tr><tr><td>Filled</td>' +
           '<td>' + data.actual + '/' + data.capacity + '</td>' + 
           '<td>' + data.waitlist_actual + '/' + data.waitlist_capacity + '</td></tr></table>';
 
