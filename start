@@ -26,6 +26,9 @@ sudo chown `id -u` /data/db # $() forks the script, runs the contents, and retur
 sudo cp mongod.conf /etc/mongod.conf
 sudo mongod --config /etc/mongod.conf --smallfiles
 
+# Start deluge
+./deluge_run
+
 ./node_modules/forever/bin/forever \
 start \
 -al forever.log \
