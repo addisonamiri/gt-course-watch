@@ -5,6 +5,7 @@ if(window.location.protocol.match(/https/)) {
 } else{
   var socket = io.connect('http://' + window.location.hostname);
 }
+  
 
 var buzzPortVerified = false;
 var autoCRNVerified = false;

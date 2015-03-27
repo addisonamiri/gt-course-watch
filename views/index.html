@@ -26,17 +26,20 @@
  -->
 	</h1>
 
+	<!-- AdBlock Detection Test Ad -->
 
-	<!-- Header Adboard -->
-	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-	<ins class="adsbygoogle"
-	     style="display:block"
-	     data-ad-client="ca-pub-5006930321157769"
-	     data-ad-slot="8208497131"
-	     data-ad-format="auto"></ins>
-	<script>
-		(adsbygoogle = window.adsbygoogle || []).push({});
-	</script>
+	<div id="test_ad">
+		<!-- Header Adboard -->
+		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+		<ins class="adsbygoogle"
+		     style="display:block"
+		     data-ad-client="ca-pub-5006930321157769"
+		     data-ad-slot="8208497131"
+		     data-ad-format="auto"></ins>
+		<script>
+			(adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
+	</div>
 
   <h4 id="fulfillment_stats">
   	Request Fulfillment Rate: - % (-/-) 
@@ -111,5 +114,12 @@
         </div>
       </div>
     </div>
-
 </div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+	    if ($('#test_ad').height() == 0) {
+	    	console.log('adblock detected');
+	    }
+	});
+</script>
