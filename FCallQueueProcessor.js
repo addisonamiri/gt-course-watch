@@ -14,6 +14,7 @@ FCallQueueProcessor.prototype.poll_q = function() {
 	var _this = this;
 
 	if(_this.fcall_q.length > 0) {
+		// each 'fcall' is a list of parameters to be supplied to this.func
 		var fcall = _this.fcall_q.shift();
 		_this.check_active = true;
 		// TRACKING show the current CRN being tested
