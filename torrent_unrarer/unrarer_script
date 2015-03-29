@@ -1,8 +1,11 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import sys
 import os
 import shelve
 import ConcurrentShelf
+import shutil
 
 '''
 @author Vikram Somu
@@ -38,7 +41,8 @@ File_Count: Simply the number of files in a folder
 
 class ExtractionManager(object):
     def __init__(self, shelve_file):
-        # Concurrent Shelf to represent Folder Memory
+        # Concurrent Shelf to represent Folder Memory. 
+        # This is the Memory shelf
         self.cshelf = ConcurrentShelf.ConcurrentShelf(shelve_file)
 
     # Scan the source folder for unprocessed folders (folders not in memory). 
@@ -46,10 +50,15 @@ class ExtractionManager(object):
     # on files based on file type and state.
 
     # In our case, root sourcef wil be: (/var/www/html/dl)
-    # We recursively call scan_sourcef on unvisited subdirs
-    def scan_sourcef(self, sourcef):
+    # We recursively call scan_sourcefp on unvisited subdirs
+    def scan_sourcefp(self, sourcef):
+        # If sourcef is not a dir, break flow of execution
+        if not os.path.isdir(sourcef):
+            return
+
         for file in os.listdir(sourcef):
             fp = sourcef + '/' + file
+            # print 'all traversed files:', sourcef, file
 
             # Check to be sure fp points to a directory
             if os.path.isdir(fp):
@@ -58,25 +67,31 @@ class ExtractionManager(object):
                     numfiles_in_fp = self.count_files(fp)
                     # Add it as unvisited with current number of files in directory
                     self.cshelf.set(fp, ('unvisited', numfiles_in_fp))
-                    # Handle Unvisited Folder Checking
-                    self.handle_unvisited_fp(fp)
-                    # Recursively scan this newly found subdir
+                    # Visit unvisited Folder Checking
+                    self.visit_unvisited_fp(fp)
+                else: # File is in the memory shelf      
+                    memstate = self.cshelf.get(fp) #(File_State, File_Count)
+                    # Check and make sure FP is visited_dirty state!
+                    if memstate[0] == 'visited_dirty':
+                        self.visit_dirty_fp(fp, memstate)
 
-                else: # File is in memory
-                    curstate = self.cshelf.get(fp) #(File_State, File_Count)
-
-                    # Only handle 'visited_dirty' not 'visited_clean' since those are done
-                    if curstate == 'visited_dirty':
-
+                # Recursively scan this newly found subdir, whether in memory or not
+                # As we need to scan for new unvisited files AS WELL as re-scan
+                # old files in the 'visited_dirty' state to re-check
+                self.scan_sourcefp(fp)
 
     # Utility function to check unvisited fp for rar files and extract them
+    # and updating state for the fp in the Shelf
 
     # If a folder is unvisited, visit it and scan for .rar files
         # We must update memory of fp to 'visited_dirty' before we scan. 
-        # Now scan by recursively looking through all sub-folders for any .rar files
-    def handle_unvisited_fp(self, fp):
+        # If no .rar files are found, set state to 'visited_clean'
+    def visit_unvisited_fp(self, fp):
         unrared_lens = []
+        filect = self.count_files(fp)
+        dirty = False
 
+        # Walk through the fp dir
         for file in os.listdir(fp):
             # Check for file with ending .rar
             if file.endswith(".rar"):
@@ -88,25 +103,39 @@ class ExtractionManager(object):
                     # BE SURE TO CHANGE STATE IN MEMORY BEFORE STARTING EXTRACTION.
                     # Since we don't want duplicate extraction
                     rarfp = fp + '/' + file
+                    # print 'found rarfp:', rarfp
                     self.cshelf.set(fp, ('visited_dirty', 'PROCESSING'))
+                    # Issue shell unrar command on rarfp
                     os.system('unrar x {0}'.format(rarfp))
-                    filect = self.count_files(fp)
                     self.cshelf.set(fp, ('visited_dirty', filect))
                     dirty = True
 
+        # If clean, set state to 'visited_clean'
+        if not dirty:
+            self.cshelf.set(fp, ('visited_clean', filect))
 
-
-
-
-        pass
 
     # Utility function to check dirty fp for change in file count
-    def handle_dirty_fp(self, fp):
-        pass
+    # If the number of files in the directory decreases, we
+    # anihilate the directory from the file system and the memory shelf
 
+    # If a folder is visited_dirty, we check to see if the # of files
+    # currently in the folder is different from the # in memory.
+        # If the number is lower, the torrent has been deleted from
+        # the deluge Web UI, so we must clean the extracted content
+        # by issuing 'rm -rf folderpath' (we use a python equivalent)
+    def visit_dirty_fp(self, fp, memstate):
+        oldct = memstate[1]
 
-        # return unvisited files
-        return ret
+        if  oldct != 'PROCESSING':
+            curct = self.count_files(fp)
+            # Content from folder has been deleted....
+            # Time to anihilate the folder completely
+            if curct < oldct:
+                # rm -rf fp from file system
+                shutil.rmtree(fp)
+                # Remove entry corresponding to fp from the Shelf
+                self.cshelf.del_entry(fp)
 
     # Return number of Hidden/Unhidden Files/Directories in fp
     def count_files(self, fp):
@@ -115,23 +144,17 @@ class ExtractionManager(object):
     def get_parent_dir(self, fp):
         return '/'.join(fp.split('/')[:-1])
 
+def main():
+    shelf_name = 'folder_mem'
+    root_sourcefp = sys.argv[1]
+    em = ExtractionManager(shelf_name)
+    em.scan_sourcefp(root_sourcefp)
+
+main()
+
+# '/Users/vikram/gtcw/torrent_mover'
 
 
-
-
-
-em = ExtractionManager('folder_mem.db')
-ret = em.scan_sourcef_unvisited('/Users/vikram')
-print ret
-
-
-    # If a folder is visited_clean, we skip over it.
-
-    # If a folder is visited_dirty, we check to see if the # of files
-    # currently in the folder is different from the # in memory.
-        # If there is a difference, the torrent has been deleted from
-        # the deluge Web UI, so we must clean the extracted content
-        # by issuing 'rm -rf folderpath'
 
 
 
