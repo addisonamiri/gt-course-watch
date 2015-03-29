@@ -1,0 +1,129 @@
+#! /usr/bin/env python
+import sys
+import os
+import shelve
+import ConcurrentShelf
+
+'''
+@author Vikram Somu
+@date 3/29/2015
+
+A program for a robot to continually unrar new content and clean 
+that content up by deleting it when the rest of the rared content
+has been deleted (probably through the Deluge Web UI).
+
+This manager can only be used on a Source Folder (sourcef) where
+torrents are moved to said folder AFTER they have completed downloading.
+If this condition isn't true, the dirty checking will be fucked up.
+
+'''
+
+'''
+Store a memory of archive folders that we have previously
+visited. This 'memory' will be a file containing JSON output...
+The script will simply read in and write out to this file to both
+retrieve and update its memory.
+
+Key -> Value
+Folder_Path -> (Folder_State, File_Count)
+
+Folder_State: The state of the folder
+- unvisited: any new folder that has not ever been scanned before is 'unvisited'
+- visited_clean: folder that has been visited and does not have any extracted content
+- visited_dirty: folder has been visited, content was extracted, and is still in the folder
+
+File_Count: Simply the number of files in a folder
+'''
+
+class ExtractionManager(object):
+    def __init__(self, shelve_file):
+        # Concurrent Shelf to represent Folder Memory
+        self.cshelf = ConcurrentShelf.ConcurrentShelf(shelve_file)
+
+    # Scan the source folder (/var/www/html/dl) in our case
+    # and perform appropriate checking / handling actions
+    # on fp based on state.
+    def scan_sourcef(self, sourcef):
+        for file in os.listdir(sourcef):
+            fp = sourcef + '/' + file
+
+            # Check to be sure fp points to a directory
+            if os.path.isdir(fp):
+                # file not in memory, thus unvisited
+                if not self.cshelf.get(fp):
+                    numfiles_in_fp = self.count_files(fp)
+                    # Add it as unvisited with current number of files in directory
+                    self.cshelf.set(fp, ('unvisited', numfiles_in_fp))
+                    # Handle Unvisited Folder Checking
+                    self.handle_unvisited_fp(fp)
+
+                else: # File is in memory
+                    curstate = self.cshelf.get(fp) #(File_State, File_Count)
+
+                    if curstate == 'visited_dirty':
+                        # Handle Dirty Folder Checking
+
+
+    # If a folder is unvisited, visit it and scan for .rar files
+
+        # We must update memory of the visitation before we scan. 
+        # Now scan by recursively looking through all sub-folders for any .rar files
+
+
+    # Utility function to check unvisited fp for rar files
+    def handle_unvisited_fp(self, fp):
+        unrared_lens = []
+
+        for file in os.listdir(fp):
+            # Check for file with ending .rar
+            if file.endswith(".rar"):
+                # Check to make sure we haven't unrared other .rar files that are 
+                # the same length  (this case is common with multi-part file archives)
+                if len(file) not in unrared_lens:
+                    unrared_lens.append(len(file))
+                    # If .rar file is found, we will issue the command 'unrar x filename' on it.
+                    # BE SURE TO CHANGE STATE IN MEMORY BEFORE STARTING EXTRACTION.
+                    # Don't want duplicate extraction
+                    os.system('unrar x {0}'.format(fp + '/' + file))
+
+
+
+
+        pass
+
+    # Utility function to check dirty fp for change in file count
+    def handle_dirty_fp(self, fp):
+        pass
+
+
+        # return unvisited files
+        return ret
+
+    # Return number of Hidden/Unhidden Files/Directories in fp
+    def count_files(self, fp):
+        return len([name for name in os.listdir(fp)])
+
+
+
+
+
+em = ExtractionManager('folder_mem.db')
+ret = em.scan_sourcef_unvisited('/Users/vikram')
+print ret
+
+
+    # If a folder is visited_clean, we skip over it.
+
+    # If a folder is visited_dirty, we check to see if the # of files
+    # currently in the folder is different from the # in memory.
+        # If there is a difference, the torrent has been deleted from
+        # the deluge Web UI, so we must clean the extracted content
+        # by issuing 'rm -rf folderpath'
+
+
+
+
+
+
+
+
