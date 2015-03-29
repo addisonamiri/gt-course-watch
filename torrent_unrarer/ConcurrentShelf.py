@@ -11,7 +11,8 @@ import pickle
 A shelf that allows for concurrent accesses by
 using atomic operations. The locking mechanism
 to accomplish said 'atomic' operations is the 
-'fcntl' module.
+'fcntl' module. Thus the ConcurrentShelf will only work
+on Unix systems, since fcntl was made for *nix.
 '''
 
 '''
@@ -21,6 +22,9 @@ class ConcurrentShelf(object):
     def __init__(self, shelvefile):
         self.shelvemgr = ShelveLocker(shelvefile)
 
+    # Not-really atomic access get operation, since the lock 
+    # obtained will be a shared lock... Other processes can also read, 
+    # no writing though.
     def get(self, k):
         # try and open the shelf mgr in 'r' mode...
         # if the shelf file does not yet exist, an Exception will be thrown
@@ -34,6 +38,7 @@ class ConcurrentShelf(object):
         except:
             return None
 
+    # Atomic access set operation
     def set(self, k, v):
         self.shelvemgr.open('READWRITE')
         self.shelvemgr.shelve[k] = v
@@ -45,25 +50,32 @@ Lock manager class for shelve objects
 '''
 class ShelveLocker(object):
     def __init__(self, shelvefile):
+        # The shelvefile 
         self.shelvefile = shelvefile
 
     def open(self, mode='READONLY'):
         if mode is 'READWRITE':
-            lockfilemode = 'a' 
+            lockfilemode = 'a' # Append
             lockmode = fcntl.LOCK_EX # Exclusive Lock
-            shelve_mode = 'c'
+            shelve_mode = 'c' # Open shelf for reading and writing, creating it if it doesn’t exist
         else:
-            lockfilemode = 'r'
+            lockfilemode = 'r' # Read
             lockmode = fcntl.LOCK_SH # Shared Lock
-            shelve_mode = 'r'
+            shelve_mode = 'r' # Open existing database for reading only (default)
 
-        self.lockfd = open(self.shelvefile+".lck", lockfilemode)
+        # Open the lock file to get a file handle
+        self.lockfd = open(self.shelvefile + ".lck", lockfilemode)
+        # Obtain lock on the file handle, or block
         fcntl.flock(self.lockfd.fileno(), lockmode )
+        # Open the shelf for mutation now that we have obtained lock
         self.shelve = shelve.open(self.shelvefile, flag=shelve_mode, protocol=pickle.HIGHEST_PROTOCOL)
 
     def close(self):
+        # Close the shelf file
         self.shelve.close()
-        fcntl.flock(self.lockfd.fileno(), fcntl.LOCK_UN) # Unlock lock
+        # Release the lock on self.lockfd
+        fcntl.flock(self.lockfd.fileno(), fcntl.LOCK_UN)
+        # Close the lock file self.lockfd
         self.lockfd.close()
 
 

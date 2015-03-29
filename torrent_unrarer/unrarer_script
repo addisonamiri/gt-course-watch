@@ -8,6 +8,8 @@ import ConcurrentShelf
 @author Vikram Somu
 @date 3/29/2015
 
+DEPENDENCIES: 'unrar' unix command line tool
+
 A program for a robot to continually unrar new content and clean 
 that content up by deleting it when the rest of the rared content
 has been deleted (probably through the Deluge Web UI).
@@ -15,7 +17,6 @@ has been deleted (probably through the Deluge Web UI).
 This manager can only be used on a Source Folder (sourcef) where
 torrents are moved to said folder AFTER they have completed downloading.
 If this condition isn't true, the dirty checking will be fucked up.
-
 '''
 
 '''
@@ -40,9 +41,12 @@ class ExtractionManager(object):
         # Concurrent Shelf to represent Folder Memory
         self.cshelf = ConcurrentShelf.ConcurrentShelf(shelve_file)
 
-    # Scan the source folder (/var/www/html/dl) in our case
-    # and perform appropriate checking / handling actions
-    # on fp based on state.
+    # Scan the source folder for unprocessed folders (folders not in memory). 
+    # Perform appropriate checking / handling actions
+    # on files based on file type and state.
+
+    # In our case, root sourcef wil be: (/var/www/html/dl)
+    # We recursively call scan_sourcef on unvisited subdirs
     def scan_sourcef(self, sourcef):
         for file in os.listdir(sourcef):
             fp = sourcef + '/' + file
@@ -56,21 +60,20 @@ class ExtractionManager(object):
                     self.cshelf.set(fp, ('unvisited', numfiles_in_fp))
                     # Handle Unvisited Folder Checking
                     self.handle_unvisited_fp(fp)
+                    # Recursively scan this newly found subdir
 
                 else: # File is in memory
                     curstate = self.cshelf.get(fp) #(File_State, File_Count)
 
+                    # Only handle 'visited_dirty' not 'visited_clean' since those are done
                     if curstate == 'visited_dirty':
-                        # Handle Dirty Folder Checking
 
+
+    # Utility function to check unvisited fp for rar files and extract them
 
     # If a folder is unvisited, visit it and scan for .rar files
-
-        # We must update memory of the visitation before we scan. 
+        # We must update memory of fp to 'visited_dirty' before we scan. 
         # Now scan by recursively looking through all sub-folders for any .rar files
-
-
-    # Utility function to check unvisited fp for rar files
     def handle_unvisited_fp(self, fp):
         unrared_lens = []
 
@@ -83,8 +86,14 @@ class ExtractionManager(object):
                     unrared_lens.append(len(file))
                     # If .rar file is found, we will issue the command 'unrar x filename' on it.
                     # BE SURE TO CHANGE STATE IN MEMORY BEFORE STARTING EXTRACTION.
-                    # Don't want duplicate extraction
-                    os.system('unrar x {0}'.format(fp + '/' + file))
+                    # Since we don't want duplicate extraction
+                    rarfp = fp + '/' + file
+                    self.cshelf.set(fp, ('visited_dirty', 'PROCESSING'))
+                    os.system('unrar x {0}'.format(rarfp))
+                    filect = self.count_files(fp)
+                    self.cshelf.set(fp, ('visited_dirty', filect))
+                    dirty = True
+
 
 
 
@@ -102,6 +111,10 @@ class ExtractionManager(object):
     # Return number of Hidden/Unhidden Files/Directories in fp
     def count_files(self, fp):
         return len([name for name in os.listdir(fp)])
+
+    def get_parent_dir(self, fp):
+        return '/'.join(fp.split('/')[:-1])
+
 
 
 
