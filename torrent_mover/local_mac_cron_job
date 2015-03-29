@@ -5,7 +5,7 @@ env EDITOR=vim crontab -e
 # 10 seconds, we are going to have to use a kludge:
 # http://stackoverflow.com/questions/9619362/running-a-cron-every-30-seconds
 
-# * * * * * makes a job run every 1 minute
+# '* * * * * exec' syntax makes a exec run every 1 minute
 
 # The syntax for the job is below:
 
