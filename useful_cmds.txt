@@ -9,6 +9,10 @@ mongorestore <our database name>
 # To zip up a file
 tar -cvzf backup.tar.gz gtcw_backup/
 
+# untar to folder 'foo'
+mkdir foo
+tar -xzf bar.tar.gz -C foo
+
 # SCP with key file
 http://stackoverflow.com/questions/6558080/scp-secure-copy-to-ec2-instance-without-password 
 scp -i GTCW.pem backup.tar.gz ec2-user@54.174.170.202:/
