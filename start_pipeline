@@ -12,6 +12,10 @@ if [ $HTTPS_ENABLED == 'true' ]; then
   sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to $HTTPS_PORT
 fi
 
+# Start the firewall
+chmod +x firewall
+./firewall
+
 # Allocate 2GB Swap Space
 # TO UNMOUNT THE SWAP SPACE, simply issue: 'swapoff -a'
 sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=2048
