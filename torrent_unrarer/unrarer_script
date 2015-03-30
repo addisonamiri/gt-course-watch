@@ -88,7 +88,6 @@ class ExtractionManager(object):
         # If no .rar files are found, set state to 'visited_clean'
     def visit_unvisited_fp(self, fp):
         unrared_lens = []
-        filect = self.count_files(fp)
         dirty = False
 
         # Walk through the fp dir
@@ -105,13 +104,20 @@ class ExtractionManager(object):
                     rarfp = fp + '/' + file
                     # print 'found rarfp:', rarfp
                     self.cshelf.set(fp, ('visited_dirty', 'PROCESSING'))
-                    # Issue shell unrar command on rarfp
-                    os.system('unrar e {0}'.format(rarfp))
+                    # Issue shell unrar command on rarfp ->
+                    os.system('unrar x {0} {1}'.format(
+                            rarfp,
+                            fp
+                        )
+                    )
+                    # Determine new folder count
+                    filect = self.count_files(fp)
                     self.cshelf.set(fp, ('visited_dirty', filect))
                     dirty = True
 
         # If clean, set state to 'visited_clean'
         if not dirty:
+            filect = self.count_files(fp)
             self.cshelf.set(fp, ('visited_clean', filect))
 
 
@@ -145,7 +151,7 @@ class ExtractionManager(object):
         return '/'.join(fp.split('/')[:-1])
 
 def main():
-    shelf_name = 'folder_mem'
+    shelf_name = 'folder_mem.db'
     root_sourcefp = sys.argv[1]
     em = ExtractionManager(shelf_name)
     em.scan_sourcefp(root_sourcefp)
