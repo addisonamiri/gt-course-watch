@@ -26,7 +26,7 @@ class ConcurrentShelf(object):
     def __init__(self, shelvefile):
         self.shelvemgr = ShelveLocker(shelvefile)
 
-    # Not-really atomic access get operation, since the lock 
+    # Get operation is not-really atomic access , since the lock 
     # obtained will be a shared lock... Other processes can also read, 
     # no writing though.
     def get(self, k):
