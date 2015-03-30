@@ -3,6 +3,7 @@ export HTTPS_PORT=8000
 export HTTPS_ENABLED=false #Don't forget to turn off HTTPS url redirect in NameCheap
 export BUILD_ENVIRONMENT=production
 export HOST_PROVIDER=digitalocean #either digitalocean or amazon
+export BTSYNCF=/root/btsyncf #Btsync folder
 
 # port remapping solution involving changing the routing table
 sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to $HTTP_PORT
@@ -31,6 +32,9 @@ sudo mongod --config /etc/mongod.conf --smallfiles
 # Restart the httpd service
 sudo cp httpd.conf /etc/httpd/conf/httpd.conf
 sudo service httpd restart
+
+# Start Btsync
+$BTSYNCF/btsync --webui.listen 0.0.0.0:8888
 
 # Start deluge
 ./deluge_run
