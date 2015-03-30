@@ -79,7 +79,7 @@ class ShelveLocker(object):
             shelve_mode = 'r' # Open existing database for reading only (default)
 
         # Open the lock file to get a file handle
-        self.lockfd = open(self.shelvefilestr + ".db.lck", lockfilemode)
+        self.lockfd = open(self.shelvefilestr + ".lck", lockfilemode)
         # Obtain lock on the file handle, or block
         fcntl.flock(self.lockfd.fileno(), lockmode )
         # Open the shelf for mutation now that we have obtained lock
