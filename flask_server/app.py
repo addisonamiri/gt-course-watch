@@ -12,14 +12,14 @@ def hello():
     return "Hello World!"
 
 # Perform the Unix df command and send output as response
-@app.route("/df/<flag>")
-def df(flag):
+@app.route("/dfh")
+def dfh():
     # Popen has a bug... it doesnt take the second argument in the
     # list into account, which is why I had to combine the flag
     # param into the same string as the df call. Now there is only one
     # string in the command args list... this is the only way it would work.
     proc = subprocess.Popen(
-        ["df -{0}".format(flag)], 
+        ["df -h"], 
         stdout=subprocess.PIPE, 
         shell=True
     )
