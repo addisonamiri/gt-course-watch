@@ -11,7 +11,7 @@ app = Flask(__name__)
 def hello():
     return "Hello World!"
 
-# Perform the Unix df command and send output as response
+# Perform the Unix df -h command and send output as response
 @app.route("/dfh")
 def dfh():
     # Popen has a bug... it doesnt take the second argument in the
@@ -25,6 +25,44 @@ def dfh():
     )
     (out, err) = proc.communicate()
     outlines = out.split('\n')
+    ret_html = "<html><body>{0}</body></html>".format(
+        shellout_to_html(outlines)
+    )    # Simple method just inserting BRs
+    # out = out.replace('\n', '<br>')
+    return ret_html
+
+# Perform the Unix df -k command and send output as response
+@app.route("/dfk")
+def dfk():
+    proc = subprocess.Popen(
+        ["df -k"], 
+        stdout=subprocess.PIPE, 
+        shell=True
+    )
+    (out, err) = proc.communicate()
+    outlines = out.split('\n')
+    ret_html = "<html><body>{0}</body></html>".format(
+        shellout_to_html(outlines)
+    )
+    return ret_html
+
+@app.route("/peekdl")
+def peekdl():
+    try:
+        folder_memdb_fp = os.environ["FOLDER_MEMDB_FP"]
+        folder_mem_shelf = shelve.open(
+            folder_memdb_fp, 
+            flag='r'
+        )
+        return jsonify(folder_mem_shelf)
+    except Exception, e:
+        # print str(e)
+        return "Error accessing folder_mem.db"
+
+# Transform output of multiple lines seperated by '\n' char
+# and multiple data cells on each line seperated by ' ' char
+# into an html table.
+def shellout_to_html(outlines):
     ret_html = ''
 
     header_contents = ''
@@ -44,24 +82,9 @@ def dfh():
         rowhtml = '<tr>{0}</tr>'.format(rowcontents)
         ret_html += rowhtml 
 
-    ret_html = "<html><body><table>{0}</table></body></html>".format(ret_html)
-
-    # Simple method just inserting BRs
-    # out = out.replace('\n', '<br>')
+    ret_html = "<table>{0}</table>".format(ret_html)
     return ret_html
 
-@app.route("/peekdl")
-def peekdl():
-    try:
-        folder_memdb_fp = os.environ["FOLDER_MEMDB_FP"]
-        folder_mem_shelf = shelve.open(
-            folder_memdb_fp, 
-            flag='r'
-        )
-        return jsonify(folder_mem_shelf)
-    except Exception, e:
-        # print str(e)
-        return "Error accessing folder_mem.db"
 
 if __name__ == "__main__":
     # host='0.0.0.0' makes the server externally visible
