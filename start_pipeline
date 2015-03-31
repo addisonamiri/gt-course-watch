@@ -4,6 +4,7 @@ export HTTPS_ENABLED=false #Don't forget to turn off HTTPS url redirect in NameC
 export BUILD_ENVIRONMENT=production
 export HOST_PROVIDER=digitalocean #either digitalocean or amazon
 export BTSYNCF=/root/btsyncf #Btsync folder
+export FOLDER_MEMDB_FP=/root/folder_mem.db
 
 # port remapping solution involving changing the routing table
 sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to $HTTP_PORT
@@ -42,6 +43,18 @@ $BTSYNCF/btsync --webui.listen 0.0.0.0:8888
 
 # Start deluge
 ./deluge_run
+
+# Install EPEL
+rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+# Install pip through yum / EPEL
+sudo yum -y install python-pip
+# Install flask through pip
+sudo pip install flask
+# Start Flask Dev Server
+# nohup ensures that the process doesnt exit eve when the parent process terminates.
+# the & at the end of the command makes the command execute in the background,
+# and therefore allows you to regain access to the command line
+nohup python ./flask_server/app.py &
 
 ./node_modules/forever/bin/forever \
 start \

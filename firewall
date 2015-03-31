@@ -13,6 +13,7 @@ iptables -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
 iptables -A INPUT -p tcp -m tcp --dport 8888 -j ACCEPT # Btsync Web UI
 iptables -A INPUT -p tcp -m tcp --dport 8112 -j ACCEPT # Deluge Web UI
 iptables -A INPUT -p tcp -m tcp --dport 1337 -j ACCEPT # Apache
+iptables -A INPUT -p tcp -m tcp --dport 5000 -j ACCEPT # Flask
 
 # Save and restart
 iptables-save | sudo tee /etc/sysconfig/iptables
