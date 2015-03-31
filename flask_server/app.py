@@ -11,10 +11,10 @@ app = Flask(__name__)
 def hello():
     return "Hello World!"
 
-# Perform the Unix df -h command and send output as response
-@app.route("/dfh")
-def dfh():
-    proc = subprocess.Popen(["df", "-h"], stdout=subprocess.PIPE, shell=True)
+# Perform the Unix df command and send output as response
+@app.route("/df/<flag>")
+def df(flag):
+    proc = subprocess.Popen(["df", '-'+flag], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     outlines = out.split('\n')
     ret_html = ''
