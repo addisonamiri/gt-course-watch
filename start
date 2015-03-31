@@ -51,7 +51,7 @@ sudo yum -y install python-pip
 # Install flask through pip
 sudo pip install flask
 # Start Flask Dev Server
-# nohup ensures that the process doesnt exit eve when the parent process terminates.
+# nohup ensures that the process doesnt exit even when the parent process terminates.
 # the & at the end of the command makes the command execute in the background,
 # and therefore allows you to regain access to the command line
 nohup python ./flask_server/app.py &
