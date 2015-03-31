@@ -33,6 +33,8 @@ sudo chown `id -u` /data/db # $() forks the script, runs the contents, and retur
 sudo cp mongod.conf /etc/mongod.conf
 sudo mongod --config /etc/mongod.conf --smallfiles
 
+# Install Apache
+sudo yum -y install httpd
 # Overwrite system httpd.conf with project httpd.conf
 # Restart the httpd service
 sudo cp httpd.conf /etc/httpd/conf/httpd.conf
