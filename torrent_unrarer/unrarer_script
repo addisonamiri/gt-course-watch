@@ -110,7 +110,7 @@ class ExtractionManager(object):
                             dest_dir=fp
                         )
                     )
-                    # Determine new file count
+                    # Determine new file count, after unrar
                     filect = self.count_files(fp)
                     self.cshelf.set(fp, ('visited_dirty', filect))
                     dirty = True

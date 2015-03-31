@@ -36,10 +36,15 @@ class ConcurrentShelf(object):
         # if the key doesn't exist, value of None will be returned
         try:
             self.shelvemgr.open()
-            val = dict(self.shelvemgr.shelvefile).get(k)
+            # val = dict(self.shelvemgr.shelvefile).get(k)
+            val = self.shelvemgr.shelvefile[k]
             self.shelvemgr.close()
             return val
         except Exception, e:
+            try: 
+                self.shelvemgr.close()
+            except:
+                return None
             # print traceback.format_exc()
             # print str(e)
             return None
@@ -54,9 +59,15 @@ class ConcurrentShelf(object):
     # Delete an entry from the Shelf
     def del_entry(self, k):
         self.shelvemgr.open('READWRITE')
-        _dictrepr = dict(self.shelvemgr.shelvefile)
-        if k in _dictrepr:
-            del self.shelvemgr.shelvefile[k]    
+        # _dictrepr = dict(self.shelvemgr.shelvefile)
+        # This is how I would like to check if the shelf has a key:
+        # if k in self.shelvemgr.shelvefile:
+
+        # But this is how I have to due to retarded bsddb incompatibilities
+        # self.shelvemgr.shelvefile ends up sometimes being a 'bsddb' instance
+        # instead of a 'dbm' instance. bsddb is not itrable so the in keyword doesnt work.
+        if self.shelvemgr.shelvefile.dict.has_key('cat'):
+            del self.shelvemgr.shelvefile[k]
         self.shelvemgr.close()
 
 
@@ -70,7 +81,7 @@ class ShelveLocker(object):
 
     def open(self, mode='READONLY'):
         if mode is 'READWRITE':
-            lockfilemode = 'a' # Append
+            lockfilemode = 'r' # Append
             lockmode = fcntl.LOCK_EX # Exclusive Lock
             shelve_mode = 'c' # Open shelf for reading and writing, creating it if it doesn’t exist
         else:
