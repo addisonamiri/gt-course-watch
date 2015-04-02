@@ -100,7 +100,7 @@ class WebMConverter(object):
 
         duration_found = False
         program_terminated = False
-        durationv = None
+        durationt = None
 
         while not program_terminated:
             # Lowering the buffer-size param to the read method makes the 
@@ -118,17 +118,17 @@ class WebMConverter(object):
                     if durationg:
                         durationstr = durationg.groups()[0]
                         self.set_shelve_val(inf, 'duration', durationstr)
-                        durationv = self.str_to_timeobj(durationstr)
-                        duration_delta = durationv - base_time
+                        durationt = self.str_to_timeobj(durationstr)
+                        duration_delta = durationt - base_time
                         duration_found = True
 
                 timeg = re.search(self.time_re, out) # time groups
                 if timeg:
                     timecompstr = timeg.groups()[0]
                     self.set_shelve_val(inf, 'time_complete', timecompstr)
-                    
-                    timecompv = self.str_to_timeobj(timecompstr)
-                    timecomp_delta = timecompv - base_time
+
+                    timecompt = self.str_to_timeobj(timecompstr)
+                    timecomp_delta = timecompt - base_time
                     progress_ratio = timecomp_delta.total_seconds() / duration_delta.total_seconds()
                     progress_pct = progress_ratio * 100
                     self.set_shelve_val(inf, "% progress", progress_pct)
