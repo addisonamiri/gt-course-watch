@@ -66,13 +66,16 @@ class WebMConverter(object):
     def ffmpeg_proc_exec(self, fp):
         # Construct output file name from input file
         fp_fn = fp.split('/')[-1] # Name of video file
+        # Replace regular spaces with escaped spaces
+        fp_fn = fp_fn.replace(' ', '\ ')
+
         outf = '.'.join(fp_fn.split('.')[:-1]) + '.webm' # Constructed output file name
         containing_dir_fp = '/'.join(fp.split('/')[:-1]) # Name of containing directory for input/ouput
 
         # Assemble ffmpeg shell command
         cmd_template = self.translate_qality[self.quality]
         cmd = cmd_template.format(
-            inputfp=fp, 
+            inputfp=containing_dir_fp + '/' + fp_fn, 
             outputfp=containing_dir_fp + '/' + outf
         )
 

@@ -65,14 +65,15 @@ def peekdl():
 def peekwebm():
     try:
         webm_prog_fp = os.environ["WEBM_PROG_FP"]
+        print 'webm fp', webm_prog_fp
         webm_shelf = shelve.open(
             webm_prog_fp, 
             flag='r'
         )
         return jsonify(webm_shelf)
     except Exception, e:
-        # print str(e)
-        return "Error accessing folder_mem.db"
+        print str(e)
+        return "Error accessing webm_prog.db"
 
 # Transform output of multiple lines seperated by '\n' char
 # and multiple data cells on each line seperated by ' ' char
