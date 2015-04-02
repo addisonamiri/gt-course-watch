@@ -1,3 +1,6 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import subprocess
 import re
 import sys
@@ -23,7 +26,7 @@ to webm.
 
 class WebMConverter(object):
 
-    def __init__(self, qual):
+    def __init__(self, shelfn, qual):
         self.midqual_generic_cmd = "ffmpeg -y -i {inputfp} -vcodec libvpx -acodec libvorbis {outputfp}"
         self.highqal_centos7_cmd = "ffmpeg -y -i {inputfp} -codec:v libvpx -quality good -cpu-used 0 -b:v 500k -qmin 10 -qmax 42 -maxrate 500k -bufsize 1000k -threads 4 -vf scale=-1:480 -codec:a libvorbis -b:a 128k {outputfp}"
 
@@ -37,7 +40,11 @@ class WebMConverter(object):
         self.video_re = "(.*\.(?:mp4|m4v|mkv|avi|flv))$"
 
         self.quality = qual
-        self.shelvefnstr = "webm_prog"
+        self.translate_qality = {
+            'mid_gen': self.midqual_generic_cmd,
+            'hi_centos': self.highqal_centos7_cmd
+        }
+        self.shelvefnstr = shelfn
 
     # Loop through files in sourcefp directory looking for video content
     # for each found video, issue an ffmpeg shell command to convert to .webm
@@ -63,7 +70,8 @@ class WebMConverter(object):
         containing_dir_fp = '/'.join(fp.split('/')[:-1]) # Name of containing directory for input/ouput
 
         # Assemble ffmpeg shell command
-        cmd = self.midqual_generic_cmd.format(
+        cmd_template = self.translate_qality[self.quality]
+        cmd = cmd_template.format(
             inputfp=fp, 
             outputfp=containing_dir_fp + '/' + outf
         )
@@ -116,10 +124,14 @@ class WebMConverter(object):
 
 
 def main():
-    pass
+    shelf_name = "webm_prog"
+    QUALITY = sys.argv[1] # 'hi_centos' or 'mid_gen'
+    SOURCEFP = sys.argv[2]
 
-w = WebMConverter('high')
-w.scan_sourcefp('/Users/vikram/Desktop/Drugs.Inc.S01.to.S03.720p/Drugs.Inc.S01.720p.HDTV.DD5.1.x264-DON')
+    w = WebMConverter(shelf_name, QUALITY)
+    w.scan_sourcefp(SOURCEFP)
+
+main()
 
 
 
