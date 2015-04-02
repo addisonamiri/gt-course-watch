@@ -46,6 +46,7 @@ def dfk():
     )
     return ret_html
 
+# View download history
 @app.route("/peekdl")
 def peekdl():
     try:
@@ -55,6 +56,20 @@ def peekdl():
             flag='r'
         )
         return jsonify(folder_mem_shelf)
+    except Exception, e:
+        # print str(e)
+        return "Error accessing folder_mem.db"
+
+# View webm conversion status
+@app.route("/peekwebm")
+def peekwebm():
+    try:
+        webm_prog_fp = os.environ["WEBM_PROG_FP"]
+        webm_shelf = shelve.open(
+            webm_prog_fp, 
+            flag='r'
+        )
+        return jsonify(webm_shelf)
     except Exception, e:
         # print str(e)
         return "Error accessing folder_mem.db"

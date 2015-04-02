@@ -56,9 +56,9 @@ class ExtractionManager(object):
     # Scan the source folder for unprocessed folders (folders not in memory). 
     # Perform appropriate checking / handling actions
     # on files based on file type and state.
-
-    # In our case, root sourcef wil be: (/var/www/html/dl)
     # We recursively call scan_sourcefp on unvisited subdirs
+
+    # In our case, root sourcefp wil be: '/var/www/html/dl'
     def scan_sourcefp(self, sourcef):
         # If sourcef is not a dir, break flow of execution
         if not os.path.isdir(sourcef):
@@ -85,7 +85,7 @@ class ExtractionManager(object):
 
                 # Recursively scan this newly found subdir, whether in memory or not
                 # As we need to scan for new unvisited files AS WELL as re-scan
-                # old files in the 'visited_dirty' state to re-check
+                # old files in the 'visited_dirty' state to re-check state for update
                 self.scan_sourcefp(fp)
 
     # Utility function to check unvisited fp for rar files and extract them

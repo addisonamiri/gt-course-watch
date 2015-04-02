@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import fcntl
 import shelve
-import time
-import sys
 import pickle
 import traceback
 
