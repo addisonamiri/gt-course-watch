@@ -44,5 +44,5 @@ cd /gt-course-watch/torrent_webm_converter
 ./webm_conv QUALITY_ARGV SCANFP_ARGV
 
 # starting in background
-nohup python webm_conv QUALITY_ARGV SCANFP_ARGV &
+nohup ./webm_conv QUALITY_ARGV SCANFP_ARGV &
 ```
