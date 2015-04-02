@@ -126,7 +126,7 @@ class WebMConverter(object):
 
 
 def main():
-    shelf_name = "webm_prog"
+    shelf_name = "webm_prog.db"
     QUALITY = sys.argv[1] # 'hi_centos' or 'mid_gen'
     SOURCEFP = sys.argv[2]
 
