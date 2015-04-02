@@ -21,6 +21,7 @@ chooses.
 
 # Take as input a sourcefp to scan for video content
 # Video content defined: .mp4, .m4v, .mkv, .avi, .flv
+# REGEX NON-MATCHING GROUPS
 # The ?: in the beginning of the inner match group, makes it so that
 # group is a non-matching group, meaning its matches wont be returned.
 # It is solely used for grouping.
