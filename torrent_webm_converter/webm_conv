@@ -9,12 +9,14 @@ import shelve
 
 '''
 @author Vikram Somu
-@date 3/29/2015
+@date 4/1/2015
 
 DEPENDENCIES: 'ffmpeg' unix command line tool
 
 This is a script to convert all video files in a certain directory
-to webm. 
+to webm using ffmpeg. The progress gets saved to a python shelf on the 
+disk in real-time so that said progress can be manipulated however one 
+chooses. 
 '''
 
 # Take as input a sourcefp to scan for video content
@@ -26,7 +28,7 @@ to webm.
 
 class WebMConverter(object):
 
-    def __init__(self, shelfn, qual):
+    def __init__(self, shelfn, quality):
         self.midqual_generic_cmd = "ffmpeg -y -i {inputfp} -vcodec libvpx -acodec libvorbis {outputfp}"
         self.highqal_centos7_cmd = "ffmpeg -y -i {inputfp} -codec:v libvpx -quality good -cpu-used 0 -b:v 500k -qmin 10 -qmax 42 -maxrate 500k -bufsize 1000k -threads 4 -vf scale=-1:480 -codec:a libvorbis -b:a 128k {outputfp}"
 
@@ -39,8 +41,8 @@ class WebMConverter(object):
         # Extract entire video name if one of the formats matches
         self.video_re = "(.*\.(?:mp4|m4v|mkv|avi|flv))$"
 
-        self.quality = qual
-        self.translate_qality = {
+        self.quality = quality
+        self.translate_quality = {
             'mid_gen': self.midqual_generic_cmd,
             'hi_centos': self.highqal_centos7_cmd
         }
@@ -66,7 +68,7 @@ class WebMConverter(object):
 
     # Execute/Monitor a single ffmpeg subprocess to convert 1 video file.
     # We track real-time progress of said conversion using process 
-    # communication through stdout and update said progress in a shelf.
+    # communication through stdout and update said progress in a python shelf.
     def ffmpeg_proc_exec(self, fp):
         # Construct output file name from input file
         fp_fn = fp.split('/')[-1] # Name of video file
@@ -74,13 +76,13 @@ class WebMConverter(object):
         fp_fn = fp_fn.replace(' ', '\ ')
 
         outf = '.'.join(fp_fn.split('.')[:-1]) + '.webm' # Constructed output file name
-        containing_dir_fp = '/'.join(fp.split('/')[:-1]) # Name of containing directory for input/ouput
+        parent_dir_fp = '/'.join(fp.split('/')[:-1]) # Parent dir of input/ouput files
 
         # Assemble ffmpeg shell command
-        cmd_template = self.translate_qality[self.quality]
+        cmd_template = self.translate_quality[self.quality]
         cmd = cmd_template.format(
-            inputfp=containing_dir_fp + '/' + fp_fn, 
-            outputfp=containing_dir_fp + '/' + outf
+            inputfp=parent_dir_fp + '/' + fp_fn, 
+            outputfp=parent_dir_fp + '/' + outf
         )
 
         # ffmpeg directs progress info to stderr
@@ -94,7 +96,7 @@ class WebMConverter(object):
             # of only 1 by using child.stderr.read(1)
             # ffmpeg happens to output progress to stderr, but this works same for stdout
             out = child.stderr.read(1024)
-            if out == '' and child.poll() != None:
+            if out == '' and child.poll() != None: # program has finished
                 break
             if out != '':
                 if not duration_found:
@@ -119,6 +121,9 @@ class WebMConverter(object):
     vstr is the attribute to set the value dictionary, a nested dict
         i.e. shelf[k] -> value dictionary
     And v is the value to set for the key 'vstr' in the nested dict
+
+    This method opens and closes the shelf within it so that the update
+    gets synced to the file system. (For some reason Shelf.sync wouldn't work for me)
     '''
     def set_shelve_val(self, k, vstr, v):
         shelvef = shelve.open(self.shelvefnstr, flag='c')
@@ -137,7 +142,7 @@ class WebMConverter(object):
 def main():
     shelf_name = "webm_prog.db"
     QUALITY = sys.argv[1] # 'hi_centos' or 'mid_gen'
-    SOURCEFP = sys.argv[2]
+    SOURCEFP = sys.argv[2] # The sourcefp to scan
 
     w = WebMConverter(shelf_name, QUALITY)
     w.scan_sourcefp(SOURCEFP)

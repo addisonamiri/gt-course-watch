@@ -23,7 +23,7 @@ def dfh():
         stdout=subprocess.PIPE, 
         shell=True
     )
-    (out, err) = proc.communicate()
+    (out, err) = proc.communicate() # Communicate blocks
     outlines = out.split('\n')
     ret_html = "<html><body>{0}</body></html>".format(
         shellout_to_html(outlines)
@@ -57,7 +57,7 @@ def peekdl():
         )
         return jsonify(folder_mem_shelf)
     except Exception, e:
-        # print str(e)
+        print str(e)
         return "Error accessing folder_mem.db"
 
 # View webm conversion status
@@ -65,7 +65,6 @@ def peekdl():
 def peekwebm():
     try:
         webm_prog_fp = os.environ["WEBM_PROG_FP"]
-        print 'webm fp', webm_prog_fp
         webm_shelf = shelve.open(
             webm_prog_fp, 
             flag='r'
