@@ -81,7 +81,6 @@ class WebMConverter(object):
 
         # ffmpeg directs progress info to stderr
         child = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
-
         duration_found = False
 
         while True:
@@ -100,6 +99,7 @@ class WebMConverter(object):
                     if durationg:
                         durationd = durationg.groups()[0]
                         self.set_shelve_val(fp_fn, 'duration', durationd)
+                        duration_found = True
 
                 timeg = re.search(self.time_re, out) # time groups
                 if timeg:
@@ -110,7 +110,12 @@ class WebMConverter(object):
                 # sys.stdout.write(out)
                 # sys.stdout.flush()
 
-
+    '''
+    k is the key, the movie file title 
+    vstr is the attribute to set the value dictionary, a nested dict
+        i.e. shelf[k] -> value dictionary
+    And v is the value to set for the key 'vstr' in the nested dict
+    '''
     def set_shelve_val(self, k, vstr, v):
         shelvef = shelve.open(self.shelvefnstr, flag='c')
 
