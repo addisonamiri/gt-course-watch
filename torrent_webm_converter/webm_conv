@@ -47,11 +47,12 @@ class WebMConverter(object):
         # Extract entire video name if one of the formats matches
         self.video_re = "(.*\.(?:mp4|m4v|mkv|avi|flv))$"
 
-        self.quality = quality
         self.translate_quality = {
             'mid_gen': self.midqual_generic_cmd,
             'hi_centos': self.highqal_centos7_cmd
         }
+        
+        self.quality = quality
         self.shelvefnstr = shelfn
 
     # Loop through files in sourcefp directory looking for video content
@@ -76,47 +77,48 @@ class WebMConverter(object):
     # We track real-time progress of said conversion using process 
     # communication through stdout and update said progress in a python shelf.
     def ffmpeg_proc_exec(self, fp):
-        # Construct output file name from input file
-        fp_fn = fp.split('/')[-1] # Name of video file
+        # Grab inpput file name
+        inf = fp.split('/')[-1] # Name of video file
         # Replace regular spaces with escaped spaces
-        fp_fn = fp_fn.replace(' ', '\ ')
-
-        outf = '.'.join(fp_fn.split('.')[:-1]) + '.webm' # Constructed output file name
+        inf = inf.replace(' ', '\ ')
+        outf = '.'.join(inf.split('.')[:-1]) + '.webm' # Constructed output file name
         parent_dir_fp = '/'.join(fp.split('/')[:-1]) # Parent dir of input/ouput files
 
         # Assemble ffmpeg shell command
         cmd_template = self.translate_quality[self.quality]
         cmd = cmd_template.format(
-            inputfp=parent_dir_fp + '/' + fp_fn, 
+            inputfp=parent_dir_fp + '/' + inf, 
             outputfp=parent_dir_fp + '/' + outf
         )
 
         # ffmpeg directs progress info to stderr
         child = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
+        
         duration_found = False
+        program_terminated = False
 
-        while True:
+        while not program_terminated:
             # Lowering the buffer-size param to the read method makes the 
             # data come back faster since a smaller buffer size must be filled up
             # before read() can return. The most responsive is to have a buffer size 
             # of only 1 by using child.stderr.read(1)
             # ffmpeg happens to output progress to stderr, but this works same for stdout
             out = child.stderr.read(1024)
-            if out == '' and child.poll() != None: # program has finished
-                break
+            if out == '' and child.poll() != None:
+                program_terminated = True
             if out != '':
                 if not duration_found:
                     durationg = re.search(self.duration_re, out) # duration groups
 
                     if durationg:
                         durationd = durationg.groups()[0]
-                        self.set_shelve_val(fp_fn, 'duration', durationd)
+                        self.set_shelve_val(inf, 'duration', durationd)
                         duration_found = True
 
                 timeg = re.search(self.time_re, out) # time groups
                 if timeg:
                     timed = timeg.groups()[0]
-                    self.set_shelve_val(fp_fn, 'time_complete', timed)
+                    self.set_shelve_val(inf, 'time_complete', timed)
 
                 # To send stdout of child on to console that executed python:
                 # sys.stdout.write(out)
