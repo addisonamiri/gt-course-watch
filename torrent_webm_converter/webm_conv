@@ -6,6 +6,7 @@ import re
 import sys
 import os
 import shelve
+from datetime import datetime
 
 '''
 @author Vikram Somu
@@ -51,7 +52,7 @@ class WebMConverter(object):
             'mid_gen': self.midqual_generic_cmd,
             'hi_centos': self.highqal_centos7_cmd
         }
-        
+
         self.quality = quality
         self.shelvefnstr = shelfn
 
@@ -94,8 +95,12 @@ class WebMConverter(object):
         # ffmpeg directs progress info to stderr
         child = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
         
+        base_time = self.str_to_timeobj("00:00:00.00")
+        duration_delta = None
+
         duration_found = False
         program_terminated = False
+        durationv = None
 
         while not program_terminated:
             # Lowering the buffer-size param to the read method makes the 
@@ -111,14 +116,22 @@ class WebMConverter(object):
                     durationg = re.search(self.duration_re, out) # duration groups
 
                     if durationg:
-                        durationd = durationg.groups()[0]
-                        self.set_shelve_val(inf, 'duration', durationd)
+                        durationstr = durationg.groups()[0]
+                        self.set_shelve_val(inf, 'duration', durationstr)
+                        durationv = self.str_to_timeobj(durationstr)
+                        duration_delta = durationv - base_time
                         duration_found = True
 
                 timeg = re.search(self.time_re, out) # time groups
                 if timeg:
-                    timed = timeg.groups()[0]
-                    self.set_shelve_val(inf, 'time_complete', timed)
+                    timecompstr = timeg.groups()[0]
+                    self.set_shelve_val(inf, 'time_complete', timecompstr)
+                    
+                    timecompv = self.str_to_timeobj(timecompstr)
+                    timecomp_delta = timecompv - base_time
+                    progress_ratio = timecomp_delta.total_seconds() / duration_delta.total_seconds()
+                    progress_pct = progress_ratio * 100
+                    self.set_shelve_val(inf, "% progress", progress_pct)
 
                 # To send stdout of child on to console that executed python:
                 # sys.stdout.write(out)
@@ -144,7 +157,10 @@ class WebMConverter(object):
         curv[vstr] = v
         shelvef[k] = curv
 
-        shelvef.close()    
+        shelvef.close()
+
+    def str_to_timeobj(self, timestr):
+        return datetime.strptime(timestr, "%H:%M:%S.%f")
 
 
 def main():
