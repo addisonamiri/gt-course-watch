@@ -53,6 +53,10 @@ class WebMConverter(object):
         if not os.path.isdir(sourcefp):
             return
 
+        # If last char is a '/', exclude it
+        if sourcefp[-1] == '/':
+            sourcefp = sourcefp[:-1]
+
         for file in os.listdir(sourcefp):
             fp = sourcefp + '/' + file
             if re.match(self.video_re, fp):
