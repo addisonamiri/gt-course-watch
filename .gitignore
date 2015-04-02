@@ -37,5 +37,5 @@ ehthumbs.db
 Thumbs.db
 
 node_modules/
-webm_prog.db
-folder_mem.db
+torrent_webm_converter/webm_prog.db
+torrent_webm_converter/nohup.out
