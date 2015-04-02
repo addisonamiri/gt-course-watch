@@ -107,7 +107,6 @@ class WebMConverter(object):
                 # sys.stdout.write(out)
                 # sys.stdout.flush()
 
-        shelvef.close()
 
     def set_shelve_val(self, k, vstr, v):
         shelvef = shelve.open(self.shelvefnstr, flag='c')
