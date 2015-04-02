@@ -25,7 +25,6 @@
 *.log
 *.sql
 *.sqlite
-*.db # Python Shelf module files
 
 # OS generated files #
 ######################
@@ -38,3 +37,5 @@ ehthumbs.db
 Thumbs.db
 
 node_modules/
+webm_prog.db
+folder_mem.db
