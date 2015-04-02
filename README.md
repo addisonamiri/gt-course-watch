@@ -13,18 +13,6 @@ node app.js
 chmod +x start
 ./start
 ```
-
-### Using the WebM Converter
-```
-cd /gt-course-watch/torrent_webm_converter
-
-# starting in foreground
-./webm_conv QUALITY_ARGV SCANFP_ARGV
-
-# starting in background
-nohup python webm_conv QUALITY_ARGV SCANFP_ARGV &
-```
-
 Note: mongod must be running in both cases.
 
 ## Features
@@ -44,3 +32,17 @@ Since I decided to experiment with WebSockets and socket.io when I started this 
 - d3.js (Data Visualization Library)
 - socket.io (WebSocket Library)
 - Twitter Bootstrap
+
+
+## Media Hub
+
+### Using the WebM Converter
+```
+cd /gt-course-watch/torrent_webm_converter
+
+# starting in foreground
+./webm_conv QUALITY_ARGV SCANFP_ARGV
+
+# starting in background
+nohup python webm_conv QUALITY_ARGV SCANFP_ARGV &
+```
