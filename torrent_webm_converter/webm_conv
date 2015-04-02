@@ -13,19 +13,24 @@ import shelve
 
 DEPENDENCIES: 'ffmpeg' unix command line tool
 
+INPUT ARGV
+SOURCEFP: Take as input a sourcefp to scan for video content
+Video content defined: .mp4, .m4v, .mkv, .avi, .flv
+QUALITY:'mid_gen' or 'hi_centos' (might add more later)
+
 This is a script to convert all video files in a certain directory
 to webm using ffmpeg. The progress gets saved to a python shelf on the 
 disk in real-time so that said progress can be manipulated however one 
-chooses. 
+chooses. This is not a multi-threaded program because frankly there is no point...
+
+Used some good new Regex strategies in this script, such as NON-MATCHING GROUPS
+REGEX NON-MATCHING GROUPS
+The ?: in the beginning of the inner match group, makes it so that
+group is a non-matching group, meaning its matches wont be returned.
+It is solely used for grouping.
+re.match('(.*\.(?:mp4|m4v|mkv|avi|flv))$', 'haha.avi')
 '''
 
-# Take as input a sourcefp to scan for video content
-# Video content defined: .mp4, .m4v, .mkv, .avi, .flv
-# REGEX NON-MATCHING GROUPS
-# The ?: in the beginning of the inner match group, makes it so that
-# group is a non-matching group, meaning its matches wont be returned.
-# It is solely used for grouping.
-# re.match('(.*\.(?:mp4|m4v|mkv|avi|flv))$', 'haha.avi')
 
 class WebMConverter(object):
 
