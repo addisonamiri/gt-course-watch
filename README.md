@@ -14,6 +14,17 @@ chmod +x start
 ./start
 ```
 
+### Using the WebM Converter
+```
+cd /gt-course-watch/torrent_webm_converter
+
+# starting in foreground
+./webm_conv QUALITY_ARGV SCANFP_ARGV
+
+# starting in background
+nohup python webm_conv QUALITY_ARGV SCANFP_ARGV &
+```
+
 Note: mongod must be running in both cases.
 
 ## Features
