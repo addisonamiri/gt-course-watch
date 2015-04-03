@@ -97,10 +97,10 @@ class WebMConverter(object):
         
         base_time = self.str_to_timeobj("00:00:00.00")
         duration_delta = None
+        durationt = None
 
         duration_found = False
         program_terminated = False
-        durationt = None
 
         while not program_terminated:
             # Lowering the buffer-size param to the read method makes the 

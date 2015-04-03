@@ -38,6 +38,7 @@ Thumbs.db
 
 node_modules/
 torrent_webm_converter/webm_prog.db
+torrent_webm_converter/webm_prog.db.db
 torrent_webm_converter/nohup.out
 *.pyc
 nohup.out
