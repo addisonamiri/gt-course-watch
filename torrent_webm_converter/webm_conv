@@ -63,6 +63,7 @@ class WebMConverter(object):
         if not os.path.isdir(sourcefp):
             return
 
+        sourcefp = sourcefp.strip()
         # If last char is a '/', exclude it
         if sourcefp[-1] == '/':
             sourcefp = sourcefp[:-1]
@@ -78,9 +79,10 @@ class WebMConverter(object):
     # We track real-time progress of said conversion using process 
     # communication through stdout and update said progress in a python shelf.
     def ffmpeg_proc_exec(self, fp):
+        fp = fp.strip()
         # Grab inpput file name
         inf = fp.split('/')[-1] # Name of video file
-        # Replace regular spaces with escaped spaces
+        # Escape the spaces
         inf = inf.replace(' ', '\ ')
         outf = '.'.join(inf.split('.')[:-1]) + '.webm' # Constructed output file name
         parent_dir_fp = '/'.join(fp.split('/')[:-1]) # Parent dir of input/ouput files
@@ -95,9 +97,9 @@ class WebMConverter(object):
         # ffmpeg directs progress info to stderr
         child = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
         
-        base_time = self.str_to_timeobj("00:00:00.00")
+        basedt = self.str_to_dtobj("00:00:00.00")
+        durationdt = None
         duration_delta = None
-        durationt = None
 
         duration_found = False
         program_terminated = False
@@ -118,8 +120,8 @@ class WebMConverter(object):
                     if durationg:
                         durationstr = durationg.groups()[0]
                         self.set_shelve_val(inf, 'duration', durationstr)
-                        durationt = self.str_to_timeobj(durationstr)
-                        duration_delta = durationt - base_time
+                        durationdt = self.str_to_dtobj(durationstr)
+                        duration_delta = durationdt - basedt
                         duration_found = True
 
                 timeg = re.search(self.time_re, out) # time groups
@@ -127,8 +129,8 @@ class WebMConverter(object):
                     timecompstr = timeg.groups()[0]
                     self.set_shelve_val(inf, 'time_complete', timecompstr)
 
-                    timecompt = self.str_to_timeobj(timecompstr)
-                    timecomp_delta = timecompt - base_time
+                    timecompdt = self.str_to_dtobj(timecompstr)
+                    timecomp_delta = timecompdt - basedt
                     progress_ratio = timecomp_delta.total_seconds() / duration_delta.total_seconds()
                     progress_pct = progress_ratio * 100
                     self.set_shelve_val(inf, "% progress", progress_pct)
@@ -159,14 +161,14 @@ class WebMConverter(object):
 
         shelvef.close()
 
-    def str_to_timeobj(self, timestr):
+    def str_to_dtobj(self, timestr):
         return datetime.strptime(timestr, "%H:%M:%S.%f")
 
 
 def main():
     shelf_name = "webm_prog.db"
-    QUALITY = sys.argv[1] # 'hi_centos' or 'mid_gen'
-    SOURCEFP = sys.argv[2] # The sourcefp to scan
+    QUALITY = sys.argv[1].strip() # 'hi_centos' or 'mid_gen'
+    SOURCEFP = sys.argv[2].strip() # The sourcefp to scan
 
     w = WebMConverter(shelf_name, QUALITY)
     w.scan_sourcefp(SOURCEFP)
