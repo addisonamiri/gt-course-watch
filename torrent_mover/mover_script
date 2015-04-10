@@ -29,8 +29,8 @@ def move_file(scanf, destf, file):
 
 # Main func to run program
 def main():
-    SCANF = sys.argv[1]
-    DESTF = sys.argv[2]
+    SCANF = sys.argv[1].strip()
+    DESTF = sys.argv[2].strip()
     found_files = scan_for_torrents(SCANF)
 
     for file in found_files:

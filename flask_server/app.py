@@ -24,12 +24,12 @@ def dfh():
         shell=True
     )
     (out, err) = proc.communicate() # Communicate blocks
-    outlines = out.split('\n')
-    ret_html = "<html><body>{0}</body></html>".format(
-        shellout_to_html(outlines)
-    )    # Simple method just inserting BRs
+
+    return "<html><body>{0}</body></html>".format(
+        shellout_to_tblhtml(out)
+    )    
+    # Simple method just inserting BRs
     # out = out.replace('\n', '<br>')
-    return ret_html
 
 # Perform the Unix df -k command and send output as response
 @app.route("/dfk")
@@ -40,11 +40,10 @@ def dfk():
         shell=True
     )
     (out, err) = proc.communicate()
-    outlines = out.split('\n')
-    ret_html = "<html><body>{0}</body></html>".format(
-        shellout_to_html(outlines)
+    
+    return "<html><body>{0}</body></html>".format(
+        shellout_to_tblhtml(out)
     )
-    return ret_html
 
 # View download history
 @app.route("/peekdl")
@@ -77,7 +76,8 @@ def peekwebm():
 # Transform output of multiple lines seperated by '\n' char
 # and multiple data cells on each line seperated by ' ' char
 # into an html table.
-def shellout_to_html(outlines):
+def shellout_to_tblhtml(shellout):
+    outlines = shellout.split('\n')
     ret_html = ''
 
     header_contents = ''

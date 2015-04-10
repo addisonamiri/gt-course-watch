@@ -164,7 +164,7 @@ class ExtractionManager(object):
 
 def main():
     shelf_name = 'folder_mem.db'
-    root_sourcefp = sys.argv[1]
+    root_sourcefp = sys.argv[1].strip()
     em = ExtractionManager(shelf_name, True)
     em.scan_sourcefp(root_sourcefp)
 
